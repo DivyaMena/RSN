@@ -719,6 +719,22 @@ async def get_batch_tutors(batch_id: str, request: Request):
     
     return result
 
+@api_router.get("/batches/{batch_id}/students")
+async def get_batch_students(batch_id: str, request: Request):
+    """Get students in a batch (tutor, coordinator, admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["tutor", "coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    batch = await db.batches.find_one({"id": batch_id}, {"_id": 0})
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    
+    # Get student details
+    students = await db.students.find({"id": {"$in": batch["student_ids"]}}, {"_id": 0}).to_list(None)
+    return students
+
 # ============= LOG BOARD ROUTES =============
 
 @api_router.post("/logboard", response_model=LogBoardEntry)
