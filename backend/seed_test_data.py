@@ -124,33 +124,111 @@ async def seed_test_data():
     print("\n📚 Creating tutor profiles...")
     tutors_data = []
     
-    # Tutor 1: Mathematics & Physics for classes 9-10
+    # Tutor 1: Mathematics & Physics for classes 9-10 (APPROVED)
     tutor1_profile = {
         "id": "tutor-profile-001",
         "user_id": "tutor-test-001",
         "tutor_code": "RSN-TS-T-00001",
-        "state": "TS",
+        "aadhaar_number": "123456789012",
+        "board_preference": "TS",
+        "current_address": "Hyderabad, Telangana",
+        "pincode": "500001",
         "classes_can_teach": [9, 10],
         "subjects_can_teach": ["MAT", "PHY"],
         "available_days": ["Monday", "Wednesday", "Friday"],
+        "status": "active",
+        "approval_status": "approved",
+        "availability_status": "available",
         "registration_timestamp": datetime.now(timezone.utc).isoformat(),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     tutors_data.append(tutor1_profile)
     
-    # Tutor 2: Science & Biology for classes 8-9
+    # Tutor 2: Science & Biology for classes 8-9 (APPROVED)
     tutor2_profile = {
         "id": "tutor-profile-002",
         "user_id": "tutor-test-002",
         "tutor_code": "RSN-TS-T-00002",
-        "state": "TS",
+        "aadhaar_number": "987654321098",
+        "board_preference": "TS",
+        "current_address": "Warangal, Telangana",
+        "pincode": "506001",
         "classes_can_teach": [8, 9],
         "subjects_can_teach": ["SCI", "BIO", "ENG"],
         "available_days": ["Tuesday", "Thursday", "Saturday"],
+        "status": "active",
+        "approval_status": "approved",
+        "availability_status": "available",
         "registration_timestamp": datetime.now(timezone.utc).isoformat(),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     tutors_data.append(tutor2_profile)
+    
+    print("\n🆕 Creating pending tutors for approval testing...")
+    
+    # Create 2 additional users for pending tutors
+    pending_tutor1_user = {
+        "id": "tutor-pending-001",
+        "email": "pending1@test.com",
+        "name": "Ravi Teja (Pending Tutor)",
+        "picture": "https://via.placeholder.com/150",
+        "role": "tutor",
+        "state": "TS",
+        "user_code": "RSN-TS-T-00003",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    pending_tutor2_user = {
+        "id": "tutor-pending-002",
+        "email": "pending2@test.com",
+        "name": "Sneha Reddy (Pending Tutor)",
+        "picture": "https://via.placeholder.com/150",
+        "role": "tutor",
+        "state": "AP",
+        "user_code": "RSN-AP-T-00001",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_many([pending_tutor1_user, pending_tutor2_user])
+    print("✅ Created pending tutor users")
+    
+    # Pending Tutor 1: English for classes 6-8 (PENDING APPROVAL)
+    pending_tutor1_profile = {
+        "id": "tutor-profile-003",
+        "user_id": "tutor-pending-001",
+        "tutor_code": "RSN-TS-T-00003",
+        "aadhaar_number": "111222333444",
+        "board_preference": "TS",
+        "current_address": "Karimnagar, Telangana",
+        "pincode": "505001",
+        "classes_can_teach": [6, 7, 8],
+        "subjects_can_teach": ["ENG"],
+        "available_days": ["Monday", "Tuesday", "Friday"],
+        "status": "pending",
+        "approval_status": "pending",
+        "availability_status": "available",
+        "registration_timestamp": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    tutors_data.append(pending_tutor1_profile)
+    
+    # Pending Tutor 2: All subjects for classes 9-10 (PENDING APPROVAL)
+    pending_tutor2_profile = {
+        "id": "tutor-profile-004",
+        "user_id": "tutor-pending-002",
+        "tutor_code": "RSN-AP-T-00001",
+        "aadhaar_number": "555666777888",
+        "board_preference": "AP",
+        "current_address": "Vijayawada, Andhra Pradesh",
+        "pincode": "520001",
+        "classes_can_teach": [9, 10],
+        "subjects_can_teach": ["MAT", "PHY", "SCI", "BIO", "ENG"],
+        "available_days": ["Wednesday", "Thursday", "Saturday", "Sunday"],
+        "status": "pending",
+        "approval_status": "pending",
+        "availability_status": "available",
+        "registration_timestamp": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    tutors_data.append(pending_tutor2_profile)
     
     await db.tutors.insert_many(tutors_data)
     print(f"✅ Created {len(tutors_data)} tutor profiles")
