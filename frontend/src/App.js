@@ -92,6 +92,7 @@ function App() {
   const logout = async () => {
     try {
       await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+      localStorage.removeItem('test_session_token');
       setUser(null);
       setSessionToken(null);
       window.location.href = '/';
