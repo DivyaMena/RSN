@@ -25,6 +25,11 @@ export default function TutorDashboard({ user, logout }) {
   const [batches, setBatches] = useState([]);
   const [batchTutors, setBatchTutors] = useState({});
   const [loading, setLoading] = useState(true);
+  const [tutorProfile, setTutorProfile] = useState(null);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('available');
+  const [unavailableFrom, setUnavailableFrom] = useState('');
+  const [unavailableTo, setUnavailableTo] = useState('');
 
   useEffect(() => {
     fetchData();
