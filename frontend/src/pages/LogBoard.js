@@ -70,6 +70,34 @@ export default function LogBoard({ user, logout }) {
         );
         setCurriculum(currRes.data);
       }
+
+      // Fetch students if tutor/coordinator
+      if (user.role === 'tutor' || user.role === 'coordinator' || user.role === 'admin') {
+        try {
+          const studentsRes = await axios.get(`${API}/batches/${batchId}/students`, { withCredentials: true });
+          setStudents(studentsRes.data);
+        } catch (error) {
+          console.log('Could not fetch students');
+        }
+      }
+
+      // Fetch tutors
+      try {
+        const tutorsRes = await axios.get(`${API}/batches/${batchId}/tutors`, { withCredentials: true });
+        setTutors(tutorsRes.data);
+      } catch (error) {
+        console.log('Could not fetch tutors');
+      }
+
+      // Get my tutor ID if I'm a tutor
+      if (user.role === 'tutor') {
+        try {
+          const myTutorRes = await axios.get(`${API}/tutors/me`, { withCredentials: true });
+          setMyTutorId(myTutorRes.data.id);
+        } catch (error) {
+          console.log('Could not fetch tutor profile');
+        }
+      }
     } catch (error) {
       toast.error('Failed to fetch data');
     } finally {
