@@ -394,7 +394,7 @@ async def check_and_create_batch(student: Student, subject: str):
         academic_year = f"{current_year}-{str(current_year + 1)[-2:]}"
         
         batch = Batch(
-            batch_code=generate_batch_code(student.board, academic_year, student.class_level, subject),
+            batch_code=await generate_batch_code(student.board, academic_year, student.class_level, subject),
             state=student.board,
             academic_year=academic_year,
             class_level=student.class_level,
