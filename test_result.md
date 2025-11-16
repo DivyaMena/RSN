@@ -101,3 +101,196 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Rising Stars Nation - A non-profit free online tuition platform with multi-user roles (Parents, Students, Tutors, Coordinators).
+  Current phase: Testing newly rewritten Coordinator Dashboard and implementing pending features including:
+  1. Tutor approval/rejection functionality in Coordinator Dashboard
+  2. View Students feature for batches
+  3. Tutor status management in Tutor Dashboard (Available/Unavailable/Delete Account)
+  4. Notification system (both email and in-app) for class intimations
+
+backend:
+  - task: "Tutor approval endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint exists at PUT /api/tutors/{tutor_id}/approve - needs testing to verify functionality"
+
+  - task: "Tutor rejection endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint exists at PUT /api/tutors/{tutor_id}/reject - needs testing to verify functionality and reason parameter handling"
+
+  - task: "Get pending tutors endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint exists at GET /api/tutors/pending - needs testing to verify it returns tutors with approval_status='pending'"
+
+  - task: "Get batch students endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint exists at GET /api/batches/{batch_id}/students - needs testing to verify it returns student list for a batch"
+
+  - task: "Update tutor status endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint exists at PUT /api/tutors/{tutor_id}/status - needs testing for status updates and unavailability date handling"
+
+  - task: "Notification system backend"
+    implemented: false
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Not yet implemented - need to add notification endpoints for both email and in-app notifications"
+
+frontend:
+  - task: "Coordinator Dashboard - Tutor approval UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/CoordinatorDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "UI implemented with approve/reject buttons and dialog. Need to test if it loads correctly and API calls work"
+
+  - task: "Coordinator Dashboard - Batch grouping by class"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/CoordinatorDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Batches are grouped by class_level. Need to test if grouping displays correctly"
+
+  - task: "Coordinator Dashboard - View Students feature"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/CoordinatorDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "View Students button exists with API call to fetch students and display in dialog. Need to verify functionality"
+
+  - task: "Tutor Dashboard - Status management UI"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/pages/TutorDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Not yet implemented - need to add UI for tutors to set Available/Unavailable/Delete Account status with date pickers for unavailability"
+
+  - task: "Tutor Registration - React rendering error fix"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/RegisterTutor.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "User reported 'Objects are not valid as a React child' error during submission. Need to verify if this is fixed"
+
+  - task: "Notification system frontend"
+    implemented: false
+    working: "NA"
+    file: "To be created"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Not yet implemented - need to add notification UI component for displaying both email and in-app notifications"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Backend: Test all tutor approval/rejection/status endpoints"
+    - "Backend: Test batch students endpoint"
+    - "Frontend: Verify Coordinator Dashboard loads and displays correctly"
+    - "Frontend: Test tutor approval/rejection flow"
+    - "Frontend: Test batch grouping and view students"
+    - "Frontend: Verify Tutor Registration for React rendering errors"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Initial test data setup complete. The Coordinator Dashboard has been completely rewritten with new features.
+      
+      Testing priorities:
+      1. BACKEND FIRST: Verify all tutor management endpoints (approve, reject, get pending, update status)
+      2. BACKEND: Verify batch students endpoint
+      3. FRONTEND: Test if Coordinator Dashboard loads without errors
+      4. FRONTEND: Test the complete tutor approval/rejection workflow
+      5. FRONTEND: Test batch grouping and view students functionality
+      
+      After backend testing passes, will implement:
+      - Tutor status management UI in Tutor Dashboard
+      - Notification system (both backend and frontend) using email service integration
+      
+      Please test using the test data from seed_test_data.py which includes:
+      - Multiple test users for each role
+      - Pre-seeded batches and students
+      - Pending tutors for approval testing
