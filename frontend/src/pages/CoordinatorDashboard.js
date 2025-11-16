@@ -61,6 +61,18 @@ export default function CoordinatorDashboard({ user, logout }) {
       setBatches(batchesRes.data);
       setTutors(tutorsRes.data);
       setPendingTutors(pendingRes.data);
+      
+      // Fetch assignments for each batch
+      const assignments = {};
+      for (const batch of batchesRes.data) {
+        try {
+          const res = await axios.get(`${API}/batches/${batch.id}/tutors`, { withCredentials: true });
+          assignments[batch.id] = res.data;
+        } catch (error) {
+          assignments[batch.id] = [];
+        }
+      }
+      setBatchAssignments(assignments);
     } catch (error) {
       toast.error('Failed to fetch data');
     } finally {
