@@ -639,6 +639,205 @@ export default function CoordinatorDashboard({ user, logout }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Tutor Details View Dialog */}
+      <Dialog open={tutorDetailsDialogOpen} onOpenChange={setTutorDetailsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tutor Details</DialogTitle>
+            <DialogDescription>Complete information about the tutor</DialogDescription>
+          </DialogHeader>
+          {selectedTutorDetails && (
+            <div className="space-y-4">
+              {/* User & Profile Info */}
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6">
+                <div className="flex items-start space-x-6">
+                  {selectedTutorDetails.tutor?.photo_url && (
+                    <img 
+                      src={selectedTutorDetails.tutor.photo_url} 
+                      alt="Tutor" 
+                      className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-lg"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900">{selectedTutorDetails.user?.name}</h3>
+                    <p className="text-gray-600">{selectedTutorDetails.user?.email}</p>
+                    <p className="text-sm text-gray-600 mt-2"><strong>Code:</strong> {selectedTutorDetails.tutor?.tutor_code}</p>
+                    <div className="mt-3">
+                      <span className={`px-4 py-1 rounded-full text-sm font-medium ${
+                        selectedTutorDetails.tutor?.status === 'active' ? 'bg-green-100 text-green-800' :
+                        selectedTutorDetails.tutor?.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
+                        selectedTutorDetails.tutor?.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedTutorDetails.tutor?.status?.toUpperCase() || 'ACTIVE'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact & Address */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white border rounded-lg p-4">
+                  <h4 className="font-bold text-gray-900 mb-3">Contact Information</h4>
+                  <p className="text-sm text-gray-700"><strong>Email:</strong> {selectedTutorDetails.user?.email}</p>
+                  <p className="text-sm text-gray-700 mt-2"><strong>Address:</strong> {selectedTutorDetails.tutor?.current_address || 'Not provided'}</p>
+                  <p className="text-sm text-gray-700"><strong>Pincode:</strong> {selectedTutorDetails.tutor?.pincode || 'Not provided'}</p>
+                </div>
+
+                <div className="bg-white border rounded-lg p-4">
+                  <h4 className="font-bold text-gray-900 mb-3">Teaching Preferences</h4>
+                  <p className="text-sm text-gray-700"><strong>Board:</strong> {selectedTutorDetails.tutor?.board_preference}</p>
+                  <p className="text-sm text-gray-700 mt-2"><strong>Classes:</strong> {selectedTutorDetails.tutor?.classes_can_teach?.join(', ')}</p>
+                  <p className="text-sm text-gray-700 mt-2"><strong>Subjects:</strong> {selectedTutorDetails.tutor?.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}</p>
+                  <p className="text-sm text-gray-700 mt-2"><strong>Days:</strong> {selectedTutorDetails.tutor?.available_days?.join(', ')}</p>
+                </div>
+              </div>
+
+              {/* KYC Documents */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-bold text-gray-900 mb-3">KYC Documents</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar:</p>
+                    {selectedTutorDetails.tutor?.aadhaar_number ? (
+                      <>
+                        <p className="text-sm text-gray-700 mb-2">{selectedTutorDetails.tutor.aadhaar_number}</p>
+                        {selectedTutorDetails.tutor?.aadhaar_page1_url && (
+                          <a 
+                            href={selectedTutorDetails.tutor.aadhaar_page1_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm"
+                          >
+                            📄 View Document
+                          </a>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-500">Not provided</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Availability Status:</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                      selectedTutorDetails.tutor?.availability_status === 'available' ? 'bg-green-100 text-green-800' :
+                      selectedTutorDetails.tutor?.availability_status === 'unavailable' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {selectedTutorDetails.tutor?.availability_status?.toUpperCase() || 'AVAILABLE'}
+                    </span>
+                    {selectedTutorDetails.tutor?.unavailable_from && (
+                      <p className="text-xs text-gray-600 mt-2">
+                        Unavailable: {selectedTutorDetails.tutor.unavailable_from} to {selectedTutorDetails.tutor.unavailable_to}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => {
+                    setTutorDetailsDialogOpen(false);
+                    handleChangeStatus(selectedTutorDetails);
+                  }}
+                  className="flex-1"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Change Status
+                </Button>
+                <Button
+                  onClick={() => setTutorDetailsDialogOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Status Change Dialog */}
+      <Dialog open={statusChangeDialogOpen} onOpenChange={setStatusChangeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Tutor Status</DialogTitle>
+            <DialogDescription>
+              Update the status of {selectedTutorDetails?.user?.name}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedTutorDetails && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Current Status:</p>
+                <p className="font-bold text-lg capitalize">{selectedTutorDetails.tutor?.status || 'active'}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">New Status:</label>
+                <Select value={newTutorStatus} onValueChange={setNewTutorStatus}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">
+                      <div className="flex items-center">
+                        <UserCheck className="h-4 w-4 mr-2 text-green-600" />
+                        Active
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="suspended">
+                      <div className="flex items-center">
+                        <Ban className="h-4 w-4 mr-2 text-yellow-600" />
+                        Suspended
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="blacklisted">
+                      <div className="flex items-center">
+                        <XCircle className="h-4 w-4 mr-2 text-red-600" />
+                        Blacklisted
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="unavailable">
+                      <div className="flex items-center">
+                        <UserX className="h-4 w-4 mr-2 text-gray-600" />
+                        Unavailable
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ <strong>Note:</strong> Changing status will affect the tutor's ability to teach and be assigned to batches.
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => handleUpdateTutorStatus(selectedTutorDetails.tutor.id, newTutorStatus)}
+                  className="flex-1"
+                >
+                  Update Status
+                </Button>
+                <Button
+                  onClick={() => setStatusChangeDialogOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
