@@ -236,7 +236,6 @@ export default function ParentDashboard({ user, logout }) {
                 </form>
               </DialogContent>
             </Dialog>
-          )}
         </div>
 
         {students.length === 0 ? (
