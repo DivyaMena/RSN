@@ -502,15 +502,19 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     
     user_code = generate_user_code(input.state, "tutor")
     
-    # Create tutor profile
+    # Create tutor profile (pending approval)
     tutor = Tutor(
         user_id=user.id,
         tutor_code=user_code,
         aadhaar_number=input.aadhaar_number,
-        state=input.state,
+        board_preference=input.board_preference,
+        current_address=input.current_address,
+        pincode=input.pincode,
         classes_can_teach=input.classes_can_teach,
         subjects_can_teach=input.subjects_can_teach,
-        available_days=input.available_days
+        available_days=input.available_days,
+        status="pending",
+        approval_status="pending"
     )
     
     tutor_doc = tutor.model_dump()
