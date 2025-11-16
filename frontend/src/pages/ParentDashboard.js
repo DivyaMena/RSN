@@ -256,20 +256,34 @@ export default function ParentDashboard({ user, logout }) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Select Subjects</label>
-                    <div className="space-y-2">
-                      {SUBJECTS_ARRAY.map(subject => (
-                        <div key={subject.value} className="flex items-center space-x-2">
-                          <Checkbox
-                            data-testid={`form-subject-${subject.value}-checkbox`}
-                            id={`form-subject-${subject.value}`}
-                            checked={formData.subjects.includes(subject.value)}
-                            onCheckedChange={() => toggleSubject(subject.value)}
-                          />
-                          <label htmlFor={`form-subject-${subject.value}`} className="text-sm cursor-pointer">{subject.label}</label>
-                        </div>
-                      ))}
-                    </div>
+                    <label className="block text-sm font-medium mb-2">Select Subjects *</label>
+                    {!formData.class_level ? (
+                      <p className="text-sm text-gray-500">Please select a class first</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {SUBJECTS_ARRAY.filter(subject => {
+                          // Classes 6 & 7: No PHY, BIO
+                          if ([6, 7].includes(formData.class_level) && ['PHY', 'BIO'].includes(subject.value)) {
+                            return false;
+                          }
+                          // Classes 8, 9, 10: No SCI
+                          if ([8, 9, 10].includes(formData.class_level) && subject.value === 'SCI') {
+                            return false;
+                          }
+                          return true;
+                        }).map(subject => (
+                          <div key={subject.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              data-testid={`form-subject-${subject.value}-checkbox`}
+                              id={`form-subject-${subject.value}`}
+                              checked={formData.subjects.includes(subject.value)}
+                              onCheckedChange={() => toggleSubject(subject.value)}
+                            />
+                            <label htmlFor={`form-subject-${subject.value}`} className="text-sm cursor-pointer">{subject.label}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <Button data-testid="submit-student-btn" type="submit" className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white">
