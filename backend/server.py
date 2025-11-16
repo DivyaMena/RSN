@@ -180,7 +180,9 @@ class RegisterParentInput(BaseModel):
 
 class RegisterTutorInput(BaseModel):
     aadhaar_number: str
-    state: str
+    board_preference: str  # Which board curriculum they want to teach
+    current_address: str
+    pincode: str
     classes_can_teach: List[int]
     subjects_can_teach: List[str]
     available_days: List[str]
