@@ -50,6 +50,7 @@ class Student(BaseModel):
     parent_id: str
     name: str
     student_code: str  # RSN-TS-S-2025-12345
+    aadhaar_number: str  # 12-digit Aadhaar
     class_level: int  # 6-10
     board: str  # TS, AP, TN
     school_name: str
@@ -57,6 +58,7 @@ class Student(BaseModel):
     roll_no: str
     subjects: List[str]  # ["MAT", "PHY", "SCI", "BIO", "ENG"]
     enrollment_year: int
+    user_id: Optional[str] = None  # Linked user account for student login
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Tutor(BaseModel):
