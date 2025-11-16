@@ -18,6 +18,15 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Set up axios interceptor for test tokens
+axios.interceptors.request.use((config) => {
+  const testToken = localStorage.getItem('test_session_token');
+  if (testToken && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${testToken}`;
+  }
+  return config;
+});
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
