@@ -458,7 +458,54 @@ export default function CoordinatorDashboard({ user, logout }) {
             </div>
           )}
         </div>
-      </main>
+      </TabsContent>
+
+      {/* Pending Tutors Tab */}
+      <TabsContent value="pending">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Pending Tutor Approvals</h2>
+          {pendingTutors.length === 0 ? (
+            <div className="text-center py-20">
+              <UserCheck className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No pending approvals</h3>
+              <p className="text-gray-600">All tutor applications have been reviewed</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pendingTutors.map(tutorData => (
+                <div key={tutorData.tutor.id} className="border rounded-lg p-6 hover:bg-gray-50">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
+                      <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        <strong>Board:</strong> {tutorData.tutor.board_preference} | 
+                        <strong className="ml-2">Classes:</strong> {tutorData.tutor.classes_can_teach?.join(', ')} | 
+                        <strong className="ml-2">Subjects:</strong> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
+                      </p>
+                      <p className="text-sm text-gray-600"><strong>Available Days:</strong> {tutorData.tutor.available_days?.join(', ')}</p>
+                      <p className="text-sm text-gray-600 mt-1"><strong>Address:</strong> {tutorData.tutor.current_address || 'Not provided'}</p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setCurrentTutor(tutorData);
+                        setTutorApprovalDialogOpen(true);
+                      }}
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Review Application
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </TabsContent>
+    </Tabs>
+  </main>
 
       {/* Assign Tutor Dialog */}
       <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
