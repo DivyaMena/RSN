@@ -86,6 +86,7 @@ export default function ParentDashboard({ user, logout }) {
       setDialogOpen(false);
       setFormData({
         name: '',
+        student_photo: null,
         aadhaar_page1: null,
         aadhaar_page2: null,
         aadhaar_number: '000000000000',
