@@ -62,7 +62,7 @@ export default function Landing() {
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>For Students</h3>
             <p className="text-gray-600 leading-relaxed">
-              Access quality education in Mathematics, Science, Physics, Biology, and English. Learn from dedicated volunteer tutors in small batches of 25 students.
+              Get extra help in Mathematics, Science, Physics, Biology, and English. Small batches of 25 students ensure you get the attention you need from dedicated volunteer tutors.
             </p>
           </div>
 
