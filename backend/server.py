@@ -71,6 +71,7 @@ class Tutor(BaseModel):
     aadhaar_number: str  # 12-digit Aadhaar for KYC (or file path)
     aadhaar_page1_url: Optional[str] = None  # Aadhaar card page 1 upload
     aadhaar_page2_url: Optional[str] = None  # Aadhaar card page 2 upload (optional)
+    photo_url: Optional[str] = None  # Tutor photo/selfie
     board_preference: str  # Which board they want to teach (TS, AP, TN)
     current_address: Optional[str] = None
     pincode: Optional[str] = None
