@@ -18,8 +18,8 @@ export default function RegisterCoordinator({ setUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!state) {
-      toast.error('Please select a state');
+    if (!state || !photo) {
+      toast.error('Please select a state and upload your photo');
       return;
     }
 
