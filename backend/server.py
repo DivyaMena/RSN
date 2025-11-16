@@ -66,6 +66,7 @@ class Tutor(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     tutor_code: str  # RSN-TS-T-12345
+    aadhaar_number: str  # 12-digit Aadhaar for KYC
     state: str  # TS, AP, TN
     classes_can_teach: List[int]  # [6,7,8,9,10]
     subjects_can_teach: List[str]  # ["MAT", "PHY", "SCI", "BIO", "ENG"]
