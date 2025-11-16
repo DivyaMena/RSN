@@ -37,10 +37,10 @@ export default function Landing() {
             <span>Free Education for Underprivileged Students</span>
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 bg-clip-text text-transparent leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Empowering Dreams Through Education
+            Free Online Tuition For Students Who Need Extra Support
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Join our community of volunteer tutors and students. Together, we're building a brighter future through free online tuition for classes 6-10.
+            Helping students who struggle to understand subjects, can't speak up in crowded classrooms, or attend schools with teacher shortages. Free online tuition for classes 6-10 by volunteer tutors.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button data-testid="get-started-btn" onClick={handleLogin} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
