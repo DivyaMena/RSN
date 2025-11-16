@@ -970,6 +970,47 @@ async def update_tutor_status(tutor_id: str, status: str, request: Request):
     
     return {"success": True, "message": f"Tutor status updated to {status}"}
 
+class TutorAvailabilityUpdate(BaseModel):
+    availability_status: str
+    unavailable_from: Optional[str] = None
+    unavailable_to: Optional[str] = None
+
+@api_router.put("/tutors/{tutor_id}/availability")
+async def update_tutor_availability(tutor_id: str, update_data: TutorAvailabilityUpdate, request: Request):
+    """Update tutor availability status (tutor can update their own)"""
+    user = await require_auth(request)
+    
+    # Check if user is updating their own profile or is coordinator/admin
+    tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0})
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor not found")
+    
+    if tutor["user_id"] != user.id and user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="You can only update your own availability")
+    
+    valid_statuses = ["available", "unavailable", "not_interested"]
+    if update_data.availability_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    update_fields = {"availability_status": update_data.availability_status}
+    
+    if update_data.availability_status == "unavailable":
+        if not update_data.unavailable_from or not update_data.unavailable_to:
+            raise HTTPException(status_code=400, detail="Unavailability dates are required")
+        update_fields["unavailable_from"] = update_data.unavailable_from
+        update_fields["unavailable_to"] = update_data.unavailable_to
+    else:
+        # Clear unavailability dates if status is not unavailable
+        update_fields["unavailable_from"] = None
+        update_fields["unavailable_to"] = None
+    
+    await db.tutors.update_one(
+        {"id": tutor_id},
+        {"$set": update_fields}
+    )
+    
+    return {"success": True, "message": "Availability updated successfully"}
+
 @api_router.get("/tutors/pending")
 async def get_pending_tutors(request: Request):
     """Get pending tutor registrations (coordinator/admin only)"""
