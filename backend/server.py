@@ -680,7 +680,7 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
         raise HTTPException(status_code=403, detail="Only coordinators/admins can create batches")
     
     batch = Batch(
-        batch_code=generate_batch_code(input.state, input.academic_year, input.class_level, input.subject),
+        batch_code=await generate_batch_code(input.state, input.academic_year, input.class_level, input.subject),
         state=input.state,
         academic_year=input.academic_year,
         class_level=input.class_level,
