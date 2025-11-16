@@ -545,16 +545,61 @@ export default function CoordinatorDashboard({ user, logout }) {
           </DialogHeader>
           {currentTutor && (
             <div className="space-y-4">
+              {/* Basic Info */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-bold text-gray-900 text-lg">{currentTutor.user?.name}</h3>
                 <p className="text-sm text-gray-600">{currentTutor.user?.email}</p>
                 <p className="text-sm text-gray-600 mt-2"><strong>Tutor Code:</strong> {currentTutor.tutor?.tutor_code}</p>
                 <p className="text-sm text-gray-600"><strong>Board Preference:</strong> {currentTutor.tutor?.board_preference}</p>
-                <p className="text-sm text-gray-600"><strong>Address:</strong> {currentTutor.tutor?.current_address}</p>
-                <p className="text-sm text-gray-600"><strong>Pincode:</strong> {currentTutor.tutor?.pincode}</p>
-                <p className="text-sm text-gray-600 mt-2"><strong>Classes:</strong> {currentTutor.tutor?.classes_can_teach.join(', ')}</p>
-                <p className="text-sm text-gray-600"><strong>Subjects:</strong> {currentTutor.tutor?.subjects_can_teach.map(s => SUBJECTS[s]).join(', ')}</p>
-                <p className="text-sm text-gray-600"><strong>Available Days:</strong> {currentTutor.tutor?.available_days.join(', ')}</p>
+                <p className="text-sm text-gray-600"><strong>Address:</strong> {currentTutor.tutor?.current_address || 'Not provided'}</p>
+                <p className="text-sm text-gray-600"><strong>Pincode:</strong> {currentTutor.tutor?.pincode || 'Not provided'}</p>
+                <p className="text-sm text-gray-600 mt-2"><strong>Classes:</strong> {currentTutor.tutor?.classes_can_teach?.join(', ')}</p>
+                <p className="text-sm text-gray-600"><strong>Subjects:</strong> {currentTutor.tutor?.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}</p>
+                <p className="text-sm text-gray-600"><strong>Available Days:</strong> {currentTutor.tutor?.available_days?.join(', ')}</p>
+              </div>
+
+              {/* KYC Documents */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-bold text-gray-900 mb-3">KYC Documents</h4>
+                
+                {/* Tutor Photo */}
+                {currentTutor.tutor?.photo_url ? (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Tutor Photo:</p>
+                    <img 
+                      src={currentTutor.tutor.photo_url} 
+                      alt="Tutor" 
+                      className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 mb-4">📷 Photo: Not uploaded</p>
+                )}
+
+                {/* Aadhaar */}
+                {currentTutor.tutor?.aadhaar_number && (
+                  <p className="text-sm text-gray-700 mb-2">
+                    <strong>Aadhaar Number:</strong> {currentTutor.tutor.aadhaar_number}
+                  </p>
+                )}
+                
+                {currentTutor.tutor?.aadhaar_page1_url && (
+                  <div className="mb-2">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar Document:</p>
+                    <a 
+                      href={currentTutor.tutor.aadhaar_page1_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      📄 View Aadhaar Document
+                    </a>
+                  </div>
+                )}
+                
+                {!currentTutor.tutor?.aadhaar_number && !currentTutor.tutor?.aadhaar_page1_url && (
+                  <p className="text-sm text-gray-600">📝 Aadhaar: Not provided</p>
+                )}
               </div>
 
               <div className="flex space-x-3">
