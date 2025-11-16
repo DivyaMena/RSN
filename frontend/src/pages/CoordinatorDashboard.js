@@ -143,10 +143,22 @@ export default function CoordinatorDashboard({ user, logout }) {
     try {
       await axios.put(`${API}/tutors/${tutorId}/status?status=${status}`, {}, { withCredentials: true });
       toast.success(`Tutor status updated to ${status}`);
+      setStatusChangeDialogOpen(false);
       fetchData();
     } catch (error) {
       toast.error('Failed to update status');
     }
+  };
+
+  const handleViewTutorDetails = (tutorData) => {
+    setSelectedTutorDetails(tutorData);
+    setTutorDetailsDialogOpen(true);
+  };
+
+  const handleChangeStatus = (tutorData) => {
+    setSelectedTutorDetails(tutorData);
+    setNewTutorStatus(tutorData.tutor.status || 'active');
+    setStatusChangeDialogOpen(true);
   };
 
   // Group batches by class
