@@ -160,6 +160,18 @@ export default function RegisterTutor({ setUser }) {
             <p className="text-xs text-gray-500 mt-1">This helps coordinators understand your background</p>
           </div>
 
+          {/* Photo Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Photo/Selfie *</label>
+            <Input
+              data-testid="tutor-photo-input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFormData({ ...formData, tutor_photo: e.target.files[0] })}
+            />
+            <p className="text-xs text-gray-500 mt-1">Recent photo for profile</p>
+          </div>
+
           {/* Aadhaar Upload */}
           <div className="border border-blue-200 bg-blue-50 rounded-lg p-4">
             <p className="text-sm font-medium text-blue-900 mb-3">
