@@ -39,6 +39,11 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [currentTutor, setCurrentTutor] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [selectedClass, setSelectedClass] = useState('all');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [tutorDetailsDialogOpen, setTutorDetailsDialogOpen] = useState(false);
+  const [selectedTutorDetails, setSelectedTutorDetails] = useState(null);
+  const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false);
+  const [newTutorStatus, setNewTutorStatus] = useState('');
 
   useEffect(() => {
     fetchData();
