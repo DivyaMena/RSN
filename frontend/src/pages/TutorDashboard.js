@@ -82,7 +82,7 @@ export default function TutorDashboard({ user, logout }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Tutor Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your assigned batches and log board entries</p>
+          <p className="text-gray-600 mt-2">Help students who need extra support - track what you teach and schedule your online classes</p>
         </div>
 
         {batches.length === 0 ? (
