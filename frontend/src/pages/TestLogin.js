@@ -17,6 +17,13 @@ const TEST_USERS = [
     description: 'View 15 registered students, their batches, and log boards'
   },
   {
+    name: 'Student (Aarav Patel)',
+    email: 'aarav.patel@student.risingstarsnation.com',
+    token: 'student_test_token_2025',
+    role: 'student',
+    description: 'Class 9 student | View own batches, log boards, attendance & request remedial classes'
+  },
+  {
     name: 'Tutor 1 (Priya Sharma)',
     email: 'tutor1@test.com',
     token: 'tutor1_test_token_2025',
