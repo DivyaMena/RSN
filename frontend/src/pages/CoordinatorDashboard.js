@@ -859,7 +859,22 @@ export default function CoordinatorDashboard({ user, logout }) {
               {/* KYC Documents */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-bold text-gray-900 mb-3">KYC Documents</h4>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  {/* Selfie Photo Thumbnail */}
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Selfie Photo:</p>
+                    {selectedTutorDetails.tutor?.photo_url ? (
+                      <img 
+                        src={selectedTutorDetails.tutor.photo_url} 
+                        alt="Tutor Selfie" 
+                        className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300 shadow-sm"
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-500">Not uploaded</p>
+                    )}
+                  </div>
+                  
+                  {/* Aadhaar */}
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar:</p>
                     {selectedTutorDetails.tutor?.aadhaar_number ? (
@@ -870,9 +885,9 @@ export default function CoordinatorDashboard({ user, logout }) {
                             href={selectedTutorDetails.tutor.aadhaar_page1_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline text-sm"
+                            className="text-blue-600 hover:underline text-sm inline-flex items-center"
                           >
-                            📄 View Document
+                            📄 View Aadhaar Document →
                           </a>
                         )}
                       </>
@@ -881,6 +896,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                     )}
                   </div>
                   
+                  {/* Availability */}
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Availability Status:</p>
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
@@ -897,6 +913,47 @@ export default function CoordinatorDashboard({ user, logout }) {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Assigned Batches */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-bold text-gray-900 mb-3">Assigned Batches</h4>
+                {(() => {
+                  // Find all batches where this tutor is assigned
+                  const tutorBatches = [];
+                  batches.forEach(batch => {
+                    const assignments = batchAssignments[batch.id] || [];
+                    const tutorAssignment = assignments.find(a => 
+                      a.tutor_id === selectedTutorDetails.tutor.id
+                    );
+                    if (tutorAssignment) {
+                      tutorBatches.push({
+                        batch,
+                        days: tutorAssignment.assignment?.assigned_days || []
+                      });
+                    }
+                  });
+
+                  if (tutorBatches.length === 0) {
+                    return <p className="text-sm text-gray-600">No batches assigned yet</p>;
+                  }
+
+                  return (
+                    <div className="space-y-3">
+                      {tutorBatches.map(({ batch, days }) => (
+                        <div key={batch.id} className="bg-white rounded-lg p-3 border border-green-300">
+                          <p className="font-medium text-gray-900">{batch.batch_code}</p>
+                          <p className="text-sm text-gray-600">
+                            {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
+                          </p>
+                          <p className="text-sm text-green-700 mt-1">
+                            <strong>Days:</strong> {days.join(', ')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="flex space-x-3">
