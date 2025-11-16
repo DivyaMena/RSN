@@ -37,8 +37,16 @@ export default function TutorDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
-      const batchesRes = await axios.get(`${API}/batches`, { withCredentials: true });
+      const [batchesRes, tutorRes] = await Promise.all([
+        axios.get(`${API}/batches`, { withCredentials: true }),
+        axios.get(`${API}/tutors/me`, { withCredentials: true })
+      ]);
+      
       setBatches(batchesRes.data);
+      setTutorProfile(tutorRes.data);
+      setSelectedStatus(tutorRes.data.availability_status || 'available');
+      setUnavailableFrom(tutorRes.data.unavailable_from || '');
+      setUnavailableTo(tutorRes.data.unavailable_to || '');
 
       // Fetch tutors for each batch
       const tutorsData = {};
@@ -55,6 +63,46 @@ export default function TutorDashboard({ user, logout }) {
       toast.error('Failed to fetch data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async () => {
+    if (selectedStatus === 'unavailable' && (!unavailableFrom || !unavailableTo)) {
+      toast.error('Please provide unavailability dates');
+      return;
+    }
+
+    try {
+      let statusToSend = selectedStatus;
+      if (selectedStatus === 'unavailable') {
+        statusToSend = 'unavailable';
+      } else if (selectedStatus === 'not_interested') {
+        statusToSend = 'not_interested';
+      }
+
+      const updateData = {
+        availability_status: statusToSend
+      };
+
+      if (selectedStatus === 'unavailable') {
+        updateData.unavailable_from = unavailableFrom;
+        updateData.unavailable_to = unavailableTo;
+      }
+
+      await axios.put(
+        `${API}/tutors/${tutorProfile.id}/status`,
+        updateData,
+        { 
+          withCredentials: true,
+          params: { status: statusToSend }
+        }
+      );
+
+      toast.success('Status updated successfully');
+      setStatusDialogOpen(false);
+      fetchData(); // Refresh data
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update status');
     }
   };
 
