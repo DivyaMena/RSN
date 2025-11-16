@@ -555,34 +555,87 @@ export default function CoordinatorDashboard({ user, logout }) {
 
             <div>
               <label className="block text-sm font-medium mb-2">Select Tutor</label>
-              <Select value={selectedTutor} onValueChange={setSelectedTutor}>
+              <Select 
+                value={selectedTutor} 
+                onValueChange={(value) => {
+                  setSelectedTutor(value);
+                  // Find and store selected tutor data
+                  const tutorData = tutors.find(t => t.tutor.id === value);
+                  setSelectedTutorData(tutorData);
+                  setSelectedDays([]); // Reset selected days when tutor changes
+                }}
+              >
                 <SelectTrigger data-testid="tutor-select">
                   <SelectValue placeholder="Choose a tutor" />
                 </SelectTrigger>
                 <SelectContent>
-                  {tutors.filter(t => t.tutor.status === 'active').map(tutorData => (
-                    <SelectItem key={tutorData.tutor.id} value={tutorData.tutor.id}>
-                      {tutorData.user?.name} ({tutorData.tutor.tutor_code})
-                    </SelectItem>
-                  ))}
+                  {tutors.filter(t => t.tutor.status === 'active').map(tutorData => {
+                    // Calculate how many days this tutor has already been assigned
+                    let assignedDaysCount = 0;
+                    Object.values(batchAssignments).forEach(assignments => {
+                      assignments.forEach(assignment => {
+                        if (assignment.tutor_id === tutorData.tutor.id) {
+                          assignedDaysCount += assignment.assignment?.assigned_days?.length || 0;
+                        }
+                      });
+                    });
+                    
+                    const availableDaysCount = tutorData.tutor.available_days?.length || 0;
+                    const isFullyAssigned = assignedDaysCount >= availableDaysCount;
+                    
+                    return (
+                      <SelectItem 
+                        key={tutorData.tutor.id} 
+                        value={tutorData.tutor.id}
+                        disabled={isFullyAssigned}
+                      >
+                        {tutorData.user?.name} ({tutorData.tutor.tutor_code})
+                        {isFullyAssigned && ' - Fully Assigned'}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
 
+            {selectedTutorData && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  {selectedTutorData.user?.name}'s Available Days:
+                </p>
+                <p className="text-sm text-blue-800 font-medium">
+                  {selectedTutorData.tutor.available_days?.join(', ')}
+                </p>
+              </div>
+            )}
+
             <div>
-              <label className="block text-sm font-medium mb-2">Assign Days</label>
+              <label className="block text-sm font-medium mb-2">
+                Assign Days {selectedTutorData && '(only from tutor\'s available days)'}
+              </label>
               <div className="grid grid-cols-2 gap-2">
-                {DAYS.map(day => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Checkbox
-                      data-testid={`assign-day-${day}-checkbox`}
-                      id={`assign-day-${day}`}
-                      checked={selectedDays.includes(day)}
-                      onCheckedChange={() => toggleDay(day)}
-                    />
-                    <label htmlFor={`assign-day-${day}`} className="text-sm cursor-pointer">{day}</label>
-                  </div>
-                ))}
+                {DAYS.map(day => {
+                  const isAvailable = selectedTutorData?.tutor.available_days?.includes(day);
+                  const isDisabled = !selectedTutorData || !isAvailable;
+                  
+                  return (
+                    <div key={day} className="flex items-center space-x-2">
+                      <Checkbox
+                        data-testid={`assign-day-${day}-checkbox`}
+                        id={`assign-day-${day}`}
+                        checked={selectedDays.includes(day)}
+                        onCheckedChange={() => toggleDay(day)}
+                        disabled={isDisabled}
+                      />
+                      <label 
+                        htmlFor={`assign-day-${day}`} 
+                        className={`text-sm ${isDisabled ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        {day} {!isAvailable && selectedTutorData && '(Not available)'}
+                      </label>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -590,6 +643,7 @@ export default function CoordinatorDashboard({ user, logout }) {
               data-testid="confirm-assign-tutor"
               onClick={handleAssignTutor}
               className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white"
+              disabled={!selectedTutor || selectedDays.length === 0}
             >
               Assign Tutor
             </Button>
