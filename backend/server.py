@@ -169,6 +169,7 @@ class RegisterParentInput(BaseModel):
     state: str
 
 class RegisterTutorInput(BaseModel):
+    aadhaar_number: str
     state: str
     classes_can_teach: List[int]
     subjects_can_teach: List[str]
