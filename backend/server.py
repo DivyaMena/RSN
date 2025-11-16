@@ -810,10 +810,20 @@ async def update_log_entry(entry_id: str, input: UpdateLogEntryInput, request: R
 
 # ============= CURRICULUM ROUTES =============
 
+@api_router.get("/subjects/{class_level}")
+async def get_subjects_by_class(class_level: int):
+    """Get available subjects for a class level"""
+    subjects = get_subjects_for_class(class_level)
+    return [{"code": s, "name": SUBJECT_NAMES[s]} for s in subjects]
+
 @api_router.get("/curriculum", response_model=List[CurriculumItem])
 async def get_curriculum(board: str, class_level: int, subject: str, request: Request):
     """Get curriculum for board/class/subject"""
     await require_auth(request)
+    
+    # Validate subject for class
+    if not is_valid_subject_for_class(subject, class_level):
+        raise HTTPException(status_code=400, detail=f"Subject {subject} is not available for class {class_level}")
     
     items = await db.curriculum.find({
         "board": board,
