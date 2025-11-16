@@ -26,6 +26,9 @@ export default function LogBoard({ user, logout }) {
   const [batch, setBatch] = useState(null);
   const [logEntries, setLogEntries] = useState([]);
   const [curriculum, setCurriculum] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [tutors, setTutors] = useState([]);
+  const [myTutorId, setMyTutorId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -35,7 +38,8 @@ export default function LogBoard({ user, logout }) {
     topic_covered: '',
     curriculum_items: [],
     google_meet_link: '',
-    notes: ''
+    notes: '',
+    sessions_count: 1
   });
   const [editFormData, setEditFormData] = useState({
     topic_covered: '',
