@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
 
@@ -11,6 +12,7 @@ const API = `${BACKEND_URL}/api`;
 export default function RegisterCoordinator({ setUser }) {
   const navigate = useNavigate();
   const [state, setState] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
