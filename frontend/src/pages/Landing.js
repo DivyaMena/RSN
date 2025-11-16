@@ -82,7 +82,7 @@ export default function Landing() {
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>For Parents</h3>
             <p className="text-gray-600 leading-relaxed">
-              Register up to 2 children for free online tuition. Track their progress, view curriculum coverage, and support their educational journey.
+              Register your children for free online tuition. Perfect for students needing extra help, struggling with subjects, or shy to ask questions in large classes. Track their progress and support their learning.
             </p>
           </div>
         </div>
