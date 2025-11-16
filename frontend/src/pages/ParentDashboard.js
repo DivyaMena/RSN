@@ -86,6 +86,14 @@ export default function ParentDashboard({ user, logout }) {
     }
   };
 
+  const SUBJECTS = {
+    'MAT': 'Mathematics',
+    'PHY': 'Physics',
+    'SCI': 'Science',
+    'BIO': 'Biology',
+    'ENG': 'English'
+  };
+
   const getStudentBatches = (studentId) => {
     return batches.filter(batch => batch.student_ids.includes(studentId));
   };
