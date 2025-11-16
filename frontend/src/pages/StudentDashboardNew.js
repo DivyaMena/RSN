@@ -104,20 +104,20 @@ export default function StudentDashboardNew({ user, logout }) {
   const stats = getAttendanceStats();
 
   return (
-    <div className=\"min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50\">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
-      <header className=\"bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50\">
-        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center\">
-          <div className=\"flex items-center space-x-3\">
-            <div className=\"h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center\">
-              <BookOpen className=\"h-6 w-6 text-white\" />
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
+              <BookOpen className="h-6 w-6 text-white" />
             </div>
-            <span className=\"text-xl font-bold\" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
+            <span className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
-          <div className=\"flex items-center space-x-4\">
-            <span className=\"text-gray-700\">Welcome, {user.name}</span>
-            <Button data-testid=\"logout-btn\" onClick={logout} variant=\"outline\" size=\"sm\">
-              <LogOut className=\"h-4 w-4 mr-2\" />
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-700">Welcome, {user.name}</span>
+            <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
+              <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
           </div>
