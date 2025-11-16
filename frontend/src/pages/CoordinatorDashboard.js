@@ -44,6 +44,8 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [selectedTutorDetails, setSelectedTutorDetails] = useState(null);
   const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false);
   const [newTutorStatus, setNewTutorStatus] = useState('');
+  const [batchAssignments, setBatchAssignments] = useState({});
+  const [selectedTutorData, setSelectedTutorData] = useState(null);
 
   useEffect(() => {
     fetchData();
