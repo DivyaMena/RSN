@@ -128,7 +128,10 @@ export default function ParentDashboard({ user, logout }) {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Parent Dashboard</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Parent Dashboard</h1>
+            <p className="text-gray-600 mt-1">Register your children for free online tuition support</p>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="add-student-btn" className="bg-gradient-to-r from-blue-600 to-green-600 text-white">
