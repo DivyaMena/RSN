@@ -234,6 +234,99 @@ export default function TutorDashboard({ user, logout }) {
           </div>
         )}
       </main>
+
+      {/* Status Management Dialog */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Your Availability</DialogTitle>
+            <DialogDescription>
+              Update your availability status to help coordinators know when you can teach
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            <RadioGroup value={selectedStatus} onValueChange={setSelectedStatus}>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="available" id="available" />
+                <Label htmlFor="available" className="flex-1 cursor-pointer">
+                  <div>
+                    <p className="font-medium text-gray-900">Available</p>
+                    <p className="text-sm text-gray-600">I am ready to teach and take new batches</p>
+                  </div>
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="unavailable" id="unavailable" />
+                <Label htmlFor="unavailable" className="flex-1 cursor-pointer">
+                  <div>
+                    <p className="font-medium text-gray-900">Temporarily Unavailable</p>
+                    <p className="text-sm text-gray-600">I need a break for a specific period</p>
+                  </div>
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="not_interested" id="not_interested" />
+                <Label htmlFor="not_interested" className="flex-1 cursor-pointer">
+                  <div>
+                    <p className="font-medium text-gray-900">Not Interested / Delete Account</p>
+                    <p className="text-sm text-gray-600">I no longer wish to volunteer</p>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+
+            {selectedStatus === 'unavailable' && (
+              <div className="space-y-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 className="font-medium text-gray-900">Unavailability Period</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="unavailable_from">From Date</Label>
+                    <Input
+                      id="unavailable_from"
+                      type="date"
+                      value={unavailableFrom}
+                      onChange={(e) => setUnavailableFrom(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="unavailable_to">To Date</Label>
+                    <Input
+                      id="unavailable_to"
+                      type="date"
+                      value={unavailableTo}
+                      onChange={(e) => setUnavailableTo(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedStatus === 'not_interested' && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">
+                  ⚠️ This will mark your account as not interested. Coordinators will be notified, 
+                  and you won't be assigned to new batches. You can reactivate your account anytime 
+                  by contacting the coordinator.
+                </p>
+              </div>
+            )}
+
+            <div className="flex space-x-3 justify-end">
+              <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateStatus}>
+                Update Status
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
