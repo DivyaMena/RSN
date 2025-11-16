@@ -822,6 +822,26 @@ async def get_curriculum(board: str, class_level: int, subject: str, request: Re
     
     return [CurriculumItem(**item) for item in items]
 
+@api_router.post("/curriculum/upload")
+async def upload_curriculum(items: List[CurriculumItem], request: Request):
+    """Upload curriculum items (coordinator/admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators/admins can upload curriculum")
+    
+    # Insert or update curriculum items
+    for item in items:
+        existing = await db.curriculum.find_one({"id": item.id})
+        doc = item.model_dump()
+        
+        if existing:
+            await db.curriculum.update_one({"id": item.id}, {"$set": doc})
+        else:
+            await db.curriculum.insert_one(doc)
+    
+    return {"success": True, "count": len(items)}
+
 # ============= TUTOR ROUTES =============
 
 @api_router.get("/tutors")
