@@ -229,7 +229,7 @@ export default function ParentDashboard({ user, logout }) {
                   <div>
                     <label className="block text-sm font-medium mb-2">Select Subjects</label>
                     <div className="space-y-2">
-                      {SUBJECTS.map(subject => (
+                      {SUBJECTS_ARRAY.map(subject => (
                         <div key={subject.value} className="flex items-center space-x-2">
                           <Checkbox
                             data-testid={`form-subject-${subject.value}-checkbox`}
