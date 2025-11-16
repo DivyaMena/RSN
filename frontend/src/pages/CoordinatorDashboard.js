@@ -381,7 +381,7 @@ export default function CoordinatorDashboard({ user, logout }) {
           </TabsContent>
 
           {/* All Batches Tab */}
-          <TabsContent value="batches" value-active-batches="active-batches">
+          <TabsContent value="batches">
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Class:</label>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
@@ -399,55 +399,36 @@ export default function CoordinatorDashboard({ user, logout }) {
               </Select>
             </div>
 
-        {/* Class Filter */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Class:</label>
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-64">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
-              <SelectItem value="6">Class 6</SelectItem>
-              <SelectItem value="7">Class 7</SelectItem>
-              <SelectItem value="8">Class 8</SelectItem>
-              <SelectItem value="9">Class 9</SelectItem>
-              <SelectItem value="10">Class 10</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Batches */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            {selectedClass === 'all' ? 'All Batches' : `Class ${selectedClass} Batches`}
-          </h2>
-          {filteredBatches.length === 0 ? (
-            <div data-testid="no-batches-message" className="text-center py-20">
-              <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No batches found</h3>
-            </div>
-          ) : (
-            <div className="grid gap-6">
-              {filteredBatches.map(batch => (
-                <div key={batch.id} data-testid={`coordinator-batch-${batch.id}`} className="bg-white rounded-2xl shadow-lg p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{batch.batch_code}</h3>
-                      <p className="text-gray-600 mt-1">
-                        {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Status: <span className="capitalize font-medium">{batch.status}</span> | 
-                        Academic Year: {batch.academic_year}
-                      </p>
-                      <button
-                        onClick={() => handleViewStudents(batch)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 flex items-center"
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Students: {batch.student_ids.length}/25
-                      </button>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                {selectedClass === 'all' ? 'All Batches' : `Class ${selectedClass} Batches`}
+              </h2>
+              {filteredBatches.length === 0 ? (
+                <div data-testid="no-batches-message" className="text-center py-20">
+                  <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No batches found</h3>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {filteredBatches.map(batch => (
+                    <div key={batch.id} data-testid={`coordinator-batch-${batch.id}`} className="bg-white rounded-2xl shadow-lg p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{batch.batch_code}</h3>
+                          <p className="text-gray-600 mt-1">
+                            {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Status: <span className="capitalize font-medium">{batch.status}</span> | 
+                            Academic Year: {batch.academic_year}
+                          </p>
+                          <button
+                            onClick={() => handleViewStudents(batch)}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 flex items-center"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Students: {batch.student_ids.length}/25
+                          </button>
                     </div>
                     <div className="flex space-x-2">
                       <Button
