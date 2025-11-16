@@ -172,13 +172,24 @@ export default function ParentDashboard({ user, logout }) {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Student Name</label>
+                    <label className="block text-sm font-medium mb-2">Student Name *</label>
                     <Input
                       data-testid="student-name-input"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Enter student name"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Student Photo/Selfie *</label>
+                    <Input
+                      data-testid="student-photo-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFormData({ ...formData, student_photo: e.target.files[0] })}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Recent photo of the student</p>
                   </div>
 
                   <div>
