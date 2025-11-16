@@ -46,28 +46,22 @@ export default function TestLogin() {
   const handleTestLogin = async (user) => {
     setLoading(true);
     try {
-      // Set cookie with session token
-      document.cookie = `session_token=${user.token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=none`;
+      // Set cookie with session token - try multiple approaches
+      const cookieString = `session_token=${user.token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+      document.cookie = cookieString;
       
-      // Verify session works
-      const response = await axios.get(`${API}/auth/me`, {
-        withCredentials: true,
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        }
-      });
+      // Also set in localStorage as backup
+      localStorage.setItem('test_session_token', user.token);
       
-      toast.success(`Logged in as ${user.name}`);
+      toast.success(`Logging in as ${user.name}...`);
       
-      // Redirect to dashboard
+      // Give time for cookie to set, then hard reload to dashboard
       setTimeout(() => {
-        navigate('/dashboard');
-        window.location.reload();
+        window.location.href = '/dashboard';
       }, 500);
     } catch (error) {
       toast.error('Login failed. Please try again.');
       console.error(error);
-    } finally {
       setLoading(false);
     }
   };
