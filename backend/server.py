@@ -67,11 +67,20 @@ class Tutor(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     tutor_code: str  # RSN-TS-T-12345
-    aadhaar_number: str  # 12-digit Aadhaar for KYC
-    state: str  # TS, AP, TN
+    aadhaar_number: str  # 12-digit Aadhaar for KYC (or file path)
+    aadhaar_page1_url: Optional[str] = None  # Aadhaar card page 1 upload
+    aadhaar_page2_url: Optional[str] = None  # Aadhaar card page 2 upload (optional)
+    board_preference: str  # Which board they want to teach (TS, AP, TN)
+    current_address: Optional[str] = None
+    pincode: Optional[str] = None
     classes_can_teach: List[int]  # [6,7,8,9,10]
     subjects_can_teach: List[str]  # ["MAT", "PHY", "SCI", "BIO", "ENG"]
     available_days: List[str]  # ["Monday", "Tuesday", etc]
+    status: str = "pending"  # pending, active, suspended, blacklisted, unavailable
+    approval_status: str = "pending"  # pending, approved, rejected
+    availability_status: str = "available"  # available, unavailable, not_interested
+    unavailable_from: Optional[str] = None
+    unavailable_to: Optional[str] = None
     registration_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
