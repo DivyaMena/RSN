@@ -257,8 +257,8 @@ frontend:
         comment: "✅ TESTED: View Students feature working perfectly. Students dialog opens correctly when clicking the 'Students: 15/25' link, displays complete list of 15 students with proper details (names, codes, schools, locations), dialog is scrollable and well-formatted. API integration working seamlessly."
 
   - task: "Tutor Dashboard - Status management UI"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "/app/frontend/src/pages/TutorDashboard.js"
     stuck_count: 0
     priority: "high"
@@ -267,6 +267,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Not yet implemented - need to add UI for tutors to set Available/Unavailable/Delete Account status with date pickers for unavailability"
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED & VERIFIED: Added complete status management UI with 'Manage Availability' button, status card showing current availability, dialog with 3 options (Available, Temporarily Unavailable with date pickers, Not Interested/Delete Account), backend endpoint /api/tutors/{tutor_id}/availability created for self-service updates. Manual testing confirms UI loads correctly and dialog displays all options properly."
 
   - task: "Tutor Registration - React rendering error fix"
     implemented: true
