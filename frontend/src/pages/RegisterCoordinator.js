@@ -46,6 +46,17 @@ export default function RegisterCoordinator({ setUser }) {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Photo *</label>
+            <Input
+              data-testid="coordinator-photo-input"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPhoto(e.target.files[0])}
+            />
+            <p className="text-xs text-gray-500 mt-1">Recent photo for profile</p>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
             <Select value={state} onValueChange={setState}>
               <SelectTrigger data-testid="coordinator-state-select" className="w-full">
