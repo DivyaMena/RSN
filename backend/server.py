@@ -549,17 +549,34 @@ async def create_student(input: RegisterStudentInput, request: Request):
     
     student_code = generate_student_code(input.board, input.enrollment_year)
     
+    # Create student user account if requested
+    student_user_id = None
+    if input.create_login:
+        student_user = User(
+            email=f"{student_code.lower()}@student.risingstarsnation.com",  # Auto-generated email
+            name=input.name,
+            role="student",
+            state=input.board,
+            user_code=student_code
+        )
+        user_doc = student_user.model_dump()
+        user_doc["created_at"] = user_doc["created_at"].isoformat()
+        await db.users.insert_one(user_doc)
+        student_user_id = student_user.id
+    
     student = Student(
         parent_id=user.id,
         name=input.name,
         student_code=student_code,
+        aadhaar_number=input.aadhaar_number,
         class_level=input.class_level,
         board=input.board,
         school_name=input.school_name,
         location=input.location,
         roll_no=input.roll_no,
         subjects=input.subjects,
-        enrollment_year=input.enrollment_year
+        enrollment_year=input.enrollment_year,
+        user_id=student_user_id
     )
     
     doc = student.model_dump()
