@@ -857,7 +857,7 @@ async def get_my_student_profile(request: Request):
     if not student:
         raise HTTPException(status_code=404, detail="Student profile not found")
     
-    return Student(**student)
+    return student
 
 @api_router.get("/students/me/batches")
 async def get_my_batches(request: Request):
