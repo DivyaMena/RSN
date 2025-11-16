@@ -752,7 +752,9 @@ async def create_log_entry(input: CreateLogEntryInput, request: Request):
         curriculum_items=input.curriculum_items,
         google_meet_link=input.google_meet_link,
         notes=input.notes,
-        is_locked=True
+        sessions_count=input.sessions_count,
+        is_locked=True,
+        created_by=user.id
     )
     
     doc = entry.model_dump()
