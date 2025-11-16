@@ -137,10 +137,46 @@ export default function TutorDashboard({ user, logout }) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Tutor Dashboard</h1>
-          <p className="text-gray-600 mt-2">Help students who need extra support - track what you teach and schedule your online classes</p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Tutor Dashboard</h1>
+            <p className="text-gray-600 mt-2">Help students who need extra support - track what you teach and schedule your online classes</p>
+          </div>
+          <Button
+            onClick={() => setStatusDialogOpen(true)}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <Settings className="h-4 w-4" />
+            <span>Manage Availability</span>
+          </Button>
         </div>
+
+        {/* Tutor Status Card */}
+        {tutorProfile && (
+          <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Your Status</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Current availability: <span className={`font-semibold capitalize ${
+                    tutorProfile.availability_status === 'available' ? 'text-green-600' :
+                    tutorProfile.availability_status === 'unavailable' ? 'text-yellow-600' :
+                    'text-red-600'
+                  }`}>
+                    {tutorProfile.availability_status === 'not_interested' ? 'Not Interested' : tutorProfile.availability_status}
+                  </span>
+                </p>
+                {tutorProfile.availability_status === 'unavailable' && tutorProfile.unavailable_from && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span>
+                  </p>
+                )}
+              </div>
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
+        )}
 
         {batches.length === 0 ? (
           <div data-testid="no-batches-message" className="text-center py-20">
