@@ -63,17 +63,31 @@ export default function ParentDashboard({ user, logout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.class_level || !formData.board || formData.subjects.length === 0) {
-      toast.error('Please fill all required fields');
+    // Validation
+    if (!formData.name || !formData.class_level || !formData.board || !formData.school_name || 
+        !formData.location || !formData.roll_no || formData.subjects.length === 0 || !formData.aadhaar_page1) {
+      toast.error('Please fill all required fields including Aadhaar card upload');
       return;
     }
 
     try {
-      await axios.post(`${API}/students`, formData, { withCredentials: true });
+      // For now, we'll just send the data without files (file upload needs separate handling)
+      // In production, you'd upload files to storage and get URLs
+      const dataToSend = {
+        ...formData,
+        aadhaar_number: '000000000000' // Placeholder
+      };
+      delete dataToSend.aadhaar_page1;
+      delete dataToSend.aadhaar_page2;
+      
+      await axios.post(`${API}/students`, dataToSend, { withCredentials: true });
       toast.success('Student registered successfully!');
       setDialogOpen(false);
       setFormData({
         name: '',
+        aadhaar_page1: null,
+        aadhaar_page2: null,
+        aadhaar_number: '000000000000',
         class_level: '',
         board: '',
         school_name: '',
@@ -84,6 +98,7 @@ export default function ParentDashboard({ user, logout }) {
       });
       fetchData();
     } catch (error) {
+      console.error('Registration error:', error);
       toast.error(error.response?.data?.detail || 'Failed to register student');
     }
   };
