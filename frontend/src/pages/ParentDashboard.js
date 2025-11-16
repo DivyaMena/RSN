@@ -12,22 +12,16 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const SUBJECTS = [
-  { value: 'MAT', label: 'Mathematics' },
-  { value: 'PHY', label: 'Physics' },
-  { value: 'SCI', label: 'Science' },
-  { value: 'BIO', label: 'Biology' },
-  { value: 'ENG', label: 'English' }
-];
-
 export default function ParentDashboard({ user, logout }) {
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [batches, setBatches] = useState([]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    aadhaar_number: '',
     class_level: '',
     board: '',
     school_name: '',
