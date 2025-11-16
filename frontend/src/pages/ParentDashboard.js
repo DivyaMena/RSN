@@ -164,6 +164,17 @@ export default function ParentDashboard({ user, logout }) {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Aadhaar Number *</label>
+                    <Input
+                      data-testid="aadhaar-input"
+                      value={formData.aadhaar_number}
+                      onChange={(e) => setFormData({ ...formData, aadhaar_number: e.target.value })}
+                      placeholder="Enter 12-digit Aadhaar number"
+                      maxLength={12}
+                    />
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2">Class</label>
