@@ -59,10 +59,20 @@ function App() {
 
   const checkExistingSession = async () => {
     try {
+      // Check for test token in localStorage first
+      const testToken = localStorage.getItem('test_session_token');
+      const headers = {};
+      
+      if (testToken) {
+        headers['Authorization'] = `Bearer ${testToken}`;
+      }
+      
       const response = await axios.get(`${API}/auth/me`, {
-        withCredentials: true
+        withCredentials: true,
+        headers: testToken ? headers : undefined
       });
       setUser(response.data);
+      setSessionToken(testToken || response.data.session_token);
     } catch (error) {
       console.log('No existing session');
     } finally {
