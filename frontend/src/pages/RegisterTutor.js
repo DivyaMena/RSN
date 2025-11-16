@@ -51,11 +51,11 @@ export default function RegisterTutor({ setUser }) {
 
     // Validation
     if (!formData.board_preference || !formData.current_address || !formData.pincode || 
-        !formData.about_yourself || !formData.aadhaar_page1 ||
+        !formData.about_yourself || !formData.tutor_photo || !formData.aadhaar_page1 ||
         formData.classes_can_teach.length === 0 || 
         formData.subjects_can_teach.length === 0 || 
         formData.available_days.length === 0) {
-      toast.error('Please fill all required fields');
+      toast.error('Please fill all required fields including photo');
       return;
     }
 
