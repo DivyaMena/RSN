@@ -72,7 +72,7 @@ export default function Landing() {
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>For Tutors</h3>
             <p className="text-gray-600 leading-relaxed">
-              Volunteer 1-2 hours on your chosen days. Make a real difference in students' lives while sharing your knowledge and expertise.
+              Volunteer 1-2 hours on your chosen days. Help struggling students from government schools with teacher shortages. Make a real impact by providing the extra support they need.
             </p>
           </div>
 
