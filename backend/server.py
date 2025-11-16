@@ -176,6 +176,7 @@ class RegisterTutorInput(BaseModel):
 
 class RegisterStudentInput(BaseModel):
     name: str
+    aadhaar_number: str
     class_level: int
     board: str
     school_name: str
@@ -183,6 +184,7 @@ class RegisterStudentInput(BaseModel):
     roll_no: str
     subjects: List[str]
     enrollment_year: int
+    create_login: bool = False  # Whether to create separate login for student
 
 class CreateLogEntryInput(BaseModel):
     batch_id: str
