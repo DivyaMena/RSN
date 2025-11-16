@@ -485,11 +485,6 @@ async def create_student(input: RegisterStudentInput, request: Request):
     if user.role != "parent":
         raise HTTPException(status_code=403, detail="Only parents can register students")
     
-    # Check if parent already has 2 students
-    existing_students = await db.students.find({"parent_id": user.id}).to_list(None)
-    if len(existing_students) >= 2:
-        raise HTTPException(status_code=400, detail="Maximum 2 students per parent")
-    
     student_code = generate_student_code(input.board, input.enrollment_year)
     
     student = Student(
