@@ -33,6 +33,7 @@ class User(BaseModel):
     email: EmailStr
     name: str
     picture: Optional[str] = None
+    photo_url: Optional[str] = None  # User photo/selfie upload
     role: str  # parent, tutor, coordinator, admin
     state: Optional[str] = None  # TS, AP, TN
     user_code: Optional[str] = None  # RSN-TS-T-12345 or RSN-TS-P-12345
