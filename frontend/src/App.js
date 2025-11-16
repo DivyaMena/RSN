@@ -10,7 +10,6 @@ import ParentDashboard from './pages/ParentDashboard';
 import TutorDashboard from './pages/TutorDashboard';
 import CoordinatorDashboard from './pages/CoordinatorDashboard';
 import StudentDashboard from './pages/StudentDashboard';
-import StudentDashboardNew from './pages/StudentDashboardNew';
 import LogBoard from './pages/LogBoard';
 import TestLogin from './pages/TestLogin';
 import { Toaster } from './components/ui/sonner';
