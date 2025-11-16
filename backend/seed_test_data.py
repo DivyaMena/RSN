@@ -230,8 +230,24 @@ async def seed_test_data():
     }
     tutors_data.append(pending_tutor2_profile)
     
+    # Create sessions for pending tutors
+    pending_tutor1_session = {
+        "user_id": "tutor-pending-001",
+        "session_token": "pending1_test_token_2025",
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    pending_tutor2_session = {
+        "user_id": "tutor-pending-002",
+        "session_token": "pending2_test_token_2025",
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.user_sessions.insert_many([pending_tutor1_session, pending_tutor2_session])
+    print("✅ Created pending tutor sessions")
+    
     await db.tutors.insert_many(tutors_data)
-    print(f"✅ Created {len(tutors_data)} tutor profiles")
+    print(f"✅ Created {len(tutors_data)} tutor profiles (2 approved, 2 pending approval)")
     
     print("\n👨‍👩‍👧‍👦 Creating students...")
     students_data = []
