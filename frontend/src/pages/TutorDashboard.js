@@ -73,15 +73,8 @@ export default function TutorDashboard({ user, logout }) {
     }
 
     try {
-      let statusToSend = selectedStatus;
-      if (selectedStatus === 'unavailable') {
-        statusToSend = 'unavailable';
-      } else if (selectedStatus === 'not_interested') {
-        statusToSend = 'not_interested';
-      }
-
       const updateData = {
-        availability_status: statusToSend
+        availability_status: selectedStatus
       };
 
       if (selectedStatus === 'unavailable') {
@@ -90,19 +83,16 @@ export default function TutorDashboard({ user, logout }) {
       }
 
       await axios.put(
-        `${API}/tutors/${tutorProfile.id}/status`,
+        `${API}/tutors/${tutorProfile.id}/availability`,
         updateData,
-        { 
-          withCredentials: true,
-          params: { status: statusToSend }
-        }
+        { withCredentials: true }
       );
 
-      toast.success('Status updated successfully');
+      toast.success('Availability updated successfully');
       setStatusDialogOpen(false);
       fetchData(); // Refresh data
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to update status');
+      toast.error(error.response?.data?.detail || 'Failed to update availability');
     }
   };
 
