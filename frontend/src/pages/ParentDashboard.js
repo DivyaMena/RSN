@@ -129,14 +129,13 @@ export default function ParentDashboard({ user, logout }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Parent Dashboard</h1>
-          {students.length < 2 && (
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button data-testid="add-student-btn" className="bg-gradient-to-r from-blue-600 to-green-600 text-white">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Register Student
-                </Button>
-              </DialogTrigger>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="add-student-btn" className="bg-gradient-to-r from-blue-600 to-green-600 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Register Student
+              </Button>
+            </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Register Student</DialogTitle>
