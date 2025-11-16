@@ -279,6 +279,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "User reported 'Objects are not valid as a React child' error during submission. Need to verify if this is fixed"
+      - working: "NA"
+        agent: "testing"
+        comment: "NOT TESTED: Focused on Coordinator Dashboard testing as per priority. Tutor Registration testing was not included in current test scope."
 
   - task: "Notification system frontend"
     implemented: false
