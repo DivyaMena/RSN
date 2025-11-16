@@ -843,6 +843,174 @@ async def get_my_tutor_profile(request: Request):
     
     return tutor
 
+# ============= STUDENT ROUTES =============
+
+@api_router.get("/students/me")
+async def get_my_student_profile(request: Request):
+    """Get current student's profile (for student login)"""
+    user = await require_auth(request)
+    
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can access this endpoint")
+    
+    student = await db.students.find_one({"user_id": user.id}, {"_id": 0})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+    
+    return Student(**student)
+
+@api_router.get("/students/me/batches")
+async def get_my_batches(request: Request):
+    """Get batches for logged-in student"""
+    user = await require_auth(request)
+    
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can access this endpoint")
+    
+    student = await db.students.find_one({"user_id": user.id})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+    
+    batches = await db.batches.find({"student_ids": student["id"]}, {"_id": 0}).to_list(None)
+    return [Batch(**b) for b in batches]
+
+# ============= REMEDIAL CLASS ROUTES =============
+
+@api_router.post("/remedial/request")
+async def create_remedial_request(input: CreateRemedialRequestInput, request: Request):
+    """Student requests remedial class"""
+    user = await require_auth(request)
+    
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can request remedial classes")
+    
+    # Get student profile
+    student = await db.students.find_one({"user_id": user.id})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+    
+    # Get batch details
+    batch = await db.batches.find_one({"id": input.batch_id})
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    
+    remedial_request = RemedialRequest(
+        student_id=student["id"],
+        batch_id=input.batch_id,
+        subject=batch["subject"],
+        class_level=batch["class_level"],
+        board=batch["board"],
+        reason=input.reason,
+        topic=input.topic,
+        description=input.description,
+        status="pending"
+    )
+    
+    doc = remedial_request.model_dump()
+    doc["requested_at"] = doc["requested_at"].isoformat()
+    await db.remedial_requests.insert_one(doc)
+    
+    return remedial_request
+
+@api_router.get("/remedial/requests")
+async def get_remedial_requests(request: Request, status: Optional[str] = None):
+    """Get remedial requests (coordinator only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can view remedial requests")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    requests_list = await db.remedial_requests.find(query, {"_id": 0}).to_list(None)
+    return requests_list
+
+@api_router.get("/remedial/my-requests")
+async def get_my_remedial_requests(request: Request):
+    """Get my remedial requests (student only)"""
+    user = await require_auth(request)
+    
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can access this")
+    
+    student = await db.students.find_one({"user_id": user.id})
+    if not student:
+        return []
+    
+    requests_list = await db.remedial_requests.find({"student_id": student["id"]}, {"_id": 0}).to_list(None)
+    return requests_list
+
+# ============= ATTENDANCE ROUTES =============
+
+@api_router.post("/attendance/mark")
+async def mark_attendance(input: MarkAttendanceInput, request: Request):
+    """Mark attendance for a student (tutor only)"""
+    user = await require_auth(request)
+    
+    if user.role != "tutor":
+        raise HTTPException(status_code=403, detail="Only tutors can mark attendance")
+    
+    tutor = await db.tutors.find_one({"user_id": user.id})
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor profile not found")
+    
+    # Get log entry to get batch_id and date
+    log_entry = await db.logboard_entries.find_one({"id": input.log_entry_id})
+    if not log_entry:
+        raise HTTPException(status_code=404, detail="Log entry not found")
+    
+    attendance = Attendance(
+        student_id=input.student_id,
+        batch_id=log_entry["batch_id"],
+        log_entry_id=input.log_entry_id,
+        date=log_entry["date"],
+        status=input.status,
+        marked_by=tutor["id"]
+    )
+    
+    doc = attendance.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.attendance.insert_one(doc)
+    
+    return attendance
+
+@api_router.get("/attendance/student/{student_id}")
+async def get_student_attendance(student_id: str, request: Request):
+    """Get attendance records for a student"""
+    user = await require_auth(request)
+    
+    # Parents can see their kids' attendance, students can see their own
+    if user.role == "parent":
+        student = await db.students.find_one({"id": student_id, "parent_id": user.id})
+        if not student:
+            raise HTTPException(status_code=403, detail="Not authorized")
+    elif user.role == "student":
+        student = await db.students.find_one({"id": student_id, "user_id": user.id})
+        if not student:
+            raise HTTPException(status_code=403, detail="Not authorized")
+    elif user.role not in ["coordinator", "admin", "tutor"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    attendance_records = await db.attendance.find({"student_id": student_id}, {"_id": 0}).to_list(None)
+    return attendance_records
+
+@api_router.get("/attendance/batch/{batch_id}")
+async def get_batch_attendance(batch_id: str, request: Request, date: Optional[str] = None):
+    """Get attendance for entire batch"""
+    user = await require_auth(request)
+    
+    if user.role not in ["tutor", "coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    query = {"batch_id": batch_id}
+    if date:
+        query["date"] = date
+    
+    attendance_records = await db.attendance.find(query, {"_id": 0}).to_list(None)
+    return attendance_records
+
 app.include_router(api_router)
 
 app.add_middleware(
