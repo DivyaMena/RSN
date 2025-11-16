@@ -454,9 +454,37 @@ export default function CoordinatorDashboard({ user, logout }) {
                             Status: <span className="capitalize font-medium">{batch.status}</span> | 
                             Academic Year: {batch.academic_year}
                           </p>
+                          
+                          {/* Days Assigned Visualization */}
+                          <div className="mt-3">
+                            <p className="text-xs font-medium text-gray-600 mb-2">Assigned Days:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {DAYS.map(day => {
+                                const dayShort = day.substring(0, 3);
+                                const assignments = batchAssignments[batch.id] || [];
+                                const isDayAssigned = assignments.some(a => 
+                                  a.assignment?.assigned_days?.includes(day)
+                                );
+                                
+                                return (
+                                  <span
+                                    key={day}
+                                    className={`px-2 py-1 rounded text-xs font-medium ${
+                                      isDayAssigned 
+                                        ? 'bg-green-100 text-green-800 border border-green-300' 
+                                        : 'bg-gray-100 text-gray-400 border border-gray-200'
+                                    }`}
+                                  >
+                                    {dayShort}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          
                           <button
                             onClick={() => handleViewStudents(batch)}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 flex items-center"
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-3 flex items-center"
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Students: {batch.student_ids.length}/25
