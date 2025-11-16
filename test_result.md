@@ -303,14 +303,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Backend: Test all tutor approval/rejection/status endpoints"
-    - "Backend: Test batch students endpoint"
-    - "Frontend: Verify Coordinator Dashboard loads and displays correctly"
-    - "Frontend: Test tutor approval/rejection flow"
-    - "Frontend: Test batch grouping and view students"
     - "Frontend: Verify Tutor Registration for React rendering errors"
+    - "Frontend: Implement Tutor status management UI in Tutor Dashboard"
+    - "Backend: Implement notification system endpoints"
+    - "Frontend: Implement notification system UI"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
