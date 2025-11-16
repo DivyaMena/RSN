@@ -117,7 +117,7 @@ export default function Landing() {
             </div>
             <span className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
-          <p className="text-gray-400 mb-4">Empowering underprivileged students through quality education</p>
+          <p className="text-gray-400 mb-4">Free online tuition for students who need extra support</p>
           <p className="text-sm text-gray-500">© 2025 Rising Stars Nation. All rights reserved.</p>
         </div>
       </footer>
