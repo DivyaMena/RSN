@@ -165,22 +165,38 @@ export default function ParentDashboard({ user, logout }) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Aadhaar Number *</label>
+                    <label className="block text-sm font-medium mb-2">Aadhaar Card - Page 1 *</label>
                     <Input
-                      data-testid="aadhaar-input"
-                      value={formData.aadhaar_number}
-                      onChange={(e) => setFormData({ ...formData, aadhaar_number: e.target.value })}
-                      placeholder="Enter 12-digit Aadhaar number"
-                      maxLength={12}
+                      data-testid="aadhaar-page1-input"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setFormData({ ...formData, aadhaar_page1: e.target.files[0] })}
                     />
+                    <p className="text-xs text-gray-500 mt-1">Upload scanned copy of Aadhaar card page 1</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Aadhaar Card - Page 2 (Optional)</label>
+                    <Input
+                      data-testid="aadhaar-page2-input"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setFormData({ ...formData, aadhaar_page2: e.target.files[0] })}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Some Aadhaar cards have all details on one page</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Class</label>
-                      <Select value={formData.class_level} onValueChange={(val) => setFormData({ ...formData, class_level: parseInt(val) })}>
+                      <label className="block text-sm font-medium mb-2">Class *</label>
+                      <Select 
+                        value={formData.class_level ? formData.class_level.toString() : ""} 
+                        onValueChange={(val) => setFormData({ ...formData, class_level: parseInt(val), subjects: [] })}
+                      >
                         <SelectTrigger data-testid="class-select">
-                          <SelectValue placeholder="Select class" />
+                          <SelectValue placeholder="Select class">
+                            {formData.class_level ? `Class ${formData.class_level}` : "Select class"}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {[6, 7, 8, 9, 10].map(cls => (
