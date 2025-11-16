@@ -336,23 +336,41 @@ export default function CoordinatorDashboard({ user, logout }) {
                 {tutors.map(tutorData => (
                   <div key={tutorData.tutor.id} className="border rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
-                        <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <span className="font-medium">Board:</span> {tutorData.tutor.board_preference} | 
-                          <span className="font-medium ml-2">Classes:</span> {tutorData.tutor.classes_can_teach?.join(', ')} | 
-                          <span className="font-medium ml-2">Subjects:</span> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
-                        </p>
-                        <div className="mt-2 flex items-center space-x-2">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            tutorData.tutor.status === 'active' ? 'bg-green-100 text-green-800' :
-                            tutorData.tutor.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
-                            tutorData.tutor.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {tutorData.tutor.status?.toUpperCase() || 'ACTIVE'}
-                          </span>
+                      <div className="flex items-start space-x-4 flex-1">
+                        {/* Profile Thumbnail */}
+                        <div className="flex-shrink-0">
+                          {tutorData.tutor?.photo_url || tutorData.user?.photo_url ? (
+                            <img 
+                              src={tutorData.tutor?.photo_url || tutorData.user?.photo_url} 
+                              alt={tutorData.user?.name}
+                              className="w-16 h-16 object-cover rounded-full border-2 border-gray-300"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                              {tutorData.user?.name?.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Tutor Info */}
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
+                          <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
+                          <p className="text-sm text-gray-600 mt-2">
+                            <span className="font-medium">Board:</span> {tutorData.tutor.board_preference} | 
+                            <span className="font-medium ml-2">Classes:</span> {tutorData.tutor.classes_can_teach?.join(', ')} | 
+                            <span className="font-medium ml-2">Subjects:</span> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
+                          </p>
+                          <div className="mt-2 flex items-center space-x-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              tutorData.tutor.status === 'active' ? 'bg-green-100 text-green-800' :
+                              tutorData.tutor.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
+                              tutorData.tutor.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {tutorData.tutor.status?.toUpperCase() || 'ACTIVE'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                       <div className="flex space-x-2">
