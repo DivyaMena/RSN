@@ -494,6 +494,7 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     tutor = Tutor(
         user_id=user.id,
         tutor_code=user_code,
+        aadhaar_number=input.aadhaar_number,
         state=input.state,
         classes_can_teach=input.classes_can_teach,
         subjects_can_teach=input.subjects_can_teach,
