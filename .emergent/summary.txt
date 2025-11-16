@@ -1,0 +1,100 @@
+<analysis>
+The user wants to build a full-stack web application for a non-profit organization called Rising Stars Nation, which provides free online tuition to underprivileged students. The development process started with clarifying product requirements, where the AI engineer successfully negotiated a technology stack change from the user's initial proposal (Firebase/HTML/JS) to the platform's supported stack (FastAPI/React/MongoDB).
+
+The AI engineer then proceeded with a phased implementation. It began by creating the backend server, seeding initial curriculum data, and then building the frontend components page by page, including a landing page, role selection, and separate registration/dashboard pages for Parents, Tutors, and Coordinators.
+
+A significant part of the trajectory involves iterative refinement based on user feedback. Key iterations include:
+1.  Correcting the app's messaging from a general education app to a specific free online tuition app.
+2.  Implementing a test login system with seeded data to allow the user to explore different roles (Parent, Student, Tutor, Coordinator) after they reported being unable to access the app.
+3.  Adding numerous features requested by the user, such as KYC (Aadhaar upload), a dedicated Student login, remedial class requests, and an improved Log Board.
+4.  Debugging several critical issues, including login failures due to expired tokens, frontend rendering errors (Objects are not valid as a React child), and backend data validation errors.
+
+The project is currently in an advanced state of development, with most core features implemented but requiring further refinement and bug fixing. The immediate last task was a complete rewrite of the Coordinator Dashboard to add tutor management and batch viewing features.
+
+The user's primary language is English. The next agent must respond in English only.
+</analysis>
+
+<product_requirements>
+The Rising Stars Nation web application is a multi-user platform for a non-profit that provides free online tuition.
+
+**Core User Roles & Features:**
+1.  **Users:** Parents, Students, Tutors, and Coordinators, all authenticating via Gmail (implemented via a test login system for now).
+2.  **Registration:**
+    *   **Parents:** Register their children, providing details like class, board, and subjects. Includes Aadhaar and photo upload for KYC.
+    *   **Tutors:** Register to volunteer, specifying subjects, board preference, and availability. Registration requires coordinator approval and includes fields for address, a brief bio, and Aadhaar/photo uploads.
+3.  **Batch Management:**
+    *   Students are automatically pooled into batches (min 10, max 25) based on class and subject.
+    *   Batch codes are generated sequentially.
+    *   Tutors are assigned automatically, with coordinators able to override.
+4.  **Log Board:**
+    *   Tutors post what they taught in a class, including their Google Meet link.
+    *   Entries are locked after posting to prevent edits by tutors.
+    *   The board is visible to students and parents of that batch.
+5.  **Dashboards:**
+    *   **Parent:** View their children's progress and batch log boards.
+    *   **Student:** View their own classes, log boards, and request remedial classes.
+    *   **Tutor:** View assigned batches, manage log board entries, and see enrolled students.
+    *   **Coordinator:** Manage tutors (approve/reject/blacklist), assign tutors to batches, view all batches, and see remedial class requests.
+</product_requirements>
+
+<key_technical_concepts>
+- **Full-Stack Framework:** FastAPI (Python) for the backend, React.js for the frontend.
+- **Database:** MongoDB for data storage.
+- **Backend Modeling:** Pydantic for data validation and serialization between the API and the database.
+- **Authentication:** A temporary JWT-based test login system using  to bypass the need for real Google OAuth during development.
+- **Deployment/Hosting:** Application is hosted on Emergent's infrastructure. Backend is managed by .
+- **Styling:** Tailwind CSS with custom styles in .
+- **UI Components:** Utilizes pre-built  components.
+</key_technical_concepts>
+
+<code_architecture>
+The project follows a standard monorepo structure with separate  and  directories.
+
+
+
+**Key Files:**
+
+- ****:
+    - **Importance:** The core of the backend application. Defines all API endpoints, Pydantic models for data structures (User, Student, Tutor, Batch, LogEntry, etc.), and database logic.
+    - **Changes:** Heavily modified to add models and endpoints for all features: user roles, batch creation, log board management, remedial classes, attendance, KYC (Aadhaar), photo uploads, and tutor approval status. Logic for sequential batch codes and dynamic subject filtering was also added.
+
+- ****:
+    - **Importance:** Crucial for development and testing. It populates the MongoDB database with a comprehensive set of test users, students, batches, and log entries.
+    - **Changes:** Iteratively updated to include data for new features like student logins, Aadhaar numbers, and to fix/extend session tokens when they expired during testing.
+
+- ****:
+    - **Importance:** The main entry point for the React application. It handles routing and global state management, including the test authentication logic.
+    - **Changes:** Modified to include routes for all the different dashboard pages (, , ) and the  page. Axios interceptors were added to inject the test authentication token from  into API requests.
+
+- ****:
+    - **Importance:** The main interface for the Parent user. It includes the logic for registering new students.
+    - **Changes:** The student registration form within this component was significantly overhauled to change the Aadhaar number input to a file upload, dynamically filter subject checkboxes based on the selected class, and add a photo upload field.
+
+- ****:
+    - **Importance:** The registration form for new tutors. It captures all necessary information for a volunteer.
+    - **Changes:** Completely rewritten to address user feedback. Changes include: relabeling State to State Board Preference, adding fields for address, pincode, a Tell me about yourself textarea, and file uploads for Aadhaar and a photo.
+
+- ****:
+    - **Importance:** The central control panel for Coordinators to manage the platform's operations.
+    - **Changes:** Completely rewritten in the most recent step to add several new features: a tabbed interface to view and manage tutors (with approve/reject buttons), and another tab to view all batches, grouped by class and subject.
+</code_architecture>
+
+<pending_tasks>
+- **Tutor Dashboard Features:** Implement options for tutors to set their status (Available, Unavailable with dates, Delete my Account) and ensure this information is visible to the coordinator.
+- **Notifications:** Implement an email or in-app notification system for class intimations.
+- **Coordinator View Students:** The button/link to view students enrolled in a batch from the coordinator dashboard is not yet functional.
+- **React Rendering Error:** The Objects are not valid as a React child error was reported during Tutor Registration submission and needs to be verified as fixed.
+</pending_tasks>
+
+<current_work>
+Immediately before this summary, the AI engineer was addressing a large set of feature requests for the **Coordinator Dashboard**. The user requested:
+1.  Tutor approval/rejection functionality.
+2.  Segregation/grouping of batches by class and subject for easier monitoring.
+3.  A View Students feature for each batch.
+
+The AI engineer's last action was to completely rewrite the  file to build a new UI incorporating these features. This new file includes a tabbed layout to separate Tutor Management from Batch Overview and includes placeholder UI for approving/rejecting tutors and viewing batches grouped by class. The work was concluded by writing this new file and initiating a test. The implementation of the View Students click handler and the backend logic for tutor status updates from this new UI are still pending.
+</current_work>
+
+<optional_next_step>
+Test the newly rewritten  to verify that it loads correctly and that the new UI for tutor management and batch segregation is displayed as intended.
+</optional_next_step>
