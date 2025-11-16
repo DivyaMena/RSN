@@ -186,6 +186,18 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Endpoint working correctly. Successfully updates tutor status with valid statuses (active, suspended, blacklisted, unavailable). Properly validates status parameter and returns 400 for invalid statuses. Authentication and role-based access control working properly."
 
+  - task: "Get all tutors endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Endpoint working perfectly. GET /api/tutors returns all tutors with complete user details populated. Proper data structure with both 'tutor' and 'user' objects. Correctly restricted to coordinator/admin roles only (403 for other roles). Data integrity verified with all required fields present."
+
   - task: "Notification system backend"
     implemented: false
     working: "NA"
