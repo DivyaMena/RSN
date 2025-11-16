@@ -58,7 +58,11 @@ export default function StudentDashboard({ user, logout }) {
       }
       
       setStudent(studentData);
-      const studentBatches = batchesRes.data.filter(batch => batch.student_ids.includes(studentId));
+      
+      // For "me", batches are already filtered; for parent view, filter them
+      const studentBatches = studentId === 'me' 
+        ? batchesRes.data 
+        : batchesRes.data.filter(batch => batch.student_ids.includes(studentId));
       setBatches(studentBatches);
 
       // Fetch curriculum for student's subjects
