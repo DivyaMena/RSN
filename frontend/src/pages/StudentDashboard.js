@@ -30,16 +30,31 @@ export default function StudentDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
-      const [studentsRes, batchesRes] = await Promise.all([
-        axios.get(`${API}/students`, { withCredentials: true }),
-        axios.get(`${API}/batches`, { withCredentials: true })
-      ]);
+      let studentData;
+      let batchesRes;
       
-      const studentData = studentsRes.data.find(s => s.id === studentId);
-      if (!studentData) {
-        toast.error('Student not found');
-        navigate('/dashboard');
-        return;
+      // If studentId is "me", fetch logged-in student's data
+      if (studentId === 'me') {
+        const [studentRes, batchesData] = await Promise.all([
+          axios.get(`${API}/students/me`, { withCredentials: true }),
+          axios.get(`${API}/students/me/batches`, { withCredentials: true })
+        ]);
+        studentData = studentRes.data;
+        batchesRes = { data: batchesData.data };
+      } else {
+        // Parent viewing their kid
+        const [studentsRes, allBatchesRes] = await Promise.all([
+          axios.get(`${API}/students`, { withCredentials: true }),
+          axios.get(`${API}/batches`, { withCredentials: true })
+        ]);
+        studentData = studentsRes.data.find(s => s.id === studentId);
+        batchesRes = allBatchesRes;
+        
+        if (!studentData) {
+          toast.error('Student not found');
+          navigate('/dashboard');
+          return;
+        }
       }
       
       setStudent(studentData);
