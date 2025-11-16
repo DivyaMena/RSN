@@ -513,7 +513,7 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     if user.role != "pending":
         raise HTTPException(status_code=400, detail="User already registered")
     
-    user_code = generate_user_code(input.state, "tutor")
+    user_code = generate_user_code(input.board_preference, "tutor")
     
     # Create tutor profile (pending approval)
     tutor = Tutor(
