@@ -194,6 +194,18 @@ class CreateLogEntryInput(BaseModel):
     curriculum_items: List[str]
     google_meet_link: str
     notes: Optional[str] = None
+    sessions_count: int = 1
+
+class CreateRemedialRequestInput(BaseModel):
+    batch_id: str
+    reason: str  # "missed_class" or "need_clarification"
+    topic: str
+    description: Optional[str] = None
+
+class MarkAttendanceInput(BaseModel):
+    student_id: str
+    log_entry_id: str
+    status: str  # present, absent, late
 
 class UpdateLogEntryInput(BaseModel):
     topic_covered: Optional[str] = None
