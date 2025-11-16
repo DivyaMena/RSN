@@ -295,7 +295,7 @@ export default function ParentDashboard({ user, logout }) {
                               <div>
                                 <p className="font-medium text-gray-900">{batch.batch_code}</p>
                                 <p className="text-sm text-gray-600">
-                                  {SUBJECTS[batch.subject]} | 
+                                  {SUBJECTS_MAP[batch.subject]} | 
                                   Status: <span className="capitalize">{batch.status}</span> |
                                   Students: {batch.student_ids.length}/25
                                 </p>
