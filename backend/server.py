@@ -106,7 +106,51 @@ class LogBoardEntry(BaseModel):
     curriculum_items: List[str]  # List of curriculum item IDs covered
     google_meet_link: str
     notes: Optional[str] = None
+    sessions_count: int = 1  # Number of sessions for this topic (for multi-class lessons)
     is_locked: bool = True  # Locked by default after creation
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # User ID who created this entry
+
+class Attendance(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    student_id: str
+    batch_id: str
+    log_entry_id: str
+    date: str  # ISO date string
+    status: str  # present, absent, late
+    marked_by: Optional[str] = None  # tutor_id who marked
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RemedialRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    student_id: str
+    batch_id: str
+    subject: str
+    class_level: int
+    board: str
+    reason: str  # "missed_class" or "need_clarification"
+    topic: str
+    description: Optional[str] = None
+    status: str = "pending"  # pending, pooled, assigned, completed
+    requested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RemedialClass(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    class_code: str  # RSN-TS-REMEDIAL-C9-MAT-001
+    subject: str
+    class_level: int
+    board: str
+    topic: str
+    student_ids: List[str]  # Students in this remedial class
+    request_ids: List[str]  # Remedial requests fulfilled
+    tutor_id: Optional[str] = None
+    scheduled_date: Optional[str] = None
+    google_meet_link: Optional[str] = None
+    status: str = "pending"  # pending, scheduled, completed
+    created_by: str  # coordinator user_id
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class CurriculumItem(BaseModel):
