@@ -905,6 +905,76 @@ async def get_my_tutor_profile(request: Request):
     
     return tutor
 
+@api_router.put("/tutors/{tutor_id}/approve")
+async def approve_tutor(tutor_id: str, request: Request):
+    """Approve tutor registration (coordinator/admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can approve tutors")
+    
+    await db.tutors.update_one(
+        {"id": tutor_id},
+        {"$set": {"approval_status": "approved", "status": "active"}}
+    )
+    
+    return {"success": True, "message": "Tutor approved"}
+
+@api_router.put("/tutors/{tutor_id}/reject")
+async def reject_tutor(tutor_id: str, reason: str, request: Request):
+    """Reject tutor registration (coordinator/admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can reject tutors")
+    
+    await db.tutors.update_one(
+        {"id": tutor_id},
+        {"$set": {"approval_status": "rejected", "rejection_reason": reason}}
+    )
+    
+    return {"success": True, "message": "Tutor rejected"}
+
+@api_router.put("/tutors/{tutor_id}/status")
+async def update_tutor_status(tutor_id: str, status: str, request: Request):
+    """Update tutor status (coordinator/admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can update status")
+    
+    valid_statuses = ["active", "suspended", "blacklisted", "unavailable"]
+    if status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    await db.tutors.update_one(
+        {"id": tutor_id},
+        {"$set": {"status": status}}
+    )
+    
+    return {"success": True, "message": f"Tutor status updated to {status}"}
+
+@api_router.get("/tutors/pending")
+async def get_pending_tutors(request: Request):
+    """Get pending tutor registrations (coordinator/admin only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can view pending tutors")
+    
+    tutors = await db.tutors.find({"approval_status": "pending"}, {"_id": 0}).to_list(None)
+    
+    # Get user details for each tutor
+    result = []
+    for tutor in tutors:
+        tutor_user = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
+        result.append({
+            "tutor": tutor,
+            "user": tutor_user
+        })
+    
+    return result
+
 # ============= STUDENT ROUTES =============
 
 @api_router.get("/students/me")
