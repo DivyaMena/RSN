@@ -28,6 +28,7 @@ export default function RegisterTutor({ setUser }) {
     current_address: '',
     pincode: '',
     about_yourself: '',
+    tutor_photo: null,
     aadhaar_page1: null,
     aadhaar_page2: null,
     classes_can_teach: [],
