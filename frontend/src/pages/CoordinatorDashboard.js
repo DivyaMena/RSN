@@ -219,63 +219,185 @@ export default function CoordinatorDashboard({ user, logout }) {
           <p className="text-gray-600 mt-2">Coordinate free tuition support - manage batches and assign volunteer tutors</p>
         </div>
 
-        {/* Pending Tutors Section */}
-        {pendingTutors.length > 0 && (
-          <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <Users className="h-5 w-5 mr-2 text-yellow-600" />
-              Pending Tutor Approvals ({pendingTutors.length})
-            </h2>
-            <div className="grid gap-4">
-              {pendingTutors.map(tutorData => (
-                <div key={tutorData.tutor.id} className="bg-white rounded-lg p-4 flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900">{tutorData.user?.name}</h3>
-                    <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Board: {tutorData.tutor.board_preference} | 
-                      Classes: {tutorData.tutor.classes_can_teach.join(', ')} | 
-                      Subjects: {tutorData.tutor.subjects_can_teach.map(s => SUBJECTS[s]).join(', ')}
-                    </p>
-                    <p className="text-sm text-gray-600">Days: {tutorData.tutor.available_days.join(', ')}</p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => {
-                        setCurrentTutor(tutorData);
-                        setTutorApprovalDialogOpen(true);
-                      }}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Review
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Statistics */}
+        {/* Statistics - Clickable */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div data-testid="stat-total-batches" className="bg-white rounded-xl shadow-lg p-6">
+          <button 
+            onClick={() => setActiveTab('batches')}
+            data-testid="stat-total-batches" 
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
+          >
             <h3 className="text-gray-600 text-sm font-medium mb-2">Total Batches</h3>
             <p className="text-4xl font-bold text-blue-600">{batches.length}</p>
-          </div>
-          <div data-testid="stat-active-batches" className="bg-white rounded-xl shadow-lg p-6">
+            <p className="text-xs text-gray-500 mt-2">Click to view all</p>
+          </button>
+          <button 
+            onClick={() => setActiveTab('active-batches')}
+            data-testid="stat-active-batches" 
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
+          >
             <h3 className="text-gray-600 text-sm font-medium mb-2">Active Batches</h3>
             <p className="text-4xl font-bold text-green-600">{batches.filter(b => b.status === 'active').length}</p>
-          </div>
-          <div data-testid="stat-total-tutors" className="bg-white rounded-xl shadow-lg p-6">
+            <p className="text-xs text-gray-500 mt-2">Click to view active</p>
+          </button>
+          <button 
+            onClick={() => setActiveTab('tutors')}
+            data-testid="stat-total-tutors" 
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
+          >
             <h3 className="text-gray-600 text-sm font-medium mb-2">Approved Tutors</h3>
             <p className="text-4xl font-bold text-purple-600">{tutors.length}</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-lg p-6">
+            <p className="text-xs text-gray-500 mt-2">Click to manage</p>
+          </button>
+          <button 
+            onClick={() => setActiveTab('pending')}
+            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
+          >
             <h3 className="text-gray-600 text-sm font-medium mb-2">Pending Approvals</h3>
             <p className="text-4xl font-bold text-yellow-600">{pendingTutors.length}</p>
-          </div>
+            <p className="text-xs text-gray-500 mt-2">Click to review</p>
+          </button>
         </div>
+
+        {/* Tabbed Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="tutors">All Tutors ({tutors.length})</TabsTrigger>
+            <TabsTrigger value="batches">All Batches ({batches.length})</TabsTrigger>
+            <TabsTrigger value="pending">Pending ({pendingTutors.length})</TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview">
+            {pendingTutors.length > 0 && (
+              <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-yellow-600" />
+                  Pending Tutor Approvals ({pendingTutors.length})
+                </h2>
+                <div className="grid gap-4">
+                  {pendingTutors.slice(0, 3).map(tutorData => (
+                    <div key={tutorData.tutor.id} className="bg-white rounded-lg p-4 flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900">{tutorData.user?.name}</h3>
+                        <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          setCurrentTutor(tutorData);
+                          setTutorApprovalDialogOpen(true);
+                        }}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Review
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                {pendingTutors.length > 3 && (
+                  <Button 
+                    onClick={() => setActiveTab('pending')}
+                    variant="link" 
+                    className="mt-4"
+                  >
+                    View all {pendingTutors.length} pending tutors →
+                  </Button>
+                )}
+              </div>
+            )}
+            
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent Batches</h2>
+              <div className="grid gap-4">
+                {batches.slice(0, 3).map(batch => (
+                  <div key={batch.id} className="bg-white rounded-xl shadow-lg p-6">
+                    <h3 className="text-xl font-bold">{batch.batch_code}</h3>
+                    <p className="text-gray-600">{SUBJECTS[batch.subject]} | Class {batch.class_level}</p>
+                    <p className="text-sm text-gray-500">Students: {batch.student_ids.length}/25</p>
+                  </div>
+                ))}
+              </div>
+              <Button 
+                onClick={() => setActiveTab('batches')}
+                variant="link" 
+                className="mt-4"
+              >
+                View all batches →
+              </Button>
+            </div>
+          </TabsContent>
+
+          {/* All Tutors Tab */}
+          <TabsContent value="tutors">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">All Approved Tutors</h2>
+              <div className="space-y-4">
+                {tutors.map(tutorData => (
+                  <div key={tutorData.tutor.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
+                        <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          <span className="font-medium">Board:</span> {tutorData.tutor.board_preference} | 
+                          <span className="font-medium ml-2">Classes:</span> {tutorData.tutor.classes_can_teach?.join(', ')} | 
+                          <span className="font-medium ml-2">Subjects:</span> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
+                        </p>
+                        <div className="mt-2 flex items-center space-x-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            tutorData.tutor.status === 'active' ? 'bg-green-100 text-green-800' :
+                            tutorData.tutor.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
+                            tutorData.tutor.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {tutorData.tutor.status?.toUpperCase() || 'ACTIVE'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => handleViewTutorDetails(tutorData)}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => handleChangeStatus(tutorData)}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Change Status
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* All Batches Tab */}
+          <TabsContent value="batches" value-active-batches="active-batches">
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Class:</label>
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
+                <SelectTrigger className="w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Classes</SelectItem>
+                  <SelectItem value="6">Class 6</SelectItem>
+                  <SelectItem value="7">Class 7</SelectItem>
+                  <SelectItem value="8">Class 8</SelectItem>
+                  <SelectItem value="9">Class 9</SelectItem>
+                  <SelectItem value="10">Class 10</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
         {/* Class Filter */}
         <div className="mb-6">
