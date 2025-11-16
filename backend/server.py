@@ -250,10 +250,23 @@ def generate_student_code(state: str, year: int) -> str:
     uid = random.randint(1, 99999)
     return f"RSN-{state}-S-{year}-{uid:05d}"
 
-def generate_batch_code(state: str, academic_year: str, class_level: int, subject: str) -> str:
+async def generate_batch_code(state: str, academic_year: str, class_level: int, subject: str) -> str:
     """Generate batch code: RSN-{STATE}-{ACAD_YEAR}-C{CLASS}-{SUBJECT}-{SERIAL}"""
-    serial = random.randint(1, 999)
-    return f"RSN-{state}-{academic_year}-C{class_level}-{subject}-{serial:03d}"
+    # Get last batch for this combination to generate sequential number
+    prefix = f"RSN-{state}-{academic_year}-C{class_level}-{subject}-"
+    last_batch = await db.batches.find_one(
+        {"batch_code": {"$regex": f"^{prefix}"}},
+        sort=[("batch_code", -1)]
+    )
+    
+    if last_batch:
+        # Extract serial number and increment
+        last_serial = int(last_batch["batch_code"].split("-")[-1])
+        serial = last_serial + 1
+    else:
+        serial = 1
+    
+    return f"{prefix}{serial:03d}"
 
 async def get_current_user(request: Request) -> Optional[User]:
     """Get current user from session token (cookie or header)"""
