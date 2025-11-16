@@ -524,14 +524,14 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     
     await db.users.update_one(
         {"id": user.id},
-        {"$set": {"role": "tutor", "state": input.state, "user_code": user_code}}
+        {"$set": {"role": "tutor", "state": input.board_preference, "user_code": user_code}}
     )
     
     user.role = "tutor"
-    user.state = input.state
+    user.state = input.board_preference
     user.user_code = user_code
     
-    return user
+    return {"user": user, "message": "Registration submitted for coordinator approval"}
 
 @api_router.post("/users/register/coordinator")
 async def register_coordinator(input: RegisterParentInput, request: Request):
