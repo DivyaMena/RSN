@@ -287,7 +287,7 @@ export default function ParentDashboard({ user, logout }) {
                               <div>
                                 <p className="font-medium text-gray-900">{batch.batch_code}</p>
                                 <p className="text-sm text-gray-600">
-                                  {SUBJECTS.find(s => s.value === batch.subject)?.label} | 
+                                  {SUBJECTS[batch.subject]} | 
                                   Status: <span className="capitalize">{batch.status}</span> |
                                   Students: {batch.student_ids.length}/25
                                 </p>
