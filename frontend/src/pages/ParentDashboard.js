@@ -86,13 +86,21 @@ export default function ParentDashboard({ user, logout }) {
     }
   };
 
-  const SUBJECTS = {
+  const SUBJECTS_MAP = {
     'MAT': 'Mathematics',
     'PHY': 'Physics',
     'SCI': 'Science',
     'BIO': 'Biology',
     'ENG': 'English'
   };
+
+  const SUBJECTS_ARRAY = [
+    { value: 'MAT', label: 'Mathematics' },
+    { value: 'PHY', label: 'Physics' },
+    { value: 'SCI', label: 'Science' },
+    { value: 'BIO', label: 'Biology' },
+    { value: 'ENG', label: 'English' }
+  ];
 
   const getStudentBatches = (studentId) => {
     return batches.filter(batch => batch.student_ids.includes(studentId));
