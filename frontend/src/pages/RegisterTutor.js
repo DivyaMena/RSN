@@ -150,7 +150,7 @@ export default function RegisterTutor({ setUser }) {
 
           {/* About Yourself */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tell us briefly about yourself *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tell me about yourself (This is visible to students & parents, Co-Ordinators etc) *</label>
             <Textarea
               data-testid="about-input"
               value={formData.about_yourself}
