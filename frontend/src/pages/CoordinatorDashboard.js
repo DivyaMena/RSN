@@ -281,7 +281,16 @@ export default function CoordinatorDashboard({ user, logout }) {
     });
   }
 
-  // Slot filter is a placeholder for now (no schedule/slots model yet)
+  // Filter by Slot using tutor preferred slots
+  if (selectedSlot !== 'all') {
+    filteredBatches = filteredBatches.filter(batch => {
+      const assignments = batchAssignments[batch.id] || [];
+      return assignments.some(a => {
+        const tutorData = tutors.find(t => t.tutor.id === a.tutor_id);
+        return tutorData?.tutor?.available_slots?.includes(selectedSlot);
+      });
+    });
+  }
 
   if (loading) {
     return (
