@@ -314,6 +314,17 @@ export default function ParentDashboard({ user, logout }) {
                             <Checkbox
                               data-testid={`form-subject-${subject.value}-checkbox`}
                               id={`form-subject-${subject.value}`}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={formData.accept_terms || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, accept_terms: !!checked })}
+                    />
+                    <span className="text-xs text-gray-600">
+                      I accept the terms and conditions mentioned in this URL
+                    </span>
+                  </div>
+
+
                               checked={formData.subjects.includes(subject.value)}
                               onCheckedChange={() => toggleSubject(subject.value)}
                             />
