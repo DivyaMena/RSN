@@ -221,6 +221,42 @@ backend:
         agent: "main"
         comment: "Not yet implemented - need to add notification endpoints for both email and in-app notifications"
 
+  - task: "Email/password login endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED: POST /api/auth/login endpoint created with role-based authentication. Validates email/password, checks role match, creates session with cookie. Password hashing with bcrypt/passlib. Special handling for RSN/admin role with is_main_admin and is_co_admin checks."
+
+  - task: "User model updates for admin system"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Added password_hash, is_main_admin, is_co_admin, can_manage_admins, invite_token, and invite_expires_at fields to User model. Updated role to support 6 types: parent, tutor, coordinator, admin, student, school."
+
+  - task: "RSN Admin seed script"
+    implemented: true
+    working: true
+    file: "/app/backend/seed_admin.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Created seed_admin.py to create/update main RSN admin (idonateforneedy@gmail.com). Successfully tested - admin can log in with password 'RisingStars@2025'."
+
 frontend:
   - task: "Coordinator Dashboard - Tutor approval UI"
     implemented: true
