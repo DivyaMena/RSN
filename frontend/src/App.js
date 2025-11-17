@@ -131,7 +131,7 @@ function App() {
             user.role === 'student' ? <Navigate to="/student/me" /> :
             user.role === 'tutor' ? <TutorDashboard user={user} logout={logout} /> :
             user.role === 'coordinator' ? <CoordinatorDashboard user={user} logout={logout} /> :
-            user.role === 'admin' ? <CoordinatorDashboard user={user} logout={logout} /> :
+            user.role === 'admin' ? <AdminDashboard user={user} logout={logout} /> :
             <Navigate to="/role-selection" />
           } />
           <Route path="/student/:studentId" element={user ? <StudentDashboard user={user} logout={logout} /> : <Navigate to="/" />} />
