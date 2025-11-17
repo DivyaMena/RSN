@@ -69,7 +69,7 @@ export default function ParentDashboard({ user, logout }) {
     e.preventDefault();
     
     // Validation
-    if (!formData.name || !formData.dob || !formData.student_photo || !formData.class_level || !formData.board || !formData.school_name || 
+    if (!formData.name || !formData.dob_day || !formData.dob_month || !formData.dob_year || !formData.student_photo || !formData.class_level || !formData.board || !formData.school_name || 
         !formData.location || !formData.roll_no || formData.subjects.length === 0 || !formData.aadhaar_page1 || !formData.accept_terms) {
       toast.error('Please fill all required fields including DOB, photo, Aadhaar card and accept Terms & Conditions');
       return;
