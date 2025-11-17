@@ -643,9 +643,10 @@ export default function CoordinatorDashboard({ user, logout }) {
                                   const display = slotObj.slot === '17:00-18:00' ? '5pm-6pm' : '6pm-7pm';
 
                                   const assignments = batchAssignments[batch.id] || [];
-                                  const isAssigned = assignments.some(a =>
-                                    a.assignment?.assigned_days?.includes(slotObj.day)
-                                  );
+                                  const isAssigned = assignments.some(a => {
+                                    const days = a.assignment?.assigned_days || [];
+                                    return days.includes(slotObj.day);
+                                  });
 
                                   let classes = 'px-2 py-1 rounded text-xs font-medium border ';
                                   if (isAssigned) {
