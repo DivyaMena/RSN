@@ -41,6 +41,9 @@ export default function LogBoard({ user, logout }) {
     notes: '',
     sessions_count: 1
   });
+  const [tutorInfoDialogOpen, setTutorInfoDialogOpen] = useState(false);
+  const [tutorInfo, setTutorInfo] = useState(null);
+
   const [editFormData, setEditFormData] = useState({
     topic_covered: '',
     curriculum_items: [],
