@@ -907,6 +907,22 @@ async def upload_curriculum(items: List[CurriculumItem], request: Request):
         else:
             await db.curriculum.insert_one(doc)
     
+
+@api_router.get("/tutors/{tutor_id}")
+async def get_tutor_by_id(tutor_id: str, request: Request):
+    """Get tutor details (tutor + linked user) by tutor_id"""
+    user = await require_auth(request)
+
+    if user.role not in ["coordinator", "admin", "parent", "student", "tutor"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view tutor details")
+
+    tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0})
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor not found")
+
+    tutor_user = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
+    return {"tutor": tutor, "user": tutor_user}
+
     return {"success": True, "count": len(items)}
 
 # ============= TUTOR ROUTES =============
