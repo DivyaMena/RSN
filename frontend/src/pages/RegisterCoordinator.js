@@ -80,29 +80,127 @@ export default function RegisterCoordinator({ setUser }) {
           Register as Coordinator
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Photo *</label>
-            <Input
-              data-testid="coordinator-photo-input"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
-            />
-            <p className="text-xs text-gray-500 mt-1">Recent photo for profile</p>
-          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Which state do you belong to? *</label>
+              <Select
+                value={formData.state}
+                onValueChange={(val) => setFormData(prev => ({ ...prev, state: val }))}
+              >
+                <SelectTrigger data-testid="coordinator-state-select" className="w-full">
+                  <SelectValue placeholder="Select your state" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TS">Telangana (TS)</SelectItem>
+                  <SelectItem value="AP">Andhra Pradesh (AP)</SelectItem>
+                  <SelectItem value="TN">Tamil Nadu (TN)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
-            <Select value={state} onValueChange={setState}>
-              <SelectTrigger data-testid="coordinator-state-select" className="w-full">
-                <SelectValue placeholder="Select your state" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="TS">Telangana (TS)</SelectItem>
-                <SelectItem value="AP">Andhra Pradesh (AP)</SelectItem>
-                <SelectItem value="TN">Tamil Nadu (TN)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter your full name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+              <Input
+                value={formData.address}
+                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Enter your full address"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mobile No. *</label>
+                <Input
+                  value={formData.mobile}
+                  onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                  placeholder="Primary mobile number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Alternate Mobile No.</label>
+                <Input
+                  value={formData.altMobile}
+                  onChange={(e) => setFormData(prev => ({ ...prev, altMobile: e.target.value }))}
+                  placeholder="Alternate mobile number (optional)"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+              <Input
+                value={formData.pincode}
+                onChange={(e) => setFormData(prev => ({ ...prev, pincode: e.target.value }))}
+                placeholder="Enter your pincode"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">KYC – Selfie *</label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData(prev => ({ ...prev, selfie: e.target.files[0] }))}
+              />
+              <p className="text-xs text-gray-500 mt-1">Upload a clear selfie for KYC</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">KYC – Aadhaar *</label>
+              <Input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => setFormData(prev => ({ ...prev, aadhaar: e.target.files[0] }))}
+              />
+              <p className="text-xs text-gray-500 mt-1">Upload Aadhaar card (image or PDF)</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Languages Known *</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  'Telugu',
+                  'Hindi',
+                  'English',
+                  'Marathi',
+                  'Tamil',
+                  'Kannada',
+                  'Malayalam',
+                  'Odiya',
+                ].map(lang => (
+                  <label key={lang} className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={formData.languages.includes(lang)}
+                      onChange={() => toggleLanguage(lang)}
+                    />
+                    <span>{lang}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                checked={formData.accept_terms}
+                onChange={(e) => setFormData(prev => ({ ...prev, accept_terms: e.target.checked }))}
+              />
+              <span className="text-xs text-gray-600">
+                I accept the terms and conditions mentioned in this URL
+              </span>
+            </div>
           </div>
 
           <Button
