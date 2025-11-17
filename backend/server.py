@@ -73,6 +73,8 @@ class Tutor(BaseModel):
     aadhaar_page1_url: Optional[str] = None  # Aadhaar card page 1 upload
     aadhaar_page2_url: Optional[str] = None  # Aadhaar card page 2 upload (optional)
     photo_url: Optional[str] = None  # Tutor photo/selfie
+    about_yourself: Optional[str] = None
+
     board_preference: str  # Which board they want to teach (TS, AP, TN)
     current_address: Optional[str] = None
     pincode: Optional[str] = None
