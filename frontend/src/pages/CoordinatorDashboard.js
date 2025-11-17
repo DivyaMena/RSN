@@ -47,6 +47,11 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [batchAssignments, setBatchAssignments] = useState({});
   const [selectedTutorData, setSelectedTutorData] = useState(null);
 
+  const [availabilityDialogOpen, setAvailabilityDialogOpen] = useState(false);
+  const [coordinatorAvailability, setCoordinatorAvailability] = useState('available');
+  const [coordUnavailableFrom, setCoordUnavailableFrom] = useState('');
+  const [coordUnavailableTo, setCoordUnavailableTo] = useState('');
+
   useEffect(() => {
     fetchData();
   }, []);
