@@ -378,67 +378,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                 <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <Users className="h-5 w-5 mr-2 text-yellow-600" />
                   Pending Tutor Approvals ({pendingTutors.length})
-          {/* My Availability Tab */}
-          <TabsContent value="availability">
-            <div className="bg-white rounded-xl shadow-lg p-6 max-w-xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">My Availability</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Submit your availability request. Admin will review and update your coordinator status or reassign batches if needed.
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select option *</label>
-                  <Select value={availabilityRequestType} onValueChange={setAvailabilityRequestType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select availability option" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="available">I am Available</SelectItem>
-                      <SelectItem value="unavailable">I am Unavailable from a date to a date</SelectItem>
-                      <SelectItem value="delete_account">Delete my account</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {availabilityRequestType === 'unavailable' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Unavailable From *</label>
-                      <Input
-                        type="date"
-                        value={availabilityRequestFrom}
-                        onChange={(e) => setAvailabilityRequestFrom(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Unavailable To *</label>
-                      <Input
-                        type="date"
-                        value={availabilityRequestTo}
-                        onChange={(e) => setAvailabilityRequestTo(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {availabilityRequestType === 'delete_account' && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                    ⚠️ This will send a request to Admin to delete your coordinator account and reassign your batches.
-                  </div>
-                )}
-
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleSubmitAvailabilityRequest}
-                    disabled={availabilityRequestLoading}
-                  >
-                    {availabilityRequestLoading ? 'Submitting...' : 'Submit Request'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
+          
 
                 </h2>
                 <div className="grid gap-4">
