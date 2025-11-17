@@ -55,9 +55,9 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [availabilityRequestTo, setAvailabilityRequestTo] = useState('');
   const [availabilityRequestLoading, setAvailabilityRequestLoading] = useState(false);
 
-  const [coordinatorAvailability, setCoordinatorAvailability] = useState('available');
-  const [coordUnavailableFrom, setCoordUnavailableFrom] = useState('');
-  const [coordUnavailableTo, setCoordUnavailableTo] = useState('');
+  const [coordinatorAvailability, setCoordinatorAvailability] = useState(user.availability_status || 'available');
+  const [coordUnavailableFrom, setCoordUnavailableFrom] = useState(user.unavailable_from || '');
+  const [coordUnavailableTo, setCoordUnavailableTo] = useState(user.unavailable_to || '');
 
   useEffect(() => {
     // Initialize availability from logged-in user
