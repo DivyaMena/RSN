@@ -245,6 +245,44 @@ export default function RegisterTutor({ setUser }) {
             </div>
           </div>
 
+          {/* Preferred Slot */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Slot *</label>
+            <div className="space-y-2">
+              <label className="flex items-center space-x-2 text-sm">
+                <input
+                  type="radio"
+                  name="preferred_slot"
+                  value="5pm-6pm"
+                  checked={formData.preferred_slot === '5pm-6pm'}
+                  onChange={(e) => setFormData({ ...formData, preferred_slot: e.target.value })}
+                />
+                <span>5pm to 6pm</span>
+              </label>
+              <label className="flex items-center space-x-2 text-sm">
+                <input
+                  type="radio"
+                  name="preferred_slot"
+                  value="6pm-7pm"
+                  checked={formData.preferred_slot === '6pm-7pm'}
+                  onChange={(e) => setFormData({ ...formData, preferred_slot: e.target.value })}
+                />
+                <span>6pm to 7pm</span>
+              </label>
+              <label className="flex items-center space-x-2 text-sm">
+                <input
+                  type="radio"
+                  name="preferred_slot"
+                  value="any"
+                  checked={formData.preferred_slot === 'any'}
+                  onChange={(e) => setFormData({ ...formData, preferred_slot: e.target.value })}
+                />
+                <span>Any</span>
+              </label>
+            </div>
+          </div>
+
+
           {/* Available Days */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Available Days *</label>
