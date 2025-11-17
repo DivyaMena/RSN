@@ -40,8 +40,8 @@ export default function RegisterCoordinator({ setUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!state || !photo) {
-      toast.error('Please select a state and upload your photo');
+    if (!formData.state || !formData.name || !formData.address || !formData.mobile || !formData.pincode || !formData.selfie || !formData.aadhaar || !formData.accept_terms) {
+      toast.error('Please fill all required fields and accept Terms & Conditions');
       return;
     }
 
@@ -49,7 +49,18 @@ export default function RegisterCoordinator({ setUser }) {
     try {
       const response = await axios.post(
         `${API}/users/register/coordinator`,
-        { state },
+        {
+          state: formData.state,
+          name: formData.name,
+          address: formData.address,
+          mobile: formData.mobile,
+          altMobile: formData.altMobile,
+          pincode: formData.pincode,
+          languages: formData.languages,
+          // For now we send file placeholders/URLs – file upload pipeline can be added later
+          selfie_url: formData.selfie?.name || null,
+          aadhaar_url: formData.aadhaar?.name || null,
+        },
         { withCredentials: true }
       );
       setUser(response.data);
