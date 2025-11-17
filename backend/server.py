@@ -984,22 +984,67 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
     if not tutor:
         raise HTTPException(status_code=404, detail="Tutor not found")
     
-    # Create assignment
-    # For now, assigned_days come from coordinator selection; we also generate detailed slots
-    assigned_slots = _generate_assigned_slots_for_batch(batch["class_level"], batch["subject"], batch["batch_code"])
+    # Find existing assignment (if any)
+    existing = await db.batch_tutor_assignments.find_one({
+        "batch_id": input.batch_id,
+        "tutor_id": input.tutor_id
+    })
 
-    assignment = BatchTutorAssignment(
-        batch_id=input.batch_id,
-        tutor_id=input.tutor_id,
-        assigned_days=input.assigned_days,
-        assigned_slots=assigned_slots
-    )
-    
-    doc = assignment.model_dump()
-    doc["created_at"] = doc["created_at"].isoformat()
-    await db.batch_tutor_assignments.insert_one(doc)
-    
-    return {"success": True, "assignment": assignment}
+    # Ensure global schedule exists on batch
+    if not batch.get("schedule_slots"):
+        schedule_slots = generate_schedule_slots_for_batch(batch["class_level"], batch["subject"], batch["batch_code"])
+        await db.batches.update_one(
+            {"id": batch["id"]},
+            {"$set": {"schedule_slots": [s.model_dump() for s in schedule_slots]}}
+        )
+
+    if input.mode == "unassign":
+        # Unassign: remove selected days from existing assignment
+        if not existing:
+            return {"success": True, "assignment": None}
+
+        current_days = existing.get("assigned_days", [])
+        new_days = [d for d in current_days if d not in input.assigned_days]
+
+        if new_days:
+            await db.batch_tutor_assignments.update_one(
+                {"id": existing["id"]},
+                {"$set": {"assigned_days": new_days}}
+            )
+            existing["assigned_days"] = new_days
+            return {"success": True, "assignment": BatchTutorAssignment(**existing)}
+        else:
+            # No days left, remove assignment entirely
+            await db.batch_tutor_assignments.delete_one({"id": existing["id"]})
+            return {"success": True, "assignment": None}
+
+    # Assign mode: create or update
+    if existing:
+        current_days = existing.get("assigned_days", [])
+        # Union of existing and new days
+        new_days = sorted(list(set(current_days) | set(input.assigned_days)), key=lambda d: DAYS.index(d))
+        await db.batch_tutor_assignments.update_one(
+            {"id": existing["id"]},
+            {"$set": {"assigned_days": new_days}}
+        )
+        existing["assigned_days"] = new_days
+        return {"success": True, "assignment": BatchTutorAssignment(**existing)}
+    else:
+        # Create new assignment with global schedule slots
+        assigned_slots = generate_schedule_slots_for_batch(batch["class_level"], batch["subject"], batch["batch_code"])
+
+        assignment = BatchTutorAssignment(
+            batch_id=input.batch_id,
+            tutor_id=input.tutor_id,
+            assigned_days=input.assigned_days,
+            assigned_slots=assigned_slots
+        )
+        
+        doc = assignment.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        await db.batch_tutor_assignments.insert_one(doc)
+        
+        return {"success": True, "assignment": assignment}
 
 @api_router.get("/batches/{batch_id}/tutors")
 async def get_batch_tutors(batch_id: str, request: Request):
