@@ -915,6 +915,9 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
     if user.role not in ["coordinator", "admin"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can create batches")
     
+    # Generate global schedule slots for this batch
+    schedule_slots = generate_schedule_slots_for_batch(input.class_level, input.subject, await generate_batch_code(input.state, input.academic_year, input.class_level, input.subject))
+
     batch = Batch(
         batch_code=await generate_batch_code(input.state, input.academic_year, input.class_level, input.subject),
         state=input.state,
@@ -923,7 +926,8 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
         subject=input.subject,
         board=input.board,
         student_ids=[],
-        status="waitlist"
+        status="waitlist",
+        schedule_slots=schedule_slots
     )
     
     doc = batch.model_dump()
