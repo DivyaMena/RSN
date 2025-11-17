@@ -47,6 +47,8 @@ export default function LogBoard({ user, logout }) {
     google_meet_link: '',
     notes: ''
   });
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+
 
   useEffect(() => {
     fetchData();
