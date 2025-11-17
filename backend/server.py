@@ -218,6 +218,12 @@ class CreateLogEntryInput(BaseModel):
     sessions_count: int = 1
 
 class CreateRemedialRequestInput(BaseModel):
+
+class JoinClassAttendanceInput(BaseModel):
+    batch_id: str
+    log_entry_id: str
+
+
     batch_id: str
     reason: str  # "missed_class" or "need_clarification"
     topic: str
