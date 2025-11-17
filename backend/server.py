@@ -188,11 +188,11 @@ class RegisterTutorInput(BaseModel):
     board_preference: str  # Which board curriculum they want to teach
     current_address: str
     pincode: str
+    about_yourself: Optional[str] = None
     classes_can_teach: List[int]
     subjects_can_teach: List[str]
-    available_slots: List[str]
-
     available_days: List[str]
+    available_slots: List[str]
 
 class RegisterStudentInput(BaseModel):
     name: str
