@@ -38,10 +38,18 @@ class User(BaseModel):
     name: str
     picture: Optional[str] = None
     photo_url: Optional[str] = None  # User photo/selfie upload
-    role: str  # parent, tutor, coordinator, admin
+    role: str  # parent, tutor, coordinator, admin, student, school
+    password_hash: Optional[str] = None  # For email/password login
     state: Optional[str] = None  # TS, AP, TN
     user_code: Optional[str] = None  # RSN-TS-T-12345 or RSN-TS-P-12345
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    # Admin-specific fields
+    is_main_admin: bool = False  # True only for main RSN admin
+    is_co_admin: bool = False  # True for co-admins
+    can_manage_admins: bool = False  # True for main admin, False for co-admins
+    invite_token: Optional[str] = None  # For co-admin invites
+    invite_expires_at: Optional[datetime] = None  # Invite expiration
 
     availability_status: Optional[str] = None  # for coordinator/admin availability
     unavailable_from: Optional[str] = None
