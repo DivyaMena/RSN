@@ -624,35 +624,39 @@ export default function CoordinatorDashboard({ user, logout }) {
                             Academic Year: {batch.academic_year}
                           </p>
                           
-                          {/* Assigned Days visualization (day-level) */}
+                          {/* Assigned Days & Slots visualization based on global schedule */}
                           <div className="mt-3">
-                            <p className="text-xs font-medium text-gray-600 mb-1">Assigned Days:</p>
+                            <p className="text-xs font-medium text-gray-600 mb-1">Assigned Days & Slots:</p>
                             <div className="flex flex-wrap gap-2">
-                              {DAYS.map(day => {
-                                const dayShort = day.substring(0, 3);
+                              {(batch.schedule_slots || []).map((slotObj, idx) => {
+                                const dayShort = slotObj.day.substring(0, 3);
+                                const display = slotObj.slot === '17:00-18:00' ? '5pm-6pm' : '6pm-7pm';
+
                                 const assignments = batchAssignments[batch.id] || [];
                                 const isAssigned = assignments.some(a =>
-                                  a.assignment?.assigned_days?.includes(day)
+                                  a.assignment?.assigned_days?.includes(slotObj.day)
                                 );
 
-                                // Allowed days: Mon-Sat for class 6-9, Mon-Sun for class 10
-                                const isAllowed = batch.class_level === 10 ? true : day !== 'Sunday';
-
                                 let classes = 'px-2 py-1 rounded text-xs font-medium border ';
-                                if (!isAllowed) {
-                                  classes += 'bg-gray-100 text-gray-300 border-gray-200';
-                                } else if (isAssigned) {
+                                if (isAssigned) {
                                   classes += 'bg-green-100 text-green-800 border-green-300';
                                 } else {
-                                  classes += 'bg-orange-100 text-orange-800 border-orange-300';
+                                  classes += 'bg-yellow-100 text-yellow-800 border-yellow-300';
                                 }
 
                                 return (
-                                  <span key={day} className={classes}>
-                                    {dayShort}
+                                  <span
+                                    key={`${slotObj.day}-${slotObj.slot}-${idx}`}
+                                    className={classes}
+                                  >
+                                    {dayShort} {display}
                                   </span>
                                 );
                               })}
+
+                              {(batch.schedule_slots || []).length === 0 && (
+                                <span className="text-xs text-gray-400">No schedule defined</span>
+                              )}
                             </div>
                           </div>
                           
