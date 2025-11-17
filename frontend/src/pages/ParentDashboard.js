@@ -185,14 +185,58 @@ export default function ParentDashboard({ user, logout }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Date of Birth (DD MMM YYYY) *</label>
-                    <Input
-                      value={formData.dob || ''}
-                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      placeholder="e.g. 05 Sep 2013"
-                    />
+                    <label className="block text-sm font-medium mb-2">Date of Birth *</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Select
+                        value={formData.dob_day || ''}
+                        onValueChange={(val) => setFormData({ ...formData, dob_day: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Day" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0')).map(day => (
+                            <SelectItem key={day} value={day}>{day}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={formData.dob_month || ''}
+                        onValueChange={(val) => setFormData({ ...formData, dob_month: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="01">Jan</SelectItem>
+                          <SelectItem value="02">Feb</SelectItem>
+                          <SelectItem value="03">Mar</SelectItem>
+                          <SelectItem value="04">Apr</SelectItem>
+                          <SelectItem value="05">May</SelectItem>
+                          <SelectItem value="06">Jun</SelectItem>
+                          <SelectItem value="07">Jul</SelectItem>
+                          <SelectItem value="08">Aug</SelectItem>
+                          <SelectItem value="09">Sep</SelectItem>
+                          <SelectItem value="10">Oct</SelectItem>
+                          <SelectItem value="11">Nov</SelectItem>
+                          <SelectItem value="12">Dec</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={formData.dob_year || ''}
+                        onValueChange={(val) => setFormData({ ...formData, dob_year: val })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 15 }, (_, i) => (new Date().getFullYear() - 6 - i).toString()).map(year => (
+                            <SelectItem key={year} value={year}>{year}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-
 
 
                   <div>
