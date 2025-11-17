@@ -79,6 +79,11 @@ export default function CoordinatorDashboard({ user, logout }) {
       }
       setBatchAssignments(assignments);
     } catch (error) {
+      // Fetch coordinator availability from user (if available)
+      setCoordinatorAvailability(user.availability_status || 'available');
+      setCoordUnavailableFrom(user.unavailable_from || '');
+      setCoordUnavailableTo(user.unavailable_to || '');
+
       toast.error('Failed to fetch data');
     } finally {
       setLoading(false);
