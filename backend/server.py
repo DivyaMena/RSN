@@ -204,6 +204,11 @@ class CurriculumItem(BaseModel):
 
 # ============= INPUT MODELS =============
 
+class LoginInput(BaseModel):
+    email: EmailStr
+    password: str
+    role: str  # student, parent, tutor, coordinator, school, admin
+
 class RegisterParentInput(BaseModel):
     state: str
 
