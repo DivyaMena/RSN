@@ -1057,6 +1057,69 @@ export default function CoordinatorDashboard({ user, logout }) {
                         Active
                       </div>
                     </SelectItem>
+      {/* Coordinator Availability Dialog */}
+      <Dialog open={availabilityDialogOpen} onOpenChange={setAvailabilityDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Your Availability</DialogTitle>
+            <DialogDescription>
+              Update your availability status so admins know when you can coordinate.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <Select value={coordinatorAvailability} onValueChange={setCoordinatorAvailability}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="unavailable">Temporarily Unavailable</SelectItem>
+                <SelectItem value="not_interested">Not Interested / Delete Account</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {coordinatorAvailability === 'unavailable' && (
+              <div className="space-y-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm font-medium text-gray-700">Unavailability Period</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
+                    <Input
+                      type="date"
+                      value={coordUnavailableFrom}
+                      onChange={(e) => setCoordUnavailableFrom(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
+                    <Input
+                      type="date"
+                      value={coordUnavailableTo}
+                      onChange={(e) => setCoordUnavailableTo(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {coordinatorAvailability === 'not_interested' && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                ⚠️ This will mark your coordinator account as not interested. You will not be assigned new responsibilities.
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 mt-2">
+              <Button variant="outline" onClick={() => setAvailabilityDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateCoordinatorAvailability}>
+                Update Availability
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
                     <SelectItem value="suspended">
                       <div className="flex items-center">
                         <Ban className="h-4 w-4 mr-2 text-yellow-600" />
