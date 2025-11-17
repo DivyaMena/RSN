@@ -10,6 +10,7 @@ import RegisterCoordinator from './pages/RegisterCoordinator';
 import ParentDashboard from './pages/ParentDashboard';
 import TutorDashboard from './pages/TutorDashboard';
 import CoordinatorDashboard from './pages/CoordinatorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import LogBoard from './pages/LogBoard';
 import TestLogin from './pages/TestLogin';
