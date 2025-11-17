@@ -583,6 +583,39 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     user.state = input.board_preference
     user.user_code = user_code
     
+
+@api_router.post("/coordinators/me/availability-requests")
+async def create_coordinator_availability_request(request: Request):
+    """Coordinator submits an availability request (sent to Admin for action)"""
+    user = await require_auth(request)
+
+    if user.role != "coordinator":
+        raise HTTPException(status_code=403, detail="Only coordinators can submit availability requests")
+
+    data = await request.json()
+    request_type = data.get("request_type")
+    unavailable_from = data.get("unavailable_from")
+    unavailable_to = data.get("unavailable_to")
+
+    if request_type not in ["available", "unavailable", "delete_account"]:
+        raise HTTPException(status_code=400, detail="Invalid request_type")
+
+    if request_type == "unavailable" and (not unavailable_from or not unavailable_to):
+        raise HTTPException(status_code=400, detail="unavailable_from and unavailable_to are required for unavailable request")
+
+    availability_request = CoordinatorAvailabilityRequest(
+        coordinator_user_id=user.id,
+        request_type=request_type,
+        unavailable_from=unavailable_from,
+        unavailable_to=unavailable_to,
+    )
+
+    doc = availability_request.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.coordinator_availability_requests.insert_one(doc)
+
+    return {"success": True}
+
     return {"user": user, "message": "Registration submitted for coordinator approval"}
 
 @api_router.post("/users/register/coordinator")
