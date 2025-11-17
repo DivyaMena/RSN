@@ -1176,17 +1176,6 @@ async def mark_attendance_on_join(input: JoinClassAttendanceInput, request: Requ
     return {"success": True}
 
 
-    
-    if user.role not in ["coordinator", "admin"]:
-        raise HTTPException(status_code=403, detail="Only coordinators can view remedial requests")
-    
-    query = {}
-    if status:
-        query["status"] = status
-    
-    requests_list = await db.remedial_requests.find(query, {"_id": 0}).to_list(None)
-    return requests_list
-
 @api_router.get("/remedial/my-requests")
 async def get_my_remedial_requests(request: Request):
     """Get my remedial requests (student only)"""
