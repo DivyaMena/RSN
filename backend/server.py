@@ -312,6 +312,71 @@ async def generate_batch_code(state: str, academic_year: str, class_level: int, 
     else:
         serial = 1
     
+SLOT_VALUES = ["17:00-18:00", "18:00-19:00"]
+
+CLASS_DAYS = {
+    6: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    7: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    8: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    9: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    10: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+}
+
+
+def generate_schedule_slots_for_batch(class_level: int, subject: str, batch_code: str) -> List[AssignedSlot]:
+    """Generate global schedule slots for a batch based on class & subject rules.
+
+    - Class 6 & 7: 4 slots per subject per week (MAT, SCI, ENG)
+    - Class 8 & 9: 3 slots per subject per week (MAT, PHY, BIO, ENG)
+    - Class 10: MAT & PHY = 4 slots, BIO & ENG = 3 slots
+    - Allowed days: Mon-Sat for 6-9, Mon-Sun for 10
+    - No two consecutive slots on the same day for this batch
+    - Random but stable per batch_code
+    """
+    import random
+
+    allowed_days = CLASS_DAYS.get(class_level, CLASS_DAYS[6])
+
+    # Determine slots per week based on rules
+    if class_level in [6, 7]:
+        slots_per_week = 4
+    elif class_level in [8, 9]:
+        slots_per_week = 3
+    elif class_level == 10:
+        if subject in ["MAT", "PHY"]:
+            slots_per_week = 4
+        else:
+            slots_per_week = 3
+    else:
+        slots_per_week = 3
+
+    # Seed from batch_code so pattern is stable per batch
+    random.seed(batch_code)
+
+    assigned: List[AssignedSlot] = []
+    used_day_slots = set()
+
+    while len(assigned) < slots_per_week:
+        day = random.choice(allowed_days)
+
+        # No two slots on the same day (no consecutive hours)
+        existing_for_day = [s for s in assigned if s.day == day]
+        if existing_for_day:
+            remaining_slots = [s for s in SLOT_VALUES if s not in {es.slot for es in existing_for_day}]
+            if not remaining_slots:
+                continue
+            slot = remaining_slots[0]
+        else:
+            slot = random.choice(SLOT_VALUES)
+
+        key = (day, slot)
+        if key in used_day_slots:
+            continue
+        used_day_slots.add(key)
+        assigned.append(AssignedSlot(day=day, slot=slot))
+
+    return assigned
+
     return f"{prefix}{serial:03d}"
 
 # ---------- Assigned slots logic (days & time slots) ----------
