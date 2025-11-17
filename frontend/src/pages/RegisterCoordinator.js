@@ -11,8 +11,18 @@ const API = `${BACKEND_URL}/api`;
 
 export default function RegisterCoordinator({ setUser }) {
   const navigate = useNavigate();
-  const [state, setState] = useState('');
-  const [photo, setPhoto] = useState(null);
+  const [formData, setFormData] = useState({
+    state: '',
+    name: '',
+    address: '',
+    mobile: '',
+    altMobile: '',
+    pincode: '',
+    selfie: null,
+    aadhaar: null,
+    languages: [],
+    accept_terms: false,
+  });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
