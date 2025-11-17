@@ -39,6 +39,10 @@ class User(BaseModel):
     user_code: Optional[str] = None  # RSN-TS-T-12345 or RSN-TS-P-12345
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    availability_status: Optional[str] = None  # for coordinator/admin availability
+    unavailable_from: Optional[str] = None
+    unavailable_to: Optional[str] = None
+
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
     user_id: str
