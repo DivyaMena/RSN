@@ -379,12 +379,6 @@ def _generate_assigned_slots_for_batch(class_level: int, subject: str, batch_cod
 
     return assigned
 
-        serial = last_serial + 1
-    else:
-        serial = 1
-    
-    return f"{prefix}{serial:03d}"
-
 async def get_current_user(request: Request) -> Optional[User]:
     """Get current user from session token (cookie or header)"""
     session_token = request.cookies.get("session_token")
