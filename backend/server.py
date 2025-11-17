@@ -1007,6 +1007,164 @@ async def get_all_schools(request: Request):
     # Placeholder - schools collection to be implemented
     return []
 
+@api_router.post("/admin/coordinator-assignments")
+async def create_coordinator_assignment(input: dict, request: Request):
+    """Create a new coordinator assignment"""
+    user = await require_admin(request)
+    
+    assignment_type = input.get("assignment_type")
+    coordinator_id = input.get("coordinator_id")
+    
+    if not coordinator_id:
+        raise HTTPException(status_code=400, detail="Coordinator ID is required")
+    
+    # Verify coordinator exists
+    coordinator = await db.users.find_one({"id": coordinator_id, "role": "coordinator"}, {"_id": 0})
+    if not coordinator:
+        raise HTTPException(status_code=404, detail="Coordinator not found")
+    
+    # Create assignment based on type
+    assignment = CoordinatorAssignment(
+        coordinator_id=coordinator_id,
+        assignment_type=assignment_type,
+        created_by=user.id
+    )
+    
+    if assignment_type == "class":
+        if not input.get("class_level"):
+            raise HTTPException(status_code=400, detail="Class level is required for class assignment")
+        assignment.class_level = input.get("class_level")
+    
+    elif assignment_type == "class_subject":
+        if not input.get("class_level") or not input.get("subject"):
+            raise HTTPException(status_code=400, detail="Class level and subject are required")
+        assignment.class_level = input.get("class_level")
+        assignment.subject = input.get("subject")
+    
+    elif assignment_type == "batch_range":
+        if not input.get("batch_start") or not input.get("batch_end"):
+            raise HTTPException(status_code=400, detail="Batch start and end are required")
+        assignment.batch_start = input.get("batch_start")
+        assignment.batch_end = input.get("batch_end")
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid assignment type")
+    
+    doc = assignment.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    
+    await db.coordinator_assignments.insert_one(doc)
+    
+    return {"success": True, "message": "Coordinator assigned successfully"}
+
+@api_router.get("/admin/coordinator-assignments")
+async def get_coordinator_assignments(request: Request):
+    """Get all coordinator assignments"""
+    await require_admin(request)
+    
+    assignments = await db.coordinator_assignments.find({}, {"_id": 0}).to_list(length=None)
+    
+    # Populate coordinator details
+    result = []
+    for assignment in assignments:
+        coordinator = await db.users.find_one(
+            {"id": assignment.get("coordinator_id")},
+            {"_id": 0, "name": 1, "email": 1, "id": 1}
+        )
+        
+        assignment["coordinator"] = coordinator
+        result.append(assignment)
+    
+    return result
+
+@api_router.delete("/admin/coordinator-assignments/{assignment_id}")
+async def delete_coordinator_assignment(assignment_id: str, request: Request):
+    """Delete a coordinator assignment"""
+    await require_admin(request)
+    
+    result = await db.coordinator_assignments.delete_one({"id": assignment_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    
+    return {"success": True, "message": "Assignment removed successfully"}
+
+@api_router.post("/admin/school-tutor-assignments")
+async def create_school_tutor_assignment(input: dict, request: Request):
+    """Assign a tutor to a school"""
+    user = await require_admin(request)
+    
+    school_id = input.get("school_id")
+    tutor_id = input.get("tutor_id")
+    assigned_subjects = input.get("assigned_subjects", [])
+    
+    if not school_id or not tutor_id:
+        raise HTTPException(status_code=400, detail="School ID and Tutor ID are required")
+    
+    # Check if assignment already exists
+    existing = await db.school_tutor_assignments.find_one({
+        "school_id": school_id,
+        "tutor_id": tutor_id
+    }, {"_id": 0})
+    
+    if existing:
+        # Update existing assignment
+        await db.school_tutor_assignments.update_one(
+            {"school_id": school_id, "tutor_id": tutor_id},
+            {"$set": {"assigned_subjects": assigned_subjects}}
+        )
+        return {"success": True, "message": "Tutor assignment updated"}
+    
+    # Create new assignment
+    assignment = SchoolTutorAssignment(
+        school_id=school_id,
+        tutor_id=tutor_id,
+        assigned_subjects=assigned_subjects,
+        created_by=user.id
+    )
+    
+    doc = assignment.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    
+    await db.school_tutor_assignments.insert_one(doc)
+    
+    return {"success": True, "message": "Tutor assigned to school successfully"}
+
+@api_router.get("/admin/school-tutor-assignments")
+async def get_school_tutor_assignments(request: Request):
+    """Get all school-tutor assignments"""
+    await require_admin(request)
+    
+    assignments = await db.school_tutor_assignments.find({}, {"_id": 0}).to_list(length=None)
+    
+    # Populate school and tutor details
+    result = []
+    for assignment in assignments:
+        # Get tutor details
+        tutor_doc = await db.tutors.find_one({"id": assignment.get("tutor_id")}, {"_id": 0})
+        if tutor_doc:
+            user_doc = await db.users.find_one(
+                {"id": tutor_doc.get("user_id")},
+                {"_id": 0, "name": 1, "email": 1}
+            )
+            assignment["tutor"] = {**tutor_doc, "user": user_doc}
+        
+        result.append(assignment)
+    
+    return result
+
+@api_router.delete("/admin/school-tutor-assignments/{assignment_id}")
+async def delete_school_tutor_assignment(assignment_id: str, request: Request):
+    """Delete a school-tutor assignment"""
+    await require_admin(request)
+    
+    result = await db.school_tutor_assignments.delete_one({"id": assignment_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    
+    return {"success": True, "message": "Tutor assignment removed"}
+
 # ============= USER ROUTES =============
 
 @api_router.post("/users/register/parent")
