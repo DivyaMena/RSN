@@ -345,6 +345,42 @@ frontend:
         agent: "main"
         comment: "Not yet implemented - need to add notification UI component for displaying both email and in-app notifications"
 
+  - task: "Role-based Login page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Login.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED & TESTED: Created new Login.js page with 'I am a' dropdown showing 6 roles (Student default). Includes email/password fields, show/hide password toggle, Google OAuth option. RSN role shows 'Restricted Access' message and hides registration link. Successfully tested RSN admin login - redirects to dashboard correctly."
+
+  - task: "Landing page updates"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Landing.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Updated header and hero section buttons to redirect to /login instead of Google OAuth. 'Login' button now goes to new role-based login page. Test Login button still available."
+
+  - task: "App routing for login"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Added /login route to App.js. Login page redirects to dashboard if user already logged in. Imported and configured Login component."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
