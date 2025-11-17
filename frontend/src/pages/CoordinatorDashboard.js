@@ -291,13 +291,7 @@ export default function CoordinatorDashboard({ user, logout }) {
           <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Coordinator Dashboard</h1>
           <p className="text-gray-600 mt-2">Coordinate free tuition support - manage batches and assign volunteer tutors</p>
         </div>
-        <div className="mb-4 flex justify-between items-center">
-          <p className="text-sm text-gray-600">
-            Availability:{' '}
-            <span className={`font-semibold ${coordinatorAvailability === 'available' ? 'text-green-600' : coordinatorAvailability === 'unavailable' ? 'text-yellow-600' : 'text-red-600'}`}>
-              {coordinatorAvailability === 'not_interested' ? 'Not Interested' : coordinatorAvailability}
-            </span>
-          </p>
+        <div className="mb-4 flex justify-end items-center">
           <Button
             variant="outline"
             size="sm"
