@@ -698,6 +698,16 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
         academic_year=input.academic_year,
         class_level=input.class_level,
         subject=input.subject,
+        board=input.board,
+        student_ids=[],
+        status="waitlist"
+    )
+    
+    doc = batch.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.batches.insert_one(doc)
+    
+    return batch
 
 @api_router.post("/batches/{batch_id}/assigned-schedule")
 async def generate_assigned_schedule(batch_id: str, request: Request):
@@ -713,18 +723,6 @@ async def generate_assigned_schedule(batch_id: str, request: Request):
 
     # TODO: implement class/subject-based slot generation logic here
     return {"success": True}
-
-
-        board=input.board,
-        student_ids=[],
-        status="waitlist"
-    )
-    
-    doc = batch.model_dump()
-    doc["created_at"] = doc["created_at"].isoformat()
-    await db.batches.insert_one(doc)
-    
-    return batch
 
 @api_router.post("/batches/assign-tutor")
 async def assign_tutor(input: AssignTutorInput, request: Request):
