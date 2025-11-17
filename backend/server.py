@@ -199,7 +199,6 @@ class RegisterStudentInput(BaseModel):
     aadhaar_number: str
     class_level: int
     dob: Optional[str] = None
-
     board: str
     school_name: str
     location: str
