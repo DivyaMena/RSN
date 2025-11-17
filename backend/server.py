@@ -380,8 +380,6 @@ def generate_schedule_slots_for_batch(class_level: int, subject: str, batch_code
 
     return assigned
 
-    return f"{prefix}{serial:03d}"
-
 # ---------- Assigned slots logic (days & time slots) ----------
 
 CLASS_DAYS = {
