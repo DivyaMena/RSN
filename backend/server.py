@@ -187,6 +187,17 @@ class CurriculumItem(BaseModel):
 class RegisterParentInput(BaseModel):
     state: str
 
+class RegisterCoordinatorInput(BaseModel):
+    state: str
+    name: str
+    address: str
+    mobile: str
+    altMobile: Optional[str] = None
+    pincode: str
+    languages: List[str]
+    selfie_url: Optional[str] = None
+    aadhaar_url: Optional[str] = None
+
 class RegisterTutorInput(BaseModel):
     aadhaar_number: str
     board_preference: str  # Which board curriculum they want to teach
