@@ -100,7 +100,7 @@ export default function CoordinatorDashboard({ user, logout }) {
     }
   };
 
-  const handleAssignTutor = async () => {
+  const handleAssignTutor = async (mode = 'assign') => {
     if (!selectedTutor || selectedDays.length === 0) {
       toast.error('Please select tutor and days');
       return;
