@@ -21,7 +21,9 @@ export default function ParentDashboard({ user, logout }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    dob: '',
+    dob_day: '',
+    dob_month: '',
+    dob_year: '',
     student_photo: null,
     aadhaar_page1: null,
     aadhaar_page2: null,
