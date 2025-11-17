@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import Landing from './pages/Landing';
+import Login from './pages/Login';
 import RoleSelection from './pages/RoleSelection';
 import RegisterParent from './pages/RegisterParent';
 import RegisterTutor from './pages/RegisterTutor';
