@@ -389,7 +389,17 @@ export default function LogBoard({ user, logout }) {
                         <h3 className="text-xl font-bold text-gray-900">{entry.topic_covered}</h3>
                         {entry.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
                       </div>
-                      <p className="text-sm text-gray-600">By {entry.tutor_name} on {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                      <p className="text-sm text-gray-600">
+                        By{' '}
+                        <button
+                          type="button"
+                          className="text-blue-600 hover:underline"
+                          onClick={() => handleTutorClick(entry.tutor_name)}
+                        >
+                          {entry.tutor_name}
+                        </button>{' '}
+                        on {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' })}
+                      </p>
                     </div>
                     {canEditEntry && (
                       <Button
