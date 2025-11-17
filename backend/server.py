@@ -306,6 +306,12 @@ async def generate_batch_code(state: str, academic_year: str, class_level: int, 
     if last_batch:
         # Extract serial number and increment
         last_serial = int(last_batch["batch_code"].split("-")[-1])
+        serial = last_serial + 1
+    else:
+        serial = 1
+    
+    return f"{prefix}{serial:03d}"
+
 # ---------- Assigned slots logic (days & time slots) ----------
 
 CLASS_DAYS = {
