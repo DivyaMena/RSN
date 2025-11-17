@@ -179,6 +179,36 @@ export default function CoordinatorDashboard({ user, logout }) {
     } catch (error) {
       toast.error('Failed to update status');
     }
+  const handleSubmitAvailabilityRequest = async () => {
+    if (availabilityRequestType === 'unavailable' && (!availabilityRequestFrom || !availabilityRequestTo)) {
+      toast.error('Please provide from and to dates for unavailability');
+      return;
+    }
+
+    try {
+      setAvailabilityRequestLoading(true);
+      await axios.post(
+        `${API}/coordinators/me/availability-requests`,
+        {
+          request_type: availabilityRequestType,
+          unavailable_from: availabilityRequestType === 'unavailable' ? availabilityRequestFrom : null,
+          unavailable_to: availabilityRequestType === 'unavailable' ? availabilityRequestTo : null,
+        },
+        { withCredentials: true }
+      );
+      toast.success('Availability request sent to Admin');
+      // Reset form
+      setAvailabilityRequestType('available');
+      setAvailabilityRequestFrom('');
+      setAvailabilityRequestTo('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send request');
+    } finally {
+      setAvailabilityRequestLoading(false);
+    }
+  };
+
+
   };
 
   const handleViewTutorDetails = (tutorData) => {
