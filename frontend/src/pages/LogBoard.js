@@ -182,6 +182,24 @@ export default function LogBoard({ user, logout }) {
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to update log entry');
+  const handleTutorClick = async (tutorName) => {
+    try {
+      // Find tutor record matching this name from batch tutors
+      const match = tutors.find(t => t.tutor_user?.name === tutorName || t.tutor?.tutor_name === tutorName);
+      if (!match || !match.tutor) {
+        toast.error('Tutor details not available');
+        return;
+      }
+
+      const res = await axios.get(`${API}/tutors/${match.tutor.id}`, { withCredentials: true });
+      setTutorInfo(res.data);
+      setTutorInfoDialogOpen(true);
+    } catch (error) {
+      toast.error('Failed to load tutor details');
+    }
+  };
+
+
     }
   };
 
