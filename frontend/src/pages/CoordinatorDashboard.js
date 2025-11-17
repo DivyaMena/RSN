@@ -1157,28 +1157,28 @@ export default function CoordinatorDashboard({ user, logout }) {
                         Active
                       </div>
                     </SelectItem>
-      {/* Coordinator Availability Dialog */}
+      {/* Coordinator Availability Dialog - Submit Request to Admin */}
       <Dialog open={availabilityDialogOpen} onOpenChange={setAvailabilityDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Manage Your Availability</DialogTitle>
+            <DialogTitle>Manage Availability</DialogTitle>
             <DialogDescription>
-              Update your availability status so admins know when you can coordinate.
+              Submit your availability request. Admin will review and update your coordinator status or reassign batches if needed.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <Select value={coordinatorAvailability} onValueChange={setCoordinatorAvailability}>
+            <Select value={availabilityRequestType} onValueChange={setAvailabilityRequestType}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select availability option" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="unavailable">Temporarily Unavailable</SelectItem>
-                <SelectItem value="not_interested">Not Interested / Delete Account</SelectItem>
+                <SelectItem value="available">I am Available</SelectItem>
+                <SelectItem value="unavailable">I am Unavailable from a date to a date</SelectItem>
+                <SelectItem value="delete_account">Delete my account</SelectItem>
               </SelectContent>
             </Select>
 
-            {coordinatorAvailability === 'unavailable' && (
+            {availabilityRequestType === 'unavailable' && (
               <div className="space-y-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm font-medium text-gray-700">Unavailability Period</p>
                 <div className="grid grid-cols-2 gap-3">
@@ -1186,25 +1186,25 @@ export default function CoordinatorDashboard({ user, logout }) {
                     <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
                     <Input
                       type="date"
-                      value={coordUnavailableFrom}
-                      onChange={(e) => setCoordUnavailableFrom(e.target.value)}
+                      value={availabilityRequestFrom}
+                      onChange={(e) => setAvailabilityRequestFrom(e.target.value)}
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
                     <Input
                       type="date"
-                      value={coordUnavailableTo}
-                      onChange={(e) => setCoordUnavailableTo(e.target.value)}
+                      value={availabilityRequestTo}
+                      onChange={(e) => setAvailabilityRequestTo(e.target.value)}
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {coordinatorAvailability === 'not_interested' && (
+            {availabilityRequestType === 'delete_account' && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                ⚠️ This will mark your coordinator account as not interested. You will not be assigned new responsibilities.
+                ⚠️ This will send a request to Admin to delete your coordinator account and reassign your batches.
               </div>
             )}
 
@@ -1212,8 +1212,8 @@ export default function CoordinatorDashboard({ user, logout }) {
               <Button variant="outline" onClick={() => setAvailabilityDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleUpdateCoordinatorAvailability}>
-                Update Availability
+              <Button onClick={handleSubmitAvailabilityRequest} disabled={availabilityRequestLoading}>
+                {availabilityRequestLoading ? 'Submitting...' : 'Submit Request'}
               </Button>
             </div>
           </div>
