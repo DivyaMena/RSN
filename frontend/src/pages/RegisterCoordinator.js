@@ -12,18 +12,6 @@ const API = `${BACKEND_URL}/api`;
 export default function RegisterCoordinator({ setUser }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-  const toggleLanguage = (lang) => {
-    setFormData(prev => {
-      const exists = prev.languages.includes(lang);
-      return {
-        ...prev,
-        languages: exists
-          ? prev.languages.filter(l => l !== lang)
-          : [...prev.languages, lang]
-      };
-    });
-  };
-
     state: '',
     name: '',
     address: '',
@@ -36,6 +24,18 @@ export default function RegisterCoordinator({ setUser }) {
     accept_terms: false,
   });
   const [loading, setLoading] = useState(false);
+
+  const toggleLanguage = (lang) => {
+    setFormData(prev => {
+      const exists = prev.languages.includes(lang);
+      return {
+        ...prev,
+        languages: exists
+          ? prev.languages.filter(l => l !== lang)
+          : [...prev.languages, lang]
+      };
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
