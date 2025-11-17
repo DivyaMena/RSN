@@ -112,11 +112,12 @@ export default function CoordinatorDashboard({ user, logout }) {
         {
           batch_id: selectedBatch.id,
           tutor_id: selectedTutor,
-          assigned_days: selectedDays
+          assigned_days: selectedDays,
+          mode
         },
         { withCredentials: true }
       );
-      toast.success('Tutor assigned successfully');
+      toast.success(mode === 'assign' ? 'Tutor assigned successfully' : 'Tutor removed successfully');
       setAssignDialogOpen(false);
       setSelectedBatch(null);
       setSelectedTutor('');
