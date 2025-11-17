@@ -193,6 +193,32 @@ export default function LogBoard({ user, logout }) {
     setEditDialogOpen(true);
   };
 
+  const handleJoinClass = async (entry) => {
+    if (user.role !== 'student') {
+      window.open(entry.google_meet_link, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you willing to attend this class?');
+    if (!confirmed) return;
+
+    try {
+      setAttendanceLoading(true);
+      await axios.post(
+        `${API}/attendance/join-class`,
+        { batch_id: batchId, log_entry_id: entry.id },
+        { withCredentials: true }
+      );
+      toast.success('Attendance marked. Opening class in Google Meet...');
+      window.open(entry.google_meet_link, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to mark attendance');
+    } finally {
+      setAttendanceLoading(false);
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
