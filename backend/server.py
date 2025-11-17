@@ -112,6 +112,7 @@ class BatchTutorAssignment(BaseModel):
     batch_id: str
     tutor_id: str
     assigned_days: List[str]  # ["Monday", "Wednesday"]
+    assigned_slots: List[AssignedSlot] = Field(default_factory=list)  # detailed day/slot schedule
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class AssignedSlot(BaseModel):
