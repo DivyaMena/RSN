@@ -202,6 +202,27 @@ class CurriculumItem(BaseModel):
     topic_name: str
     description: Optional[str] = None
 
+class CoordinatorAssignment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    coordinator_id: str
+    assignment_type: str  # "class", "class_subject", "batch_range"
+    class_level: Optional[int] = None  # For class and class_subject types
+    subject: Optional[str] = None  # For class_subject type
+    batch_start: Optional[str] = None  # For batch_range type (e.g., "MAT-001")
+    batch_end: Optional[str] = None  # For batch_range type (e.g., "MAT-020")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # Admin user ID
+
+class SchoolTutorAssignment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    school_id: str
+    tutor_id: str
+    assigned_subjects: List[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # Admin user ID
+
 # ============= INPUT MODELS =============
 
 class LoginInput(BaseModel):
