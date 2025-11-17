@@ -624,27 +624,35 @@ export default function CoordinatorDashboard({ user, logout }) {
                             Academic Year: {batch.academic_year}
                           </p>
                           
-                          {/* Days & Slots Assigned Visualization */}
+                          {/* Assigned Days visualization (day-level) */}
                           <div className="mt-3">
-                            <p className="text-xs font-medium text-gray-600 mb-1">Assigned Days & Slots:</p>
+                            <p className="text-xs font-medium text-gray-600 mb-1">Assigned Days:</p>
                             <div className="flex flex-wrap gap-2">
-                              {(batchAssignments[batch.id] || []).flatMap(a => 
-                                (a.assignment?.assigned_slots || []).map((slotObj, idx) => {
-                                  const dayShort = slotObj.day.substring(0, 3);
-                                  const display = slotObj.slot === '17:00-18:00' ? '5pm-6pm' : '6pm-7pm';
-                                  return (
-                                    <span
-                                      key={`${slotObj.day}-${slotObj.slot}-${idx}`}
-                                      className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-300"
-                                    >
-                                      {dayShort} {display}
-                                    </span>
-                                  );
-                                })
-                              )}
-                              {(batchAssignments[batch.id] || []).length === 0 && (
-                                <span className="text-xs text-gray-400">No tutor assigned yet</span>
-                              )}
+                              {DAYS.map(day => {
+                                const dayShort = day.substring(0, 3);
+                                const assignments = batchAssignments[batch.id] || [];
+                                const isAssigned = assignments.some(a =>
+                                  a.assignment?.assigned_days?.includes(day)
+                                );
+
+                                // Allowed days: Mon-Sat for class 6-9, Mon-Sun for class 10
+                                const isAllowed = batch.class_level === 10 ? true : day !== 'Sunday';
+
+                                let classes = 'px-2 py-1 rounded text-xs font-medium border ';
+                                if (!isAllowed) {
+                                  classes += 'bg-gray-100 text-gray-300 border-gray-200';
+                                } else if (isAssigned) {
+                                  classes += 'bg-green-100 text-green-800 border-green-300';
+                                } else {
+                                  classes += 'bg-orange-100 text-orange-800 border-orange-300';
+                                }
+
+                                return (
+                                  <span key={day} className={classes}>
+                                    {dayShort}
+                                  </span>
+                                );
+                              })}
                             </div>
                           </div>
                           
