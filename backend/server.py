@@ -106,6 +106,11 @@ class Batch(BaseModel):
     status: str = "waitlist"  # waitlist, active, full
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class AssignedSlot(BaseModel):
+    day: str  # e.g. "Monday"
+    slot: str  # "17:00-18:00" or "18:00-19:00"
+
+
 class BatchTutorAssignment(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -114,10 +119,6 @@ class BatchTutorAssignment(BaseModel):
     assigned_days: List[str]  # ["Monday", "Wednesday"]
     assigned_slots: List[AssignedSlot] = Field(default_factory=list)  # detailed day/slot schedule
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class AssignedSlot(BaseModel):
-    day: str  # e.g. "Monday"
-    slot: str  # "17:00-18:00" or "18:00-19:00"
 
 
 class LogBoardEntry(BaseModel):
