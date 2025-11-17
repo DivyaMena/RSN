@@ -700,6 +700,23 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
         academic_year=input.academic_year,
         class_level=input.class_level,
         subject=input.subject,
+
+@api_router.post("/batches/{batch_id}/assigned-schedule")
+async def generate_assigned_schedule(batch_id: str, request: Request):
+    """Generate and store assigned days/slots for batch based on rules (admin/coordinator only)"""
+    user = await require_auth(request)
+
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators/admins can generate schedules")
+
+    batch = await db.batches.find_one({"id": batch_id})
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+
+    # TODO: implement class/subject-based slot generation logic here
+    return {"success": True}
+
+
         board=input.board,
         student_ids=[],
         status="waitlist"
