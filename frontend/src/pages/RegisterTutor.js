@@ -33,7 +33,8 @@ export default function RegisterTutor({ setUser }) {
     aadhaar_page2: null,
     classes_can_teach: [],
     subjects_can_teach: [],
-    available_days: []
+    available_days: [],
+    preferred_slot: '' // '5pm-6pm' | '6pm-7pm' | 'any'
   });
   const [loading, setLoading] = useState(false);
 
