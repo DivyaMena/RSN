@@ -575,7 +575,7 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     return {"user": user, "message": "Registration submitted for coordinator approval"}
 
 @api_router.post("/users/register/coordinator")
-async def register_coordinator(input: RegisterParentInput, request: Request):
+async def register_coordinator(input: RegisterCoordinatorInput, request: Request):
     """Register as coordinator (requires admin approval in production)"""
     user = await require_auth(request)
     
@@ -584,16 +584,40 @@ async def register_coordinator(input: RegisterParentInput, request: Request):
     
     user_code = generate_user_code(input.state, "coordinator")
     
+    # Update user core info
     await db.users.update_one(
         {"id": user.id},
-        {"$set": {"role": "coordinator", "state": input.state, "user_code": user_code}}
+        {"$set": {
+            "role": "coordinator",
+            "state": input.state,
+            "user_code": user_code,
+            "name": input.name,
+            "photo_url": input.selfie_url,
+        }}
     )
+
+    # Store coordinator profile details in a separate collection for future use
+    coordinator_profile = {
+        "id": str(uuid.uuid4()),
+        "user_id": user.id,
+        "state": input.state,
+        "name": input.name,
+        "address": input.address,
+        "mobile": input.mobile,
+        "altMobile": input.altMobile,
+        "pincode": input.pincode,
+        "languages": input.languages,
+        "selfie_url": input.selfie_url,
+        "aadhaar_url": input.aadhaar_url,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.coordinators.insert_one(coordinator_profile)
     
     user.role = "coordinator"
     user.state = input.state
     user.user_code = user_code
     
-    return user
+    return {"user": user, "message": "Coordinator registration submitted"}
 
 # ============= STUDENT ROUTES =============
 
