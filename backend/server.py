@@ -1018,6 +1018,8 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
             await db.batch_tutor_assignments.delete_one({"id": existing["id"]})
             return {"success": True, "assignment": None}
 
+    DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
     # Assign mode: create or update
     if existing:
         current_days = existing.get("assigned_days", [])
