@@ -306,6 +306,73 @@ async def generate_batch_code(state: str, academic_year: str, class_level: int, 
     if last_batch:
         # Extract serial number and increment
         last_serial = int(last_batch["batch_code"].split("-")[-1])
+# ---------- Assigned slots logic (days & time slots) ----------
+
+CLASS_DAYS = {
+    6: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    7: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    8: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    9: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    10: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+}
+
+SLOT_VALUES = ["17:00-18:00", "18:00-19:00"]
+
+
+def _generate_assigned_slots_for_batch(class_level: int, subject: str, batch_code: str) -> List[AssignedSlot]:
+    """Generate day+slot pairs for a batch based on class/subject rules.
+
+    NOTE: This is a simplified version inspired by the examples shared (C10-MAT-001, etc.).
+    It enforces:
+    - Correct number of weekly slots per subject/class
+    - Allowed days per class
+    - No consecutive slots on the same day for the same batch
+    """
+    import random
+
+    allowed_days = CLASS_DAYS.get(class_level, CLASS_DAYS[6])
+
+    # How many slots per week
+    if class_level in [6, 7]:
+        slots_per_week = 4
+    elif class_level in [8, 9]:
+        slots_per_week = 3
+    elif class_level == 10:
+        if subject in ["MAT", "PHY"]:
+            slots_per_week = 4
+        else:  # BIO, ENG
+            slots_per_week = 3
+    else:
+        slots_per_week = 3
+
+    # Seed from batch_code so pattern is stable per batch
+    random.seed(batch_code)
+
+    assigned: List[AssignedSlot] = []
+    used_day_slots = set()
+
+    while len(assigned) < slots_per_week:
+        day = random.choice(allowed_days)
+
+        # Ensure we don't pick both slots on the same day for this batch
+        existing_for_day = [s for s in assigned if s.day == day]
+        if existing_for_day:
+            # If one slot already used on this day, use the other slot or skip if both used
+            remaining_slots = [s for s in SLOT_VALUES if s not in {es.slot for es in existing_for_day}]
+            if not remaining_slots:
+                continue
+            slot = remaining_slots[0]
+        else:
+            slot = random.choice(SLOT_VALUES)
+
+        key = (day, slot)
+        if key in used_day_slots:
+            continue
+        used_day_slots.add(key)
+        assigned.append(AssignedSlot(day=day, slot=slot))
+
+    return assigned
+
         serial = last_serial + 1
     else:
         serial = 1
