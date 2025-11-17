@@ -230,6 +230,22 @@ export default function CoordinatorDashboard({ user, logout }) {
     : groupedBatches[`class_${selectedClass}`] || [];
 
   if (loading) {
+        <div className="mb-4 flex justify-between items-center">
+          <p className="text-sm text-gray-600">
+            Availability:{' '}
+            <span className={`font-semibold ${coordinatorAvailability === 'available' ? 'text-green-600' : coordinatorAvailability === 'unavailable' ? 'text-yellow-600' : 'text-red-600'}`}>
+              {coordinatorAvailability === 'not_interested' ? 'Not Interested' : coordinatorAvailability}
+            </span>
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAvailabilityDialogOpen(true)}
+          >
+            Manage Availability
+          </Button>
+        </div>
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
