@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import random
 import requests
+from passlib.context import CryptContext
 from subject_config import get_subjects_for_class, is_valid_subject_for_class, SUBJECT_NAMES
 
 ROOT_DIR = Path(__file__).parent
