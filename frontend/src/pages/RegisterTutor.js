@@ -66,10 +66,12 @@ export default function RegisterTutor({ setUser }) {
         board_preference: formData.board_preference,
         current_address: formData.current_address,
         pincode: formData.pincode,
+        about_yourself: formData.about_yourself,
         aadhaar_number: '000000000000', // Placeholder since backend expects it
         classes_can_teach: formData.classes_can_teach,
         subjects_can_teach: formData.subjects_can_teach,
-        available_days: formData.available_days
+        available_days: formData.available_days,
+        available_slots: ['17:00-18:00', '18:00-19:00']
       };
       
       const response = await axios.post(
