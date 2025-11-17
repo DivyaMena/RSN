@@ -513,21 +513,90 @@ export default function CoordinatorDashboard({ user, logout }) {
 
           {/* All Batches Tab */}
           <TabsContent value="batches">
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Class:</label>
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger className="w-64">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Classes</SelectItem>
-                  <SelectItem value="6">Class 6</SelectItem>
-                  <SelectItem value="7">Class 7</SelectItem>
-                  <SelectItem value="8">Class 8</SelectItem>
-                  <SelectItem value="9">Class 9</SelectItem>
-                  <SelectItem value="10">Class 10</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Filter Bar */}
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+              {/* Filter by Class */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    <SelectItem value="6">Class 6</SelectItem>
+                    <SelectItem value="7">Class 7</SelectItem>
+                    <SelectItem value="8">Class 8</SelectItem>
+                    <SelectItem value="9">Class 9</SelectItem>
+                    <SelectItem value="10">Class 10</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter by Subject */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Subjects" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    <SelectItem value="MAT">Maths</SelectItem>
+                    <SelectItem value="PHY">Physics</SelectItem>
+                    <SelectItem value="SCI">Science</SelectItem>
+                    <SelectItem value="BIO">Biology</SelectItem>
+                    <SelectItem value="ENG">English</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter by Days */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Day</label>
+                <Select value={selectedDayFilter} onValueChange={setSelectedDayFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Days" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Days</SelectItem>
+                    {DAYS.map(day => (
+                      <SelectItem key={day} value={day}>{day}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter by Slot (placeholder for now) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Slot</label>
+                <Select value={selectedSlot} onValueChange={setSelectedSlot}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Slots" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Slots</SelectItem>
+                    <SelectItem value="17:00-18:00">5pm - 6pm</SelectItem>
+                    <SelectItem value="18:00-19:00">6pm - 7pm</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filter by Tutor */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tutor</label>
+                <Select value={selectedTutorFilter} onValueChange={setSelectedTutorFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Tutors" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tutors</SelectItem>
+                    {tutors.map(t => (
+                      <SelectItem key={t.tutor.id} value={t.tutor.id}>{t.user?.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div>
