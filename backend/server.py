@@ -1134,6 +1134,42 @@ async def create_remedial_request(input: CreateRemedialRequestInput, request: Re
 async def get_remedial_requests(request: Request, status: Optional[str] = None):
     """Get remedial requests (coordinator only)"""
     user = await require_auth(request)
+
+@api_router.post("/attendance/join-class")
+async def mark_attendance_on_join(input: JoinClassAttendanceInput, request: Request):
+    """Student confirms they are attending class via Join button"""
+    user = await require_auth(request)
+
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can mark attendance by joining class")
+
+    student = await db.students.find_one({"user_id": user.id})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+
+    log_entry = await db.logboard_entries.find_one({"id": input.log_entry_id})
+    if not log_entry:
+        raise HTTPException(status_code=404, detail="Log entry not found")
+
+    if log_entry["batch_id"] != input.batch_id:
+        raise HTTPException(status_code=400, detail="Log entry does not belong to this batch")
+
+    attendance = Attendance(
+        student_id=student["id"],
+        batch_id=input.batch_id,
+        log_entry_id=input.log_entry_id,
+        date=log_entry["date"],
+        status="present",
+        marked_by=None
+    )
+
+    doc = attendance.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.attendance.insert_one(doc)
+
+    return {"success": True}
+
+
     
     if user.role not in ["coordinator", "admin"]:
         raise HTTPException(status_code=403, detail="Only coordinators can view remedial requests")
