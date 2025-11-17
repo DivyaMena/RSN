@@ -846,7 +846,7 @@ export default function CoordinatorDashboard({ user, logout }) {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Assign Days {selectedTutorData && '(only from tutor\'s available days)'}
+                Assign/Unassign Days {selectedTutorData && '(only from tutor\'s available days)'}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {DAYS.map(day => {
@@ -874,14 +874,24 @@ export default function CoordinatorDashboard({ user, logout }) {
               </div>
             </div>
 
-            <Button
-              data-testid="confirm-assign-tutor"
-              onClick={handleAssignTutor}
-              className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white"
-              disabled={!selectedTutor || selectedDays.length === 0}
-            >
-              Assign Tutor
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                data-testid="confirm-assign-tutor"
+                onClick={() => handleAssignTutor('assign')}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white"
+                disabled={!selectedTutor || selectedDays.length === 0}
+              >
+                Assign
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => handleAssignTutor('unassign')}
+                disabled={!selectedTutor || selectedDays.length === 0}
+              >
+                Unassign
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
