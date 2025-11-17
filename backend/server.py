@@ -312,6 +312,9 @@ async def generate_batch_code(state: str, academic_year: str, class_level: int, 
     else:
         serial = 1
     
+    return f"{prefix}{serial:03d}"
+
+
 SLOT_VALUES = ["17:00-18:00", "18:00-19:00"]
 
 CLASS_DAYS = {
