@@ -178,6 +178,28 @@ export default function CoordinatorDashboard({ user, logout }) {
     setSelectedTutorDetails(tutorData);
     setTutorDetailsDialogOpen(true);
   };
+  const handleUpdateCoordinatorAvailability = async () => {
+    if (coordinatorAvailability === 'unavailable' && (!coordUnavailableFrom || !coordUnavailableTo)) {
+      toast.error('Please provide unavailability dates');
+      return;
+    }
+
+    try {
+      const payload = {
+        availability_status: coordinatorAvailability,
+        unavailable_from: coordinatorAvailability === 'unavailable' ? coordUnavailableFrom : null,
+        unavailable_to: coordinatorAvailability === 'unavailable' ? coordUnavailableTo : null,
+      };
+
+      await axios.put(`${API}/coordinators/me/availability`, payload, { withCredentials: true });
+      toast.success('Availability updated');
+      setAvailabilityDialogOpen(false);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update availability');
+    }
+  };
+
+
 
   const handleChangeStatus = (tutorData) => {
     setSelectedTutorDetails(tutorData);
