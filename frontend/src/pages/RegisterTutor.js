@@ -64,6 +64,15 @@ export default function RegisterTutor({ setUser }) {
     setLoading(true);
     try {
       // For now, send data without actual file upload (would need file storage in production)
+      let slots = [];
+      if (formData.preferred_slot === '5pm-6pm') {
+        slots = ['17:00-18:00'];
+      } else if (formData.preferred_slot === '6pm-7pm') {
+        slots = ['18:00-19:00'];
+      } else if (formData.preferred_slot === 'any') {
+        slots = ['17:00-18:00', '18:00-19:00'];
+      }
+
       const dataToSend = {
         board_preference: formData.board_preference,
         current_address: formData.current_address,
@@ -73,7 +82,7 @@ export default function RegisterTutor({ setUser }) {
         classes_can_teach: formData.classes_can_teach,
         subjects_can_teach: formData.subjects_can_teach,
         available_days: formData.available_days,
-        available_slots: ['17:00-18:00', '18:00-19:00']
+        available_slots: slots
       };
       
       const response = await axios.post(
