@@ -923,8 +923,6 @@ async def get_tutor_by_id(tutor_id: str, request: Request):
     tutor_user = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
     return {"tutor": tutor, "user": tutor_user}
 
-    return {"success": True, "count": len(items)}
-
 # ============= TUTOR ROUTES =============
 
 @api_router.get("/tutors")
