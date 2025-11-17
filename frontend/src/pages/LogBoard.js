@@ -456,33 +456,6 @@ export default function LogBoard({ user, logout }) {
                         <p className="text-sm font-medium text-gray-700 mb-1">Notes:</p>
                         <p className="text-sm text-gray-600">{entry.notes}</p>
                       </div>
-      {/* Tutor Info Dialog */}
-      <Dialog open={tutorInfoDialogOpen} onOpenChange={setTutorInfoDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Tutor Details</DialogTitle>
-          </DialogHeader>
-          {tutorInfo && (
-            <div className="space-y-3">
-              <div>
-                <p className="font-semibold text-gray-900">{tutorInfo.user?.name}</p>
-                <p className="text-sm text-gray-600">{tutorInfo.user?.email}</p>
-              </div>
-              {tutorInfo.tutor?.about_yourself && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">
-                    Tell me about yourself (This is visible to students & parents, Co-Ordinators etc)
-                  </p>
-                  <p className="text-sm text-gray-700 whitespace-pre-line">
-                    {tutorInfo.tutor.about_yourself}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
                     )}
                   </div>
                 </div>
