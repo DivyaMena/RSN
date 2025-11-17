@@ -395,6 +395,13 @@ export default function LogBoard({ user, logout }) {
                       >
                         {entry.google_meet_link}
                       </a>
+                      <Button
+                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1"
+                        onClick={() => handleJoinClass(entry)}
+                        disabled={attendanceLoading}
+                      >
+                        Join the Class
+                      </Button>
                     </div>
 
                     {entry.curriculum_items.length > 0 && (
