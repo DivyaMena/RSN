@@ -736,6 +736,256 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("session_token", path="/", samesite="none", secure=True)
     return {"success": True}
 
+# ============= ADMIN ROUTES =============
+
+async def require_admin(request: Request):
+    """Require admin or co-admin access"""
+    user = await require_auth(request)
+    if not (user.is_main_admin or user.is_co_admin):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+async def require_main_admin(request: Request):
+    """Require main admin access only"""
+    user = await require_auth(request)
+    if not user.is_main_admin:
+        raise HTTPException(status_code=403, detail="Main admin access required")
+    return user
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(request: Request):
+    """Get dashboard statistics"""
+    await require_admin(request)
+    
+    total_coordinators = await db.users.count_documents({"role": "coordinator"})
+    total_tutors = await db.tutors.count_documents({})
+    total_students = await db.students.count_documents({})
+    total_parents = await db.users.count_documents({"role": "parent"})
+    total_batches = await db.batches.count_documents({})
+    
+    pending_coordinators = await db.users.count_documents({
+        "role": "coordinator",
+        "$or": [
+            {"approval_status": "pending"},
+            {"status": "pending"}
+        ]
+    })
+    
+    pending_tutors = await db.tutors.count_documents({"approval_status": "pending"})
+    
+    return {
+        "totalCoordinators": total_coordinators,
+        "totalTutors": total_tutors,
+        "totalStudents": total_students,
+        "totalParents": total_parents,
+        "totalBatches": total_batches,
+        "totalSchools": 0,
+        "pendingCoordinators": pending_coordinators,
+        "pendingTutors": pending_tutors
+    }
+
+@api_router.get("/admin/admins")
+async def get_all_admins(request: Request):
+    """Get all admin and co-admin users"""
+    await require_admin(request)
+    
+    admins = await db.users.find({
+        "$or": [
+            {"is_main_admin": True},
+            {"is_co_admin": True}
+        ]
+    }, {"_id": 0, "password_hash": 0}).to_list(length=None)
+    
+    return [User(**admin).model_dump() for admin in admins]
+
+@api_router.post("/admin/co-admins")
+async def create_co_admin(input: dict, request: Request):
+    """Create a new co-admin (main admin only)"""
+    await require_main_admin(request)
+    
+    # Check if email already exists
+    existing = await db.users.find_one({"email": input["email"]}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already exists")
+    
+    # Create new co-admin user
+    co_admin = User(
+        email=input["email"],
+        name=input["name"],
+        role="admin",
+        password_hash=pwd_context.hash(input["password"]),
+        is_main_admin=False,
+        is_co_admin=True,
+        can_manage_admins=False,
+        state="TS",
+        user_code=f"RSN-COADMIN-{str(uuid.uuid4())[:8].upper()}"
+    )
+    
+    doc = co_admin.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    
+    await db.users.insert_one(doc)
+    
+    return {"success": True, "message": "Co-admin created successfully"}
+
+@api_router.post("/admin/invite")
+async def generate_invite_link(input: dict, request: Request):
+    """Generate invite link for co-admin (main admin only)"""
+    await require_main_admin(request)
+    
+    email = input["email"]
+    
+    # Generate unique invite token
+    invite_token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    # Check if user already exists
+    existing = await db.users.find_one({"email": email}, {"_id": 0})
+    if existing:
+        # Update existing user with invite token
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {
+                "invite_token": invite_token,
+                "invite_expires_at": expires_at.isoformat()
+            }}
+        )
+    else:
+        # Create pending co-admin user
+        pending_admin = User(
+            email=email,
+            name="Pending Co-Admin",
+            role="pending",
+            is_main_admin=False,
+            is_co_admin=True,
+            can_manage_admins=False,
+            invite_token=invite_token,
+            invite_expires_at=expires_at
+        )
+        
+        doc = pending_admin.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        if doc.get("invite_expires_at"):
+            doc["invite_expires_at"] = doc["invite_expires_at"].isoformat()
+        
+        await db.users.insert_one(doc)
+    
+    # Generate invite link
+    invite_link = f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/accept-invite?token={invite_token}"
+    
+    return {
+        "invite_link": invite_link,
+        "expires_at": expires_at.isoformat()
+    }
+
+@api_router.delete("/admin/co-admins/{admin_id}")
+async def remove_co_admin(admin_id: str, request: Request):
+    """Remove a co-admin (main admin only)"""
+    await require_main_admin(request)
+    
+    # Check if the admin exists and is a co-admin
+    admin = await db.users.find_one({"id": admin_id}, {"_id": 0})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    if admin.get("is_main_admin"):
+        raise HTTPException(status_code=400, detail="Cannot remove main admin")
+    
+    if not admin.get("is_co_admin"):
+        raise HTTPException(status_code=400, detail="User is not a co-admin")
+    
+    # Delete the co-admin
+    await db.users.delete_one({"id": admin_id})
+    await db.user_sessions.delete_many({"user_id": admin_id})
+    
+    return {"success": True, "message": "Co-admin removed successfully"}
+
+@api_router.get("/admin/coordinators")
+async def get_all_coordinators(request: Request):
+    """Get all coordinators with their details"""
+    await require_admin(request)
+    
+    coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0, "password_hash": 0}).to_list(length=None)
+    
+    result = []
+    for coord in coordinators:
+        result.append({
+            "id": coord.get("id"),
+            "name": coord.get("name"),
+            "email": coord.get("email"),
+            "state": coord.get("state"),
+            "user_code": coord.get("user_code"),
+            "approval_status": coord.get("approval_status", "pending"),
+            "status": coord.get("status", "pending"),
+            "availability_status": coord.get("availability_status", "available")
+        })
+    
+    return result
+
+@api_router.put("/admin/coordinators/{coordinator_id}/status")
+async def update_coordinator_status(coordinator_id: str, input: dict, request: Request):
+    """Update coordinator status (approve, reject, suspend, blacklist, etc.)"""
+    await require_admin(request)
+    
+    action = input.get("action")
+    
+    update_data = {}
+    
+    if action == "approve":
+        update_data = {
+            "approval_status": "approved",
+            "status": "active"
+        }
+    elif action == "reject":
+        update_data = {
+            "approval_status": "rejected",
+            "status": "rejected"
+        }
+    elif action == "suspend":
+        update_data = {"status": "suspended"}
+    elif action == "blacklist":
+        update_data = {"status": "blacklisted"}
+    elif action == "activate":
+        update_data = {"status": "active"}
+    elif action == "terminate":
+        update_data = {"status": "terminated"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action")
+    
+    result = await db.users.update_one(
+        {"id": coordinator_id, "role": "coordinator"},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Coordinator not found")
+    
+    return {"success": True, "message": f"Coordinator {action}d successfully"}
+
+@api_router.get("/admin/students")
+async def get_all_students(request: Request):
+    """Get all students"""
+    await require_admin(request)
+    
+    students = await db.students.find({}, {"_id": 0}).to_list(length=None)
+    return students
+
+@api_router.get("/admin/parents")
+async def get_all_parents(request: Request):
+    """Get all parents"""
+    await require_admin(request)
+    
+    parents = await db.users.find({"role": "parent"}, {"_id": 0, "password_hash": 0}).to_list(length=None)
+    return [User(**parent).model_dump() for parent in parents]
+
+@api_router.get("/admin/schools")
+async def get_all_schools(request: Request):
+    """Get all schools"""
+    await require_admin(request)
+    
+    # Placeholder - schools collection to be implemented
+    return []
+
 # ============= USER ROUTES =============
 
 @api_router.post("/users/register/parent")
