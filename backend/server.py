@@ -105,8 +105,6 @@ class Batch(BaseModel):
     student_ids: List[str] = Field(default_factory=list)
     status: str = "waitlist"  # waitlist, active, full
     schedule_slots: List["AssignedSlot"] = Field(default_factory=list)  # global schedule for this batch
-
-    schedule_slots: List[AssignedSlot] = Field(default_factory=list)  # global schedule for this batch
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class AssignedSlot(BaseModel):
