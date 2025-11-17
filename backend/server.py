@@ -190,6 +190,8 @@ class RegisterTutorInput(BaseModel):
     pincode: str
     classes_can_teach: List[int]
     subjects_can_teach: List[str]
+    available_slots: List[str]
+
     available_days: List[str]
 
 class RegisterStudentInput(BaseModel):
