@@ -774,7 +774,27 @@ export default function CoordinatorDashboard({ user, logout }) {
                   <SelectValue placeholder="Choose a tutor" />
                 </SelectTrigger>
                 <SelectContent>
-                  {tutors.filter(t => t.tutor.status === 'active').map(tutorData => {
+                  {tutors
+                    .filter(tutorData => {
+                      const t = tutorData.tutor;
+                      const batch = selectedBatch;
+                      if (!batch) return false;
+
+                      const teachesClass = Array.isArray(t.classes_can_teach)
+                        ? t.classes_can_teach.includes(batch.class_level)
+                        : false;
+                      const teachesSubject = Array.isArray(t.subjects_can_teach)
+                        ? t.subjects_can_teach.includes(batch.subject)
+                        : false;
+
+                      return (
+                        t.status === 'active' &&
+                        (t.availability_status === 'available' || !t.availability_status) &&
+                        teachesClass &&
+                        teachesSubject
+                      );
+                    })
+                    .map(tutorData => {
                     // Calculate how many days this tutor has already been assigned
                     let assignedDaysCount = 0;
                     Object.values(batchAssignments).forEach(assignments => {
