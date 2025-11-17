@@ -2,7 +2,7 @@
 
 ## 🎉 Your Free Online Tuition App is Ready!
 
-**Website**: https://tutor-hub-22.preview.emergentagent.com
+**Website**: https://rising-stars-app.preview.emergentagent.com
 **Your Domain**: www.risingstarsnation.com (point to the app when ready)
 
 ---
@@ -10,7 +10,7 @@
 ## 🔐 How to Access the App
 
 ### Method 1: Test Login Portal (RECOMMENDED)
-1. Go to: https://tutor-hub-22.preview.emergentagent.com/test-login
+1. Go to: https://rising-stars-app.preview.emergentagent.com/test-login
 2. Click on any user role to instantly login
 3. Explore the complete app!
 
