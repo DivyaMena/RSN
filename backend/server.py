@@ -901,7 +901,15 @@ async def get_batches(request: Request):
     else:
         return []
     
-    return [Batch(**b) for b in batches]
+    batch_models: List[Batch] = []
+    for b in batches:
+        # Ensure schedule_slots exists for older batches
+        if not b.get("schedule_slots"):
+            slots = generate_schedule_slots_for_batch(b["class_level"], b["subject"], b["batch_code"])
+            b["schedule_slots"] = [s.model_dump() for s in slots]
+        batch_models.append(Batch(**b))
+    
+    return batch_models
 
 @api_router.get("/batches/{batch_id}", response_model=Batch)
 async def get_batch(batch_id: str, request: Request):
