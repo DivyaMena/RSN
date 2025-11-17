@@ -55,8 +55,9 @@ export default function RegisterTutor({ setUser }) {
         !formData.about_yourself || !formData.tutor_photo || !formData.aadhaar_page1 ||
         formData.classes_can_teach.length === 0 || 
         formData.subjects_can_teach.length === 0 || 
-        formData.available_days.length === 0) {
-      toast.error('Please fill all required fields including photo');
+        formData.available_days.length === 0 ||
+        !formData.preferred_slot) {
+      toast.error('Please fill all required fields including photo and preferred slot');
       return;
     }
 
