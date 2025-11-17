@@ -48,7 +48,7 @@ export default function Landing() {
             Helping students who struggle to understand subjects, can't speak up in crowded classrooms, or attend schools with teacher shortages. Free online tuition for classes 6-10 by volunteer tutors.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button data-testid="get-started-btn" onClick={handleLogin} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
+            <Button data-testid="get-started-btn" onClick={() => navigate('/login')} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
               Get Started
             </Button>
             <Button data-testid="learn-more-btn" variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300 px-8 py-6 text-lg">
