@@ -59,8 +59,6 @@ export default function CoordinatorDashboard({ user, logout }) {
     setCoordUnavailableTo(user.unavailable_to || '');
 
     fetchData();
-    // we only want to run this once on mount for the current user
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
