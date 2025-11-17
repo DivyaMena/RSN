@@ -24,11 +24,11 @@ export default function Landing() {
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
           <div className="flex items-center space-x-3">
-            <Button onClick={() => navigate('/test-login')} variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+            <Button onClick={() => navigate('/test-login')} variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
               Test Login
             </Button>
-            <Button data-testid="header-login-btn" onClick={handleLogin} className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl px-6">
-              Login with Google
+            <Button onClick={() => navigate('/login')} className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl px-6">
+              Login
             </Button>
           </div>
         </div>
