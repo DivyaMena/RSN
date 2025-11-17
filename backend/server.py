@@ -658,6 +658,68 @@ async def get_session_data(request: Request):
         "user": user.model_dump()
     }
 
+@api_router.post("/auth/login")
+async def login(input: LoginInput, response: Response):
+    """Login with email and password"""
+    # Find user by email
+    user_doc = await db.users.find_one({"email": input.email}, {"_id": 0})
+    
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    user = User(**user_doc)
+    
+    # Verify password
+    if not user.password_hash:
+        raise HTTPException(status_code=401, detail="This account uses Google login. Please use 'Login with Google' button.")
+    
+    if not pwd_context.verify(input.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Verify role matches (except for pending role users who haven't registered yet)
+    if user.role != "pending" and user.role != input.role:
+        raise HTTPException(status_code=403, detail=f"This account is registered as {user.role}, not {input.role}")
+    
+    # For admin role, check if user is actually admin or co-admin
+    if input.role == "admin" or input.role == "rsn":
+        if not (user.is_main_admin or user.is_co_admin):
+            raise HTTPException(status_code=403, detail="Access denied. This area is restricted to RSN team only.")
+    
+    # Create session
+    session_token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    session = UserSession(
+        user_id=user.id,
+        session_token=session_token,
+        expires_at=expires_at
+    )
+    
+    session_doc = session.model_dump()
+    session_doc["created_at"] = session_doc["created_at"].isoformat()
+    session_doc["expires_at"] = session_doc["expires_at"].isoformat()
+    
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        max_age=7 * 24 * 60 * 60,
+        httponly=True,
+        secure=True,
+        samesite="none"
+    )
+    
+    # Don't return password_hash
+    user_data = user.model_dump()
+    user_data.pop("password_hash", None)
+    
+    return {
+        "session_token": session_token,
+        "user": user_data
+    }
+
 @api_router.get("/auth/me")
 async def get_me(request: Request):
     """Get current user"""
