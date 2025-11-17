@@ -65,7 +65,7 @@ export default function ParentDashboard({ user, logout }) {
     e.preventDefault();
     
     // Validation
-    if (!formData.name || !formData.student_photo || !formData.class_level || !formData.board || !formData.school_name || 
+    if (!formData.name || !formData.dob || !formData.student_photo || !formData.class_level || !formData.board || !formData.school_name || 
         !formData.location || !formData.roll_no || formData.subjects.length === 0 || !formData.aadhaar_page1) {
       toast.error('Please fill all required fields including photo and Aadhaar card');
       return;
