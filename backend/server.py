@@ -571,15 +571,19 @@ async def check_and_create_batch(student: Student, subject: str):
         current_year = datetime.now(timezone.utc).year
         academic_year = f"{current_year}-{str(current_year + 1)[-2:]}"
         
+        batch_code = await generate_batch_code(student.board, academic_year, student.class_level, subject)
+        schedule_slots = generate_schedule_slots_for_batch(student.class_level, subject, batch_code)
+
         batch = Batch(
-            batch_code=await generate_batch_code(student.board, academic_year, student.class_level, subject),
+            batch_code=batch_code,
             state=student.board,
             academic_year=academic_year,
             class_level=student.class_level,
             subject=subject,
             board=student.board,
             student_ids=[student.id],
-            status="waitlist"
+            status="waitlist",
+            schedule_slots=schedule_slots
         )
         
         doc = batch.model_dump()
