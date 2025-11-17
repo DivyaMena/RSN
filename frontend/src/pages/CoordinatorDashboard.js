@@ -350,15 +350,7 @@ export default function CoordinatorDashboard({ user, logout }) {
             <p className="text-4xl font-bold text-blue-600">{batches.length}</p>
             <p className="text-xs text-gray-500 mt-2">Click to view all</p>
           </button>
-          <button 
-            onClick={() => setActiveTab('active-batches')}
-            data-testid="stat-active-batches" 
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
-          >
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Active Batches</h3>
-            <p className="text-4xl font-bold text-green-600">{batches.filter(b => b.status === 'active').length}</p>
-            <p className="text-xs text-gray-500 mt-2">Click to view active</p>
-          </button>
+          {/* Active Batches card removed as per latest requirement */}
           <button 
             onClick={() => setActiveTab('tutors')}
             data-testid="stat-total-tutors" 
