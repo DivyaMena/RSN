@@ -253,6 +253,17 @@ class UpdateLogEntryInput(BaseModel):
     notes: Optional[str] = None
 
 class AssignTutorInput(BaseModel):
+
+class CoordinatorAvailabilityRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    coordinator_user_id: str
+    request_type: str  # available, unavailable, delete_account
+    unavailable_from: Optional[str] = None
+    unavailable_to: Optional[str] = None
+    status: str = "pending"  # pending, approved, rejected
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
     batch_id: str
     tutor_id: str
     assigned_days: List[str]
