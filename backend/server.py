@@ -1057,13 +1057,6 @@ async def update_tutor_availability(tutor_id: str, update_data: TutorAvailabilit
     
     valid_statuses = ["available", "unavailable", "not_interested"]
     if update_data.availability_status not in valid_statuses:
-
-class CoordinatorAvailabilityUpdate(BaseModel):
-    availability_status: str
-    unavailable_from: Optional[str] = None
-    unavailable_to: Optional[str] = None
-
-
         raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
     
     update_fields = {"availability_status": update_data.availability_status}
@@ -1073,6 +1066,7 @@ class CoordinatorAvailabilityUpdate(BaseModel):
             raise HTTPException(status_code=400, detail="Unavailability dates are required")
         update_fields["unavailable_from"] = update_data.unavailable_from
         update_fields["unavailable_to"] = update_data.unavailable_to
+
     else:
         # Clear unavailability dates if status is not unavailable
         update_fields["unavailable_from"] = None
