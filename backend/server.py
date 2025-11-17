@@ -1010,6 +1010,30 @@ async def update_tutor_status(tutor_id: str, status: str, request: Request):
         {"id": tutor_id},
         {"$set": {"status": status}}
     )
+
+@api_router.put("/coordinators/me/availability")
+async def update_coordinator_availability(update_data: CoordinatorAvailabilityUpdate, request: Request):
+    """Coordinator updates their own availability"""
+    user = await require_auth(request)
+
+    if user.role != "coordinator":
+        raise HTTPException(status_code=403, detail="Only coordinators can update their availability")
+
+    valid_statuses = ["available", "unavailable", "not_interested"]
+    if update_data.availability_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+
+    update_fields = {
+        "availability_status": update_data.availability_status,
+        "unavailable_from": update_data.unavailable_from if update_data.availability_status == "unavailable" else None,
+        "unavailable_to": update_data.unavailable_to if update_data.availability_status == "unavailable" else None,
+    }
+
+    await db.users.update_one({"id": user.id}, {"$set": update_fields})
+
+    return {"success": True, "message": "Coordinator availability updated"}
+
+
     
     return {"success": True, "message": f"Tutor status updated to {status}"}
 
