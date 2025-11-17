@@ -353,16 +353,6 @@ export default function CoordinatorDashboard({ user, logout }) {
 
           {/* Overview Tab */}
           <TabsContent value="overview">
-            <div className="mb-6 flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setAvailabilityDialogOpen(true)}
-              >
-                Manage Availability
-              </Button>
-            </div>
-
             {pendingTutors.length > 0 && (
               <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
