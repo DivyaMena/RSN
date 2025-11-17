@@ -1130,6 +1130,16 @@ async def create_remedial_request(input: CreateRemedialRequestInput, request: Re
 async def get_remedial_requests(request: Request, status: Optional[str] = None):
     """Get remedial requests (coordinator only)"""
     user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can view remedial requests")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    requests_list = await db.remedial_requests.find(query, {"_id": 0}).to_list(None)
+    return requests_list
 
 @api_router.post("/attendance/join-class")
 async def mark_attendance_on_join(input: JoinClassAttendanceInput, request: Request):
