@@ -535,6 +535,7 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
         board_preference=input.board_preference,
         current_address=input.current_address,
         pincode=input.pincode,
+        about_yourself=input.about_yourself,
         classes_can_teach=input.classes_can_teach,
         subjects_can_teach=input.subjects_can_teach,
         available_days=input.available_days,
