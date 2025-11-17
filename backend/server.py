@@ -899,10 +899,14 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
         raise HTTPException(status_code=404, detail="Tutor not found")
     
     # Create assignment
+    # For now, assigned_days come from coordinator selection; we also generate detailed slots
+    assigned_slots = _generate_assigned_slots_for_batch(batch["class_level"], batch["subject"], batch["batch_code"])
+
     assignment = BatchTutorAssignment(
         batch_id=input.batch_id,
         tutor_id=input.tutor_id,
-        assigned_days=input.assigned_days
+        assigned_days=input.assigned_days,
+        assigned_slots=assigned_slots
     )
     
     doc = assignment.model_dump()
