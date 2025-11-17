@@ -198,7 +198,15 @@ export default function RegisterCoordinator({ setUser }) {
                 onChange={(e) => setFormData(prev => ({ ...prev, accept_terms: e.target.checked }))}
               />
               <span className="text-xs text-gray-600">
-                I accept the terms and conditions mentioned in this URL
+                I accept the{' '}
+                <a
+                  href="https://example.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  terms and conditions
+                </a>
               </span>
             </div>
           </div>
