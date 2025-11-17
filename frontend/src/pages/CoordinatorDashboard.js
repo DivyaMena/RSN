@@ -179,6 +179,8 @@ export default function CoordinatorDashboard({ user, logout }) {
     } catch (error) {
       toast.error('Failed to update status');
     }
+  };
+
   const handleSubmitAvailabilityRequest = async () => {
     if (availabilityRequestType === 'unavailable' && (!availabilityRequestFrom || !availabilityRequestTo)) {
       toast.error('Please provide from and to dates for unavailability');
@@ -206,9 +208,6 @@ export default function CoordinatorDashboard({ user, logout }) {
     } finally {
       setAvailabilityRequestLoading(false);
     }
-  };
-
-
   };
 
   const handleViewTutorDetails = (tutorData) => {
