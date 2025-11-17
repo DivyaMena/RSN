@@ -334,6 +334,17 @@ export default function ParentDashboard({ user, logout }) {
 
         {students.length === 0 ? (
           <div data-testid="no-students-message" className="text-center py-20">
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Checkbox
+                      checked={formData.accept_terms || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, accept_terms: !!checked })}
+                    />
+                    <span className="text-xs text-gray-600">
+                      I accept the terms and conditions mentioned in this URL
+                    </span>
+                  </div>
+
+
             <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No students registered yet</h3>
             <p className="text-gray-600">Click the "Register Student" button to get started</p>
