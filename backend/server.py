@@ -1013,6 +1013,13 @@ async def update_tutor_status(tutor_id: str, status: str, request: Request):
 
 @api_router.put("/coordinators/me/availability")
 async def update_coordinator_availability(update_data: CoordinatorAvailabilityUpdate, request: Request):
+
+class CoordinatorAvailabilityUpdate(BaseModel):
+    availability_status: str
+    unavailable_from: Optional[str] = None
+    unavailable_to: Optional[str] = None
+
+
     """Coordinator updates their own availability"""
     user = await require_auth(request)
 
