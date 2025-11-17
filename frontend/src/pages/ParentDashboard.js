@@ -78,10 +78,17 @@ export default function ParentDashboard({ user, logout }) {
     try {
       // For now, we'll just send the data without files (file upload needs separate handling)
       // In production, you'd upload files to storage and get URLs
+      const dobFormatted = `${formData.dob_year}-${formData.dob_month}-${formData.dob_day}`;
+
       const dataToSend = {
         ...formData,
+        dob: dobFormatted,
         aadhaar_number: '000000000000' // Placeholder
       };
+      delete dataToSend.dob_day;
+      delete dataToSend.dob_month;
+      delete dataToSend.dob_year;
+      delete dataToSend.accept_terms;
       delete dataToSend.aadhaar_page1;
       delete dataToSend.aadhaar_page2;
       
