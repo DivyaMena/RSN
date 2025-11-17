@@ -357,25 +357,17 @@ def generate_schedule_slots_for_batch(class_level: int, subject: str, batch_code
     random.seed(batch_code)
 
     assigned: List[AssignedSlot] = []
-    used_day_slots = set()
+    used_days = set()
 
     while len(assigned) < slots_per_week:
         day = random.choice(allowed_days)
 
-        # No two slots on the same day (no consecutive hours)
-        existing_for_day = [s for s in assigned if s.day == day]
-        if existing_for_day:
-            remaining_slots = [s for s in SLOT_VALUES if s not in {es.slot for es in existing_for_day}]
-            if not remaining_slots:
-                continue
-            slot = remaining_slots[0]
-        else:
-            slot = random.choice(SLOT_VALUES)
-
-        key = (day, slot)
-        if key in used_day_slots:
+        # Enforce at most ONE slot per day for this batch (no consecutive hours on same day)
+        if day in used_days:
             continue
-        used_day_slots.add(key)
+
+        slot = random.choice(SLOT_VALUES)
+        used_days.add(day)
         assigned.append(AssignedSlot(day=day, slot=slot))
 
     return assigned
