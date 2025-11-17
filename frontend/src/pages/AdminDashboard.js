@@ -269,6 +269,58 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  // Coordinator Assignment Functions
+  const fetchCoordinatorAssignments = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/coordinator-assignments`, {
+        withCredentials: true
+      });
+      setCoordinatorAssignments(response.data);
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+    }
+  };
+
+  const handleCreateAssignment = async () => {
+    if (!assignmentData.coordinator_id) {
+      toast.error('Please select a coordinator');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/admin/coordinator-assignments`, assignmentData, {
+        withCredentials: true
+      });
+      toast.success('Coordinator assigned successfully');
+      setShowAssignCoordinatorDialog(false);
+      setAssignmentData({
+        coordinator_id: '',
+        assignment_type: 'class',
+        class_level: '',
+        subject: '',
+        batch_start: '',
+        batch_end: ''
+      });
+      fetchCoordinatorAssignments();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create assignment');
+    }
+  };
+
+  const handleDeleteAssignment = async (assignmentId) => {
+    if (!confirm('Are you sure you want to remove this assignment?')) return;
+
+    try {
+      await axios.delete(`${API}/admin/coordinator-assignments/${assignmentId}`, {
+        withCredentials: true
+      });
+      toast.success('Assignment removed');
+      fetchCoordinatorAssignments();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to remove assignment');
+    }
+  };
+
   const filteredCoordinators = coordinatorFilter === 'all' 
     ? coordinators 
     : coordinators.filter(c => c.status === coordinatorFilter || c.approval_status === coordinatorFilter);
