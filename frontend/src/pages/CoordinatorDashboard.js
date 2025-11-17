@@ -50,6 +50,11 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [selectedTutorData, setSelectedTutorData] = useState(null);
 
   const [availabilityDialogOpen, setAvailabilityDialogOpen] = useState(false);
+  const [availabilityRequestType, setAvailabilityRequestType] = useState('available');
+  const [availabilityRequestFrom, setAvailabilityRequestFrom] = useState('');
+  const [availabilityRequestTo, setAvailabilityRequestTo] = useState('');
+  const [availabilityRequestLoading, setAvailabilityRequestLoading] = useState(false);
+
   const [coordinatorAvailability, setCoordinatorAvailability] = useState('available');
   const [coordUnavailableFrom, setCoordUnavailableFrom] = useState('');
   const [coordUnavailableTo, setCoordUnavailableTo] = useState('');
