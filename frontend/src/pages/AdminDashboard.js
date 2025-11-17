@@ -87,10 +87,25 @@ export default function AdminDashboard({ user, logout }) {
   // Batches State
   const [batches, setBatches] = useState([]);
 
+  // Coordinator Assignments State
+  const [coordinatorAssignments, setCoordinatorAssignments] = useState([]);
+  const [showAssignCoordinatorDialog, setShowAssignCoordinatorDialog] = useState(false);
+  const [assignmentData, setAssignmentData] = useState({
+    coordinator_id: '',
+    assignment_type: 'class',
+    class_level: '',
+    subject: '',
+    batch_start: '',
+    batch_end: ''
+  });
+
   useEffect(() => {
     fetchDashboardStats();
     if (activeTab === 'admins') fetchAdmins();
-    if (activeTab === 'coordinators') fetchCoordinators();
+    if (activeTab === 'coordinators') {
+      fetchCoordinators();
+      fetchCoordinatorAssignments();
+    }
     if (activeTab === 'tutors') fetchTutors();
     if (activeTab === 'students') fetchStudents();
     if (activeTab === 'parents') fetchParents();
