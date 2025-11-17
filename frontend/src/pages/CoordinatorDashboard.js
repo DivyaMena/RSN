@@ -256,9 +256,32 @@ export default function CoordinatorDashboard({ user, logout }) {
     });
   });
 
-  const filteredBatches = selectedClass === 'all' 
+  let filteredBatches = selectedClass === 'all' 
     ? batches 
     : groupedBatches[`class_${selectedClass}`] || [];
+
+  // Further filter by Subject
+  if (selectedSubject !== 'all') {
+    filteredBatches = filteredBatches.filter(batch => batch.subject === selectedSubject);
+  }
+
+  // Further filter by Day (uses existing batchAssignments structure)
+  if (selectedDayFilter !== 'all') {
+    filteredBatches = filteredBatches.filter(batch => {
+      const assignments = batchAssignments[batch.id] || [];
+      return assignments.some(a => a.assignment?.assigned_days?.includes(selectedDayFilter));
+    });
+  }
+
+  // Further filter by Tutor
+  if (selectedTutorFilter !== 'all') {
+    filteredBatches = filteredBatches.filter(batch => {
+      const assignments = batchAssignments[batch.id] || [];
+      return assignments.some(a => a.tutor_id === selectedTutorFilter);
+    });
+  }
+
+  // Slot filter is a placeholder for now (no schedule/slots model yet)
 
   if (loading) {
     return (
