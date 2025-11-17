@@ -182,6 +182,16 @@ export default function ParentDashboard({ user, logout }) {
                       placeholder="Enter student name"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Date of Birth (DD MMM YYYY) *</label>
+                    <Input
+                      value={formData.dob || ''}
+                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                      placeholder="e.g. 05 Sep 2013"
+                    />
+                  </div>
+
+
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Student Photo/Selfie *</label>
