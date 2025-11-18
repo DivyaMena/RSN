@@ -402,9 +402,10 @@ export default function CoordinatorDashboard({ user, logout }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="batches">All Batches ({batches.length})</TabsTrigger>
             <TabsTrigger value="tutors">All Tutors ({tutors.length})</TabsTrigger>
+            <TabsTrigger value="schools">Schools ({pendingSchools.length})</TabsTrigger>
             <TabsTrigger value="pending">Pending ({pendingTutors.length})</TabsTrigger>
           </TabsList>
 
