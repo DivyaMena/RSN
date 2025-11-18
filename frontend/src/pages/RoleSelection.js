@@ -15,7 +15,7 @@ export default function RoleSelection({ user }) {
           <p className="text-lg text-gray-600">Choose your role to get started</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <button
             data-testid="role-parent-btn"
             onClick={() => navigate('/register/parent')}
