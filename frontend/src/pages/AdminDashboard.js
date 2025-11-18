@@ -1701,6 +1701,124 @@ export default function AdminDashboard({ user, logout }) {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Curriculum Tab */}
+          <TabsContent value="curriculum" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Curriculum Management</h2>
+              <div className="flex gap-2">
+                {selectedCurriculum.length > 0 && (
+                  <Button variant="destructive" onClick={() => handleOpenDeleteDialog('curriculum', selectedCurriculum)}>
+                    <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedCurriculum.length})
+                  </Button>
+                )}
+                <label htmlFor="csv-upload">
+                  <Button as="span" disabled={uploadingCsv}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploadingCsv ? 'Uploading...' : 'Upload CSV'}
+                  </Button>
+                  <input
+                    id="csv-upload"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCsvUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+                <a href="/sample_curriculum.csv" download>
+                  <Button variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />Download Sample CSV
+                  </Button>
+                </a>
+              </div>
+            </div>
+
+            {/* Curriculum Summary - Hierarchical View */}
+            {curriculumSummary.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Curriculum Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {curriculumSummary.map((board) => (
+                      <div key={board._id} className="border rounded-lg p-4">
+                        <h3 className="font-bold text-lg mb-2">Board: {board._id}</h3>
+                        <div className="space-y-3 ml-4">
+                          {board.classes.map((cls) => (
+                            <div key={cls.class_level} className="border-l-2 border-blue-500 pl-4">
+                              <h4 className="font-semibold text-md mb-2">Class {cls.class_level}</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 ml-4">
+                                {cls.subjects.map((subj) => (
+                                  <div key={subj.subject} className="bg-blue-50 p-2 rounded text-sm">
+                                    <span className="font-medium">{subj.subject}</span>
+                                    <span className="text-gray-600 ml-2">({subj.lesson_count} lessons)</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* All Curriculum Items - List View */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  {curriculum.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox
+                        checked={selectedCurriculum.length === curriculum.length}
+                        onCheckedChange={() => handleSelectAll('curriculum', curriculum, selectedCurriculum, setSelectedCurriculum)}
+                      />
+                      <span className="text-sm font-medium">Select All ({curriculum.length} lessons)</span>
+                    </div>
+                  )}
+                  {curriculum.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">No curriculum items found. Upload a CSV to get started!</p>
+                  ) : (
+                    curriculum.map((item) => (
+                      <div key={item.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedCurriculum.includes(item.id)}
+                            onCheckedChange={() => handleSelectSingle(item.id, selectedCurriculum, setSelectedCurriculum)}
+                          />
+                          <button onClick={() => handleToggleExpand(item.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === item.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <p className="font-semibold">{item.topic_name}</p>
+                            <p className="text-sm text-gray-600">
+                              {item.board} | Class {item.class_level} | {item.subject} | Lesson {item.topic_number}
+                            </p>
+                          </div>
+                        </div>
+                        {expandedId === item.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Lesson Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Board:</span> {item.board}</p>
+                              <p><span className="font-medium">Class:</span> {item.class_level}</p>
+                              <p><span className="font-medium">Subject:</span> {item.subject}</p>
+                              <p><span className="font-medium">Lesson Number:</span> {item.topic_number}</p>
+                              <p><span className="font-medium">Title:</span> {item.topic_name}</p>
+                              <p><span className="font-medium">Summary:</span> {item.description || 'N/A'}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
