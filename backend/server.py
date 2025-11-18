@@ -547,6 +547,136 @@ async def require_auth(request: Request) -> User:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
+async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: str):
+    """Send email notification to coordinators and students when log entry is created"""
+    try:
+        # Get SMTP configuration from environment
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = int(os.environ.get('SMTP_PORT', 587))
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_password = os.environ.get('SMTP_PASSWORD')
+        email_from = os.environ.get('EMAIL_FROM')
+        email_from_name = os.environ.get('EMAIL_FROM_NAME', 'Rising Stars Nation')
+        
+        if not all([smtp_host, smtp_user, smtp_password, email_from]):
+            logging.error("Email configuration is incomplete")
+            return
+        
+        # Get all coordinators
+        coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0}).to_list(None)
+        coordinator_emails = [c["email"] for c in coordinators if c.get("email")]
+        
+        # Get all students in the batch
+        student_ids = batch.get("student_ids", [])
+        students = await db.students.find({"id": {"$in": student_ids}}, {"_id": 0}).to_list(None)
+        
+        # Get parent emails for students
+        parent_user_ids = [s["parent_user_id"] for s in students if s.get("parent_user_id")]
+        parents = await db.users.find({"id": {"$in": parent_user_ids}}, {"_id": 0}).to_list(None)
+        parent_emails = [p["email"] for p in parents if p.get("email")]
+        
+        # Combine all recipient emails
+        all_recipients = list(set(coordinator_emails + parent_emails))  # Remove duplicates
+        
+        if not all_recipients:
+            logging.info("No recipients found for log entry notification")
+            return
+        
+        # Format the date
+        log_date = log_entry.get('date', 'N/A')
+        if isinstance(log_date, str):
+            try:
+                log_date_obj = datetime.fromisoformat(log_date)
+                log_date = log_date_obj.strftime('%B %d, %Y')
+            except:
+                pass
+        
+        # Create email content
+        subject = f"New Class Log Entry by {tutor_name} - {batch['batch_code']}"
+        
+        # Format curriculum items
+        curriculum_html = ""
+        if log_entry.get('curriculum_items'):
+            curriculum_html = "<ul style='margin: 10px 0;'>"
+            for item in log_entry['curriculum_items']:
+                curriculum_html += f"<li style='margin: 5px 0;'>{item.get('topic', 'N/A')}: {item.get('description', 'N/A')}</li>"
+            curriculum_html += "</ul>"
+        
+        html_body = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0; }}
+                .content {{ background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }}
+                .details {{ background: white; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #667eea; }}
+                .footer {{ background: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #6b7280; border-radius: 0 0 10px 10px; }}
+                h2 {{ margin: 0; font-size: 24px; }}
+                .label {{ font-weight: bold; color: #4b5563; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2>📚 New Class Log Entry</h2>
+                </div>
+                <div class="content">
+                    <p>Dear Parent/Coordinator,</p>
+                    <p><strong>{tutor_name}</strong> has created a new log entry for the following batch:</p>
+                    
+                    <div class="details">
+                        <p><span class="label">Batch Code:</span> {batch['batch_code']}</p>
+                        <p><span class="label">Subject:</span> {batch.get('subject', 'N/A')}</p>
+                        <p><span class="label">Class:</span> {batch.get('class_level', 'N/A')}</p>
+                        <p><span class="label">Board:</span> {batch.get('board', 'N/A')}</p>
+                        <p><span class="label">Date:</span> {log_date}</p>
+                        <p><span class="label">Topic Covered:</span> {log_entry.get('topic_covered', 'N/A')}</p>
+                    </div>
+                    
+                    <div class="details">
+                        <p class="label">Curriculum Items Covered:</p>
+                        {curriculum_html if curriculum_html else '<p>No curriculum items specified</p>'}
+                    </div>
+                    
+                    {f'<div class="details"><p><span class="label">Google Meet Link:</span> <a href="{log_entry.get("google_meet_link")}">{log_entry.get("google_meet_link")}</a></p></div>' if log_entry.get('google_meet_link') else ''}
+                    
+                    {f'<div class="details"><p><span class="label">Notes:</span> {log_entry.get("notes")}</p></div>' if log_entry.get('notes') else ''}
+                    
+                    <p style="margin-top: 20px;">This is an automated notification from Rising Stars Nation.</p>
+                </div>
+                <div class="footer">
+                    <p>© 2025 Rising Stars Nation - Free Online Tuition Platform</p>
+                    <p>This email was sent to you because you are associated with the batch {batch['batch_code']}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Send emails
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            
+            for recipient in all_recipients:
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = subject
+                msg['From'] = f"{email_from_name} <{email_from}>"
+                msg['To'] = recipient
+                
+                html_part = MIMEText(html_body, 'html')
+                msg.attach(html_part)
+                
+                server.send_message(msg)
+                logging.info(f"Email sent to {recipient}")
+        
+        logging.info(f"Successfully sent log entry notifications to {len(all_recipients)} recipients")
+        
+    except Exception as e:
+        logging.error(f"Failed to send email notifications: {str(e)}")
+        # Don't raise exception - email failure shouldn't block log entry creation
+
 async def auto_assign_tutor_to_batch(batch: Batch):
     """Automatically assign tutor to batch based on priority"""
     # Find eligible tutors
