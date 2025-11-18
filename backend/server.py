@@ -629,8 +629,8 @@ async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: 
                     <h2>📚 New Class Log Entry</h2>
                 </div>
                 <div class="content">
-                    <p>Dear Parent/Coordinator,</p>
-                    <p><strong>{tutor_name}</strong> has created a new log entry for the following batch:</p>
+                    <p>Dear Parent/Coordinator/Tutor,</p>
+                    <p>A new log entry has been created by <strong>{tutor_name}</strong> for the following batch:</p>
                     
                     <div class="details">
                         <p><span class="label">Batch Code:</span> {batch['batch_code']}</p>
