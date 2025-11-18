@@ -505,6 +505,24 @@ async def get_current_user(request: Request) -> Optional[User]:
         await db.user_sessions.delete_one({"session_token": session_token})
         return None
     
+    # Check if this is a student session (user_id matches a student ID)
+    student_doc = await db.students.find_one({"id": session["user_id"]}, {"_id": 0})
+    if student_doc:
+        # This is a student session - reconstruct User object from student data
+        student = Student(**student_doc)
+        parent_doc = await db.users.find_one({"id": student.parent_id}, {"_id": 0})
+        parent_email = parent_doc["email"] if parent_doc else "student@risingstarsnation.com"
+        
+        return User(
+            id=student.id,
+            email=parent_email,
+            name=student.name,
+            role="student",
+            state=student.board,
+            user_code=student.student_code
+        )
+    
+    # Regular user session
     user_doc = await db.users.find_one({"id": session["user_id"]}, {"_id": 0})
     if not user_doc:
         return None
