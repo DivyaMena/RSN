@@ -318,16 +318,6 @@ export default function CoordinatorDashboard({ user, logout }) {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <span className="text-gray-700 hidden sm:inline">Welcome, {user.name}</span>
-            <Button 
-              onClick={() => setAvailabilityDialogOpen(true)} 
-              variant="outline" 
-              size="sm"
-              className="bg-blue-50"
-            >
-              <Shield className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Manage Availability</span>
-              <span className="sm:hidden">Availability</span>
-            </Button>
             <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
               <User className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">My Profile</span>
