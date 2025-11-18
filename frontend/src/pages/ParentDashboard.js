@@ -36,6 +36,7 @@ export default function ParentDashboard({ user, logout }) {
     location: '',
     roll_no: '',
     subjects: [],
+    non_academic_courses: [],
     accept_terms: false,
     enrollment_year: new Date().getFullYear()
   });
