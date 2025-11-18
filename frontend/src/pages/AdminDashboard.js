@@ -1353,17 +1353,49 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Parents Tab */}
           <TabsContent value="parents" className="space-y-6">
-            <h2 className="text-2xl font-bold">All Parents</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">All Parents</h2>
+              {selectedParents.length > 0 && (
+                <Button variant="destructive" onClick={() => handleOpenDeleteDialog('parents', selectedParents)}>
+                  <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedParents.length})
+                </Button>
+              )}
+            </div>
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  {parents.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No parents found</p>
-                  ) : (
+                  {parents.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox checked={selectedParents.length === parents.length} onCheckedChange={() => handleSelectAll('parents', parents, selectedParents, setSelectedParents)} />
+                      <span className="text-sm font-medium">Select All ({parents.length})</span>
+                    </div>
+                  )}
+                  {parents.length === 0 ? (<p className="text-center text-gray-500 py-8">No parents found</p>) : (
                     parents.map((parent) => (
-                      <div key={parent.id} className="p-3 bg-gray-50 rounded-lg">
-                        <p className="font-semibold">{parent.name}</p>
-                        <p className="text-sm text-gray-600">{parent.email}</p>
+                      <div key={parent.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox checked={selectedParents.includes(parent.id)} onCheckedChange={() => handleSelectSingle(parent.id, selectedParents, setSelectedParents)} />
+                          <button onClick={() => handleToggleExpand(parent.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === parent.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <p className="font-semibold">{parent.name}</p>
+                            <p className="text-sm text-gray-600">{parent.email}</p>
+                          </div>
+                        </div>
+                        {expandedId === parent.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Parent Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Name:</span> {parent.name}</p>
+                              <p><span className="font-medium">Email:</span> {parent.email}</p>
+                              <p><span className="font-medium">Phone:</span> {parent.phone_number || 'N/A'}</p>
+                              <p><span className="font-medium">Location:</span> {parent.location || 'N/A'}</p>
+                              <p><span className="font-medium">State:</span> {parent.state || 'N/A'}</p>
+                              <p><span className="font-medium">User Code:</span> {parent.user_code || 'N/A'}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
@@ -1374,10 +1406,55 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Schools Tab */}
           <TabsContent value="schools" className="space-y-6">
-            <h2 className="text-2xl font-bold">All Schools</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">All Schools</h2>
+              {selectedSchools.length > 0 && (
+                <Button variant="destructive" onClick={() => handleOpenDeleteDialog('schools', selectedSchools)}>
+                  <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedSchools.length})
+                </Button>
+              )}
+            </div>
             <Card>
               <CardContent className="pt-6">
-                <p className="text-center text-gray-500 py-8">School management coming soon</p>
+                <div className="space-y-2">
+                  {schools.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox checked={selectedSchools.length === schools.length} onCheckedChange={() => handleSelectAll('schools', schools, selectedSchools, setSelectedSchools)} />
+                      <span className="text-sm font-medium">Select All ({schools.length})</span>
+                    </div>
+                  )}
+                  {schools.length === 0 ? (<p className="text-center text-gray-500 py-8">No schools found</p>) : (
+                    schools.map((school) => (
+                      <div key={school.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox checked={selectedSchools.includes(school.id)} onCheckedChange={() => handleSelectSingle(school.id, selectedSchools, setSelectedSchools)} />
+                          <button onClick={() => handleToggleExpand(school.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === school.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <p className="font-semibold">{school.school_name}</p>
+                            <p className="text-sm text-gray-600">{school.email} | {school.city}</p>
+                          </div>
+                        </div>
+                        {expandedId === school.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">School Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Name:</span> {school.school_name}</p>
+                              <p><span className="font-medium">Principal:</span> {school.principal_name}</p>
+                              <p><span className="font-medium">Email:</span> {school.email}</p>
+                              <p><span className="font-medium">Phone:</span> {school.phone}</p>
+                              <p><span className="font-medium">Address:</span> {school.address}</p>
+                              <p><span className="font-medium">City:</span> {school.city}</p>
+                              <p><span className="font-medium">State:</span> {school.state}</p>
+                              <p><span className="font-medium">Pincode:</span> {school.pincode}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
