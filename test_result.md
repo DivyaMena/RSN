@@ -856,3 +856,47 @@ agent_communication:
       - ✅ Better UX with contextual subject display
       
       🚀 READY FOR USER TESTING!
+
+  - agent: "main"
+    message: |
+      🎯 PARENT DASHBOARD ENHANCEMENTS COMPLETED!
+      
+      ✅ NEW FEATURES IMPLEMENTED:
+      
+      **1. DELETE CONFIRMATION DIALOG:**
+      - Replaced browser's window.confirm with proper Dialog component
+      - Shows student name in confirmation message
+      - Clear "Yes, Delete" and "No" buttons
+      - Red destructive styling for delete action
+      - Warning message: "This action cannot be undone"
+      - State management: deleteDialogOpen, studentToDelete
+      
+      **2. NON-ACADEMIC COURSES IN STUDENT REGISTRATION:**
+      - Added new section "Select Non Academic Courses (Optional)" ABOVE School Name field
+      - 4 courses available:
+        * Chess (CHS)
+        * Rubik's Cube (CUB)
+        * Confidence Club (CON)
+        * Career Guidance (CAR)
+      - Visual design: Blue background grid with checkboxes
+      - Helper text shows course codes
+      - Courses stored in non_academic_courses state array
+      - Combined with academic subjects before submission
+      - Both academic and non-academic courses stored in subjects field in backend
+      
+      📋 COURSE CODE FORMAT:
+      - Academic: RSN-TS-2025-26-C7-MAT-001 (Mathematics)
+      - Non-Academic: RSN-TS-2025-26-C7-CHS-001 (Chess)
+      - Non-Academic: RSN-TS-2025-26-C7-CUB-001 (Rubik's Cube)
+      - Non-Academic: RSN-TS-2025-26-C7-CON-001 (Confidence Club)
+      - Non-Academic: RSN-TS-2025-26-C7-CAR-001 (Career Guidance)
+      
+      🔧 IMPLEMENTATION DETAILS:
+      - Added NON_ACADEMIC_COURSES constant array
+      - Added toggleNonAcademicCourse function
+      - Updated formData state to include non_academic_courses
+      - Courses are optional (not required for submission)
+      - Form validation remains unchanged
+      - Combined arrays sent to backend as single subjects array
+      
+      🚀 READY FOR USER TESTING (as per user request - no automated testing performed)!
