@@ -599,13 +599,13 @@ export default function AdminDashboard({ user, logout }) {
               <BookOpen className="h-4 w-4 mr-1" />
               Batches
             </TabsTrigger>
-            <TabsTrigger value="curriculum" className="text-xs">
-              <Upload className="h-4 w-4 mr-1" />
-              Curriculum
-            </TabsTrigger>
             <TabsTrigger value="state-boards" className="text-xs">
               <Flag className="h-4 w-4 mr-1" />
               State Boards
+            </TabsTrigger>
+            <TabsTrigger value="curriculum" className="text-xs">
+              <Upload className="h-4 w-4 mr-1" />
+              Curriculum
             </TabsTrigger>
           </TabsList>
 
