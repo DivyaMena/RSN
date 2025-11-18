@@ -636,152 +636,66 @@ export default function AdminDashboard({ user, logout }) {
                 <Dialog open={showAssignCoordinatorDialog} onOpenChange={setShowAssignCoordinatorDialog}>
                   <DialogTrigger asChild>
                     <Button>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Assign Coordinator
+                      <UserCog className="h-4 w-4 mr-2" />
+                      Manage Coordinators
                     </Button>
                   </DialogTrigger>
-
-                <Dialog open={showUnassignCoordinatorDialog} onOpenChange={setShowUnassignCoordinatorDialog}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline">
-                      <Ban className="h-4 w-4 mr-2" />
-                      Unassign Coordinator
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-4xl">
                     <DialogHeader>
-                      <DialogTitle>Unassign Coordinator</DialogTitle>
-                      <DialogDescription>Remove coordinator assignments</DialogDescription>
+                      <DialogTitle>Manage Coordinator Assignments</DialogTitle>
+                      <DialogDescription>Create or delete coordinator assignments for classes, subjects, and batch ranges</DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      {coordinatorAssignments.length === 0 ? (
-                        <p className="text-center text-gray-500 py-8">No coordinator assignments found</p>
-                      ) : (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <p className="text-sm text-gray-600">
-                              {coordinatorAssignments.length} assignment(s) found
-                            </p>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={handleBulkUnassign}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Remove All
-                            </Button>
-                          </div>
-                          <div className="max-h-96 overflow-y-auto space-y-2">
-                            {coordinatorAssignments.map((assignment) => (
-                              <div key={assignment.id} className="flex justify-between items-center p-4 bg-red-50 border border-red-200 rounded-lg">
-                                <div>
-                                  <p className="font-semibold text-red-900">{assignment.coordinator?.name}</p>
-                                  <p className="text-sm text-red-700">
-                                    {assignment.assignment_type === 'class' && `Class ${assignment.class_level}`}
-                                    {assignment.assignment_type === 'class_subject' && `Class ${assignment.class_level} - ${assignment.subject}`}
-                                    {assignment.assignment_type === 'batch_range' && `Class ${assignment.class_level} ${assignment.subject}: ${assignment.batch_start} to ${assignment.batch_end}`}
-                                  </p>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleDeleteAssignment(assignment.id)}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-1" />
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      )}
+                    
+                    <div className="flex gap-4 mb-4">
+                      <Button onClick={() => setAssignmentMode('create')} className={assignmentMode === 'create' ? '' : 'variant-outline'}>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Create Assignment
+                      </Button>
+                      <Button onClick={() => setAssignmentMode('delete')} variant={assignmentMode === 'delete' ? 'destructive' : 'outline'}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Assignment
+                      </Button>
                     </div>
-                  </DialogContent>
-                </Dialog>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Assign Coordinator</DialogTitle>
-                      <DialogDescription>Assign a coordinator to manage specific classes, subjects, or batch ranges</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium">Select Coordinator</label>
-                        <Select
-                          value={assignmentData.coordinator_id}
-                          onValueChange={(value) => setAssignmentData({...assignmentData, coordinator_id: value})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose coordinator" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {coordinators.filter(c => c.status === 'active').map((coord) => (
-                              <SelectItem key={coord.id} value={coord.id}>
-                                {coord.name} ({coord.email})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
 
-                      <div>
-                        <label className="text-sm font-medium">Assignment Type</label>
-                        <Select
-                          value={assignmentData.assignment_type}
-                          onValueChange={(value) => setAssignmentData({...assignmentData, assignment_type: value})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="class">Class-wise (e.g., All Class 6)</SelectItem>
-                            <SelectItem value="class_subject">Class + Subject (e.g., Class 7 Math)</SelectItem>
-                            <SelectItem value="batch_range">Batch Range (e.g., MAT-001 to MAT-020)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {(assignmentData.assignment_type === 'class' || assignmentData.assignment_type === 'class_subject') && (
+                    {assignmentMode === 'create' && (
+                      <div className="space-y-4 border-t pt-4">
                         <div>
-                          <label className="text-sm font-medium">Class Level</label>
+                          <label className="text-sm font-medium">Select Coordinator</label>
                           <Select
-                            value={assignmentData.class_level}
-                            onValueChange={(value) => setAssignmentData({...assignmentData, class_level: value})}
+                            value={assignmentData.coordinator_id}
+                            onValueChange={(value) => setAssignmentData({...assignmentData, coordinator_id: value})}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select class" />
+                              <SelectValue placeholder="Choose coordinator" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[6, 7, 8, 9, 10].map((cls) => (
-                                <SelectItem key={cls} value={cls.toString()}>Class {cls}</SelectItem>
+                              {coordinators.filter(c => c.status === 'active').map((coord) => (
+                                <SelectItem key={coord.id} value={coord.id}>
+                                  {coord.name} ({coord.email})
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
-                      )}
 
-                      {assignmentData.assignment_type === 'class_subject' && (
                         <div>
-                          <label className="text-sm font-medium">Subject</label>
+                          <label className="text-sm font-medium">Assignment Type</label>
                           <Select
-                            value={assignmentData.subject}
-                            onValueChange={(value) => setAssignmentData({...assignmentData, subject: value})}
+                            value={assignmentData.assignment_type}
+                            onValueChange={(value) => setAssignmentData({...assignmentData, assignment_type: value})}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select subject" />
+                              <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="MAT">Mathematics</SelectItem>
-                              <SelectItem value="PHY">Physics</SelectItem>
-                              <SelectItem value="SCI">Science</SelectItem>
-                              <SelectItem value="BIO">Biology</SelectItem>
-                              <SelectItem value="ENG">English</SelectItem>
+                              <SelectItem value="class">Class-wise (e.g., All Class 6)</SelectItem>
+                              <SelectItem value="class_subject">Class + Subject (e.g., Class 7 Math)</SelectItem>
+                              <SelectItem value="batch_range">Batch Range (e.g., MAT-001 to MAT-020)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                      )}
 
-                      {assignmentData.assignment_type === 'batch_range' && (
-                        <div className="space-y-4">
+                        {(assignmentData.assignment_type === 'class' || assignmentData.assignment_type === 'class_subject') && (
                           <div>
                             <label className="text-sm font-medium">Class Level</label>
                             <Select
@@ -789,7 +703,7 @@ export default function AdminDashboard({ user, logout }) {
                               onValueChange={(value) => setAssignmentData({...assignmentData, class_level: value, subject: ''})}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select class first" />
+                                <SelectValue placeholder="Select class" />
                               </SelectTrigger>
                               <SelectContent>
                                 {[6, 7, 8, 9, 10].map((cls) => (
@@ -798,55 +712,143 @@ export default function AdminDashboard({ user, logout }) {
                               </SelectContent>
                             </Select>
                           </div>
+                        )}
 
-                          {assignmentData.class_level && (
+                        {assignmentData.assignment_type === 'class_subject' && assignmentData.class_level && (
+                          <div>
+                            <label className="text-sm font-medium">Subject</label>
+                            <Select
+                              value={assignmentData.subject}
+                              onValueChange={(value) => setAssignmentData({...assignmentData, subject: value})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select subject" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getSubjectsForClass(parseInt(assignmentData.class_level)).map((subject) => (
+                                  <SelectItem key={subject.code} value={subject.code}>
+                                    {subject.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {assignmentData.assignment_type === 'batch_range' && (
+                          <div className="space-y-4">
                             <div>
-                              <label className="text-sm font-medium">Subject</label>
+                              <label className="text-sm font-medium">Class Level</label>
                               <Select
-                                value={assignmentData.subject}
-                                onValueChange={(value) => setAssignmentData({...assignmentData, subject: value})}
+                                value={assignmentData.class_level}
+                                onValueChange={(value) => setAssignmentData({...assignmentData, class_level: value, subject: ''})}
                               >
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select subject" />
+                                  <SelectValue placeholder="Select class first" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="MAT">Mathematics</SelectItem>
-                                  <SelectItem value="PHY">Physics</SelectItem>
-                                  <SelectItem value="SCI">Science</SelectItem>
-                                  <SelectItem value="BIO">Biology</SelectItem>
-                                  <SelectItem value="ENG">English</SelectItem>
+                                  {[6, 7, 8, 9, 10].map((cls) => (
+                                    <SelectItem key={cls} value={cls.toString()}>Class {cls}</SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </div>
-                          )}
 
-                          {assignmentData.class_level && assignmentData.subject && (
-                            <div className="grid grid-cols-2 gap-4">
+                            {assignmentData.class_level && (
                               <div>
-                                <label className="text-sm font-medium">Batch Start</label>
-                                <Input
-                                  value={assignmentData.batch_start}
-                                  onChange={(e) => setAssignmentData({...assignmentData, batch_start: e.target.value})}
-                                  placeholder={`e.g., ${assignmentData.subject}-001`}
-                                />
+                                <label className="text-sm font-medium">Subject</label>
+                                <Select
+                                  value={assignmentData.subject}
+                                  onValueChange={(value) => setAssignmentData({...assignmentData, subject: value})}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select subject" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {getSubjectsForClass(parseInt(assignmentData.class_level)).map((subject) => (
+                                      <SelectItem key={subject.code} value={subject.code}>
+                                        {subject.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </div>
-                              <div>
-                                <label className="text-sm font-medium">Batch End</label>
-                                <Input
-                                  value={assignmentData.batch_end}
-                                  onChange={(e) => setAssignmentData({...assignmentData, batch_end: e.target.value})}
-                                  placeholder={`e.g., ${assignmentData.subject}-020`}
-                                />
+                            )}
+
+                            {assignmentData.class_level && assignmentData.subject && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-sm font-medium">Batch Start</label>
+                                  <Input
+                                    value={assignmentData.batch_start}
+                                    onChange={(e) => setAssignmentData({...assignmentData, batch_start: e.target.value})}
+                                    placeholder={`e.g., ${assignmentData.subject}-001`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Batch End</label>
+                                  <Input
+                                    value={assignmentData.batch_end}
+                                    onChange={(e) => setAssignmentData({...assignmentData, batch_end: e.target.value})}
+                                    placeholder={`e.g., ${assignmentData.subject}-020`}
+                                  />
+                                </div>
                               </div>
+                            )}
+                          </div>
+                        )}
+
+                        <Button onClick={handleCreateAssignment} className="w-full">
+                          Create Assignment
+                        </Button>
+                      </div>
+                    )}
+
+                    {assignmentMode === 'delete' && (
+                      <div className="space-y-4 border-t pt-4">
+                        {coordinatorAssignments.length === 0 ? (
+                          <p className="text-center text-gray-500 py-8">No coordinator assignments found</p>
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-center">
+                              <p className="text-sm text-gray-600">
+                                {coordinatorAssignments.length} assignment(s) found
+                              </p>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleBulkUnassign}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete All
+                              </Button>
                             </div>
-                          )}
-                        </div>
-                      )}
-
-                      <Button onClick={handleCreateAssignment} className="w-full">
-                        Create Assignment
-                      </Button>
-                    </div>
+                            <div className="max-h-96 overflow-y-auto space-y-2">
+                              {coordinatorAssignments.map((assignment) => (
+                                <div key={assignment.id} className="flex justify-between items-center p-4 bg-red-50 border border-red-200 rounded-lg">
+                                  <div>
+                                    <p className="font-semibold text-red-900">{assignment.coordinator?.name}</p>
+                                    <p className="text-sm text-red-700">
+                                      {assignment.assignment_type === 'class' && `Class ${assignment.class_level}`}
+                                      {assignment.assignment_type === 'class_subject' && `Class ${assignment.class_level} - ${assignment.subject}`}
+                                      {assignment.assignment_type === 'batch_range' && `Class ${assignment.class_level} ${assignment.subject}: ${assignment.batch_start} to ${assignment.batch_end}`}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleDeleteAssignment(assignment.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </DialogContent>
                 </Dialog>
 
