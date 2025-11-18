@@ -173,7 +173,20 @@ export default function AdminDashboard({ user, logout }) {
       const response = await axios.get(`${API}/admin/stats`, {
         withCredentials: true
       });
-      setStats(response.data);
+      
+      // Fetch schools and state boards counts separately
+      const schoolsResponse = await axios.get(`${API}/admin/schools`, {
+        withCredentials: true
+      });
+      const boardsResponse = await axios.get(`${API}/admin/state-boards`, {
+        withCredentials: true
+      });
+      
+      setStats({
+        ...response.data,
+        totalSchools: schoolsResponse.data.length,
+        totalStateBoards: boardsResponse.data.length
+      });
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
