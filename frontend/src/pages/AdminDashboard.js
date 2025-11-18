@@ -683,23 +683,65 @@ export default function AdminDashboard({ user, logout }) {
                       )}
 
                       {assignmentData.assignment_type === 'batch_range' && (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-4">
                           <div>
-                            <label className="text-sm font-medium">Batch Start</label>
-                            <Input
-                              value={assignmentData.batch_start}
-                              onChange={(e) => setAssignmentData({...assignmentData, batch_start: e.target.value})}
-                              placeholder="e.g., MAT-001"
-                            />
+                            <label className="text-sm font-medium">Class Level</label>
+                            <Select
+                              value={assignmentData.class_level}
+                              onValueChange={(value) => setAssignmentData({...assignmentData, class_level: value, subject: ''})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select class first" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[6, 7, 8, 9, 10].map((cls) => (
+                                  <SelectItem key={cls} value={cls.toString()}>Class {cls}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
-                          <div>
-                            <label className="text-sm font-medium">Batch End</label>
-                            <Input
-                              value={assignmentData.batch_end}
-                              onChange={(e) => setAssignmentData({...assignmentData, batch_end: e.target.value})}
-                              placeholder="e.g., MAT-020"
-                            />
-                          </div>
+
+                          {assignmentData.class_level && (
+                            <div>
+                              <label className="text-sm font-medium">Subject</label>
+                              <Select
+                                value={assignmentData.subject}
+                                onValueChange={(value) => setAssignmentData({...assignmentData, subject: value})}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select subject" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="MAT">Mathematics</SelectItem>
+                                  <SelectItem value="PHY">Physics</SelectItem>
+                                  <SelectItem value="SCI">Science</SelectItem>
+                                  <SelectItem value="BIO">Biology</SelectItem>
+                                  <SelectItem value="ENG">English</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          {assignmentData.class_level && assignmentData.subject && (
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium">Batch Start</label>
+                                <Input
+                                  value={assignmentData.batch_start}
+                                  onChange={(e) => setAssignmentData({...assignmentData, batch_start: e.target.value})}
+                                  placeholder={`e.g., ${assignmentData.subject}-001`}
+                                />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Batch End</label>
+                                <Input
+                                  value={assignmentData.batch_end}
+                                  onChange={(e) => setAssignmentData({...assignmentData, batch_end: e.target.value})}
+                                  placeholder={`e.g., ${assignmentData.subject}-020`}
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
