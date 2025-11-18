@@ -404,6 +404,108 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  // Selection handlers
+  const handleSelectAll = (type, items, selectedItems, setSelectedItems) => {
+    if (selectedItems.length === items.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(items.map(item => item.id));
+    }
+  };
+
+  const handleSelectSingle = (id, selectedItems, setSelectedItems) => {
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter(itemId => itemId !== id));
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
+  };
+
+  // Delete handlers
+  const handleOpenDeleteDialog = (type, ids) => {
+    setDeleteType(type);
+    setIdsToDelete(ids);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const endpoint = `${API}/admin/${deleteType}/bulk`;
+      const response = await axios.delete(endpoint, {
+        data: { ids: idsToDelete },
+        withCredentials: true
+      });
+
+      toast.success(`Deleted ${response.data.deleted_count} ${deleteType}`);
+      
+      if (response.data.warnings && response.data.warnings.length > 0) {
+        response.data.warnings.forEach(warning => toast.warning(warning));
+      }
+      
+      if (response.data.errors && response.data.errors.length > 0) {
+        response.data.errors.forEach(error => toast.error(error));
+      }
+
+      // Clear selections and refresh data
+      if (deleteType === 'coordinators') {
+        setSelectedCoordinators([]);
+        fetchCoordinators();
+      } else if (deleteType === 'tutors') {
+        setSelectedTutors([]);
+        fetchTutors();
+      } else if (deleteType === 'parents') {
+        setSelectedParents([]);
+        fetchParents();
+      } else if (deleteType === 'students') {
+        setSelectedStudents([]);
+        fetchStudents();
+      } else if (deleteType === 'co-admins') {
+        setSelectedAdmins([]);
+        fetchAdmins();
+      } else if (deleteType === 'schools') {
+        setSelectedSchools([]);
+        fetchSchools();
+      } else if (deleteType === 'batches') {
+        setSelectedBatches([]);
+        fetchBatches();
+      } else if (deleteType === 'state-boards') {
+        setSelectedBoards([]);
+        fetchStateBoards();
+      }
+
+      setDeleteDialogOpen(false);
+      fetchDashboardStats();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || `Failed to delete ${deleteType}`);
+    }
+  };
+
+  // State Board handlers
+  const handleAddStateBoard = async () => {
+    if (!boardFormData.name || !boardFormData.code) {
+      toast.error('Name and code are required');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/admin/state-boards`, boardFormData, {
+        withCredentials: true
+      });
+      toast.success('State board created successfully');
+      setShowAddBoardDialog(false);
+      setBoardFormData({ name: '', code: '', description: '' });
+      fetchStateBoards();
+      fetchDashboardStats();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create state board');
+    }
+  };
+
+  // Toggle expand/collapse for details view
+  const handleToggleExpand = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
   const filteredCoordinators = coordinatorFilter === 'all' 
     ? coordinators 
     : coordinators.filter(c => c.status === coordinatorFilter || c.approval_status === coordinatorFilter);
