@@ -1942,6 +1942,95 @@ async def update_my_tutor_profile(
     
     return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
 
+@api_router.put("/users/me/profile")
+async def update_my_user_profile(
+    phone_number: Optional[str] = None,
+    location: Optional[str] = None,
+    alternate_phone: Optional[str] = None,
+    availability_status: Optional[str] = None,
+    request: Request = None
+):
+    """Update user profile (coordinator/parent) - restricted to once every 15 days"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "parent"]:
+        raise HTTPException(status_code=403, detail="Only coordinators and parents can update their profile")
+    
+    user_data = await db.users.find_one({"id": user.id})
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check 15-day restriction
+    if user_data.get("last_profile_update"):
+        last_update = user_data["last_profile_update"]
+        if isinstance(last_update, str):
+            last_update = datetime.fromisoformat(last_update)
+        
+        days_since_update = (datetime.now(timezone.utc) - last_update).days
+        if days_since_update < 15:
+            days_remaining = 15 - days_since_update
+            raise HTTPException(
+                status_code=400,
+                detail=f"Profile can only be updated once every 15 days. You can edit again in {days_remaining} days."
+            )
+    
+    # Build update data
+    update_data = {}
+    if phone_number is not None:
+        update_data["phone_number"] = phone_number
+    if location is not None:
+        update_data["location"] = location
+    if alternate_phone is not None:
+        update_data["alternate_phone"] = alternate_phone
+    if availability_status is not None:
+        update_data["availability_status"] = availability_status
+    
+    update_data["last_profile_update"] = datetime.now(timezone.utc)
+    
+    await db.users.update_one({"id": user.id}, {"$set": update_data})
+    
+    return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
+
+@api_router.put("/students/me/profile")
+async def update_my_student_profile(
+    subjects: Optional[List[str]] = None,
+    request: Request = None
+):
+    """Update student profile (subjects only) - restricted to once every 15 days"""
+    user = await require_auth(request)
+    
+    if user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can access this endpoint")
+    
+    student = await db.students.find_one({"user_id": user.id})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+    
+    # Check 15-day restriction
+    if student.get("last_profile_update"):
+        last_update = student["last_profile_update"]
+        if isinstance(last_update, str):
+            last_update = datetime.fromisoformat(last_update)
+        
+        days_since_update = (datetime.now(timezone.utc) - last_update).days
+        if days_since_update < 15:
+            days_remaining = 15 - days_since_update
+            raise HTTPException(
+                status_code=400,
+                detail=f"Profile can only be updated once every 15 days. You can edit again in {days_remaining} days."
+            )
+    
+    # Build update data
+    update_data = {}
+    if subjects is not None:
+        update_data["subjects"] = subjects
+    
+    update_data["last_profile_update"] = datetime.now(timezone.utc)
+    
+    await db.students.update_one({"user_id": user.id}, {"$set": update_data})
+    
+    return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
+
 @api_router.get("/tutors")
 async def get_tutors(request: Request):
     """Get all tutors (coordinator/admin only)"""
