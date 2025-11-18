@@ -52,6 +52,7 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [newTutorStatus, setNewTutorStatus] = useState('');
   const [batchAssignments, setBatchAssignments] = useState({});
   const [selectedTutorData, setSelectedTutorData] = useState(null);
+  const [availableTutorsForBatch, setAvailableTutorsForBatch] = useState([]);
 
   const [availabilityDialogOpen, setAvailabilityDialogOpen] = useState(false);
   const [availabilityRequestType, setAvailabilityRequestType] = useState('available');
