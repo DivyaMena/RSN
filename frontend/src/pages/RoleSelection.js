@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Users, BookOpen, Shield } from 'lucide-react';
+import { Users, BookOpen, Shield, School } from 'lucide-react';
 
 export default function RoleSelection({ user }) {
   const navigate = useNavigate();
