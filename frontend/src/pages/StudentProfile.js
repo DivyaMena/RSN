@@ -62,6 +62,11 @@ export default function StudentProfile({ user, logout }) {
       const res = await axios.get(`${API}/students/me`, { withCredentials: true });
       setProfile(res.data);
       setSubjects(res.data.subjects || []);
+      setSchoolName(res.data.school_name || '');
+      
+      // Set available subjects based on class level
+      const availSubjects = getAvailableSubjects(res.data.class_level);
+      setAvailableSubjects(availSubjects);
       
       // Calculate if editing is allowed
       if (res.data.last_profile_update) {
