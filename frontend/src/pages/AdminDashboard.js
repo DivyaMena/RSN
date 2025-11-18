@@ -680,6 +680,15 @@ export default function AdminDashboard({ user, logout }) {
               <h2 className="text-2xl font-bold">Manage Admins</h2>
               {user.can_manage_admins && (
                 <div className="flex gap-2">
+                  {selectedAdmins.length > 0 && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleOpenDeleteDialog('co-admins', selectedAdmins)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Selected ({selectedAdmins.length})
+                    </Button>
+                  )}
                   <Dialog open={showAddAdminDialog} onOpenChange={setShowAddAdminDialog}>
                     <DialogTrigger asChild>
                       <Button>
