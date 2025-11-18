@@ -629,7 +629,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                       <Button
                         data-testid={`assign-tutor-${batch.id}`}
                         onClick={async () => {
-                          if (batch.status === 'WAITLIST') return;
+                          if (batch.status?.toLowerCase() === 'waitlist') return;
                           // Reset state
                           setSelectedTutor('');
                           setSelectedDays([]);
@@ -649,8 +649,8 @@ export default function CoordinatorDashboard({ user, logout }) {
                         }}
                         variant="outline"
                         size="sm"
-                        disabled={batch.status === 'WAITLIST'}
-                        className={batch.status === 'WAITLIST' ? 'opacity-50 cursor-not-allowed' : ''}
+                        disabled={batch.status?.toLowerCase() === 'waitlist'}
+                        className={batch.status?.toLowerCase() === 'waitlist' ? 'opacity-50 cursor-not-allowed bg-gray-200' : ''}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Assign Tutor
@@ -658,15 +658,15 @@ export default function CoordinatorDashboard({ user, logout }) {
                       <Button
                         data-testid={`view-logboard-${batch.id}`}
                         onClick={() => {
-                          if (batch.status === 'WAITLIST') return;
+                          if (batch.status?.toLowerCase() === 'waitlist') return;
                           navigate(`/logboard/${batch.id}`);
                         }}
-                        className={batch.status === 'WAITLIST' 
+                        className={batch.status?.toLowerCase() === 'waitlist' 
                           ? 'opacity-50 cursor-not-allowed bg-gray-400' 
                           : 'bg-gradient-to-r from-blue-600 to-green-600 text-white'
                         }
                         size="sm"
-                        disabled={batch.status === 'WAITLIST'}
+                        disabled={batch.status?.toLowerCase() === 'waitlist'}
                       >
                         View Log Board
                       </Button>
