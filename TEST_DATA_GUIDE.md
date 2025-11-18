@@ -2,7 +2,7 @@
 
 ## 🎉 Your Free Online Tuition App is Ready!
 
-**Website**: https://rsn-portal.preview.emergentagent.com
+**Website**: https://learnhub-544.preview.emergentagent.com
 **Your Domain**: www.risingstarsnation.com (point to the app when ready)
 
 ---
@@ -10,7 +10,7 @@
 ## 🔐 How to Access the App
 
 ### Method 1: Test Login Portal (RECOMMENDED)
-1. Go to: https://rsn-portal.preview.emergentagent.com/test-login
+1. Go to: https://learnhub-544.preview.emergentagent.com/test-login
 2. Click on any user role to instantly login
 3. Explore the complete app!
 
