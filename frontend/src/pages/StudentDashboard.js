@@ -223,22 +223,27 @@ export default function StudentDashboard({ user, logout }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
+                <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <span className="text-base sm:text-xl font-bold hidden sm:block" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
+              <span className="text-sm font-bold sm:hidden" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>RSN</span>
             </div>
-            <span className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button data-testid="back-btn" onClick={() => navigate('/dashboard')} variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center space-x-2">
+              {user.role !== 'student' && (
+                <Button data-testid="back-btn" onClick={() => navigate('/dashboard')} variant="outline" size="sm" className="hidden sm:flex">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+              )}
+              <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
