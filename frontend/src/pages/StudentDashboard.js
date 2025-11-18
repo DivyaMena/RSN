@@ -449,8 +449,15 @@ export default function StudentDashboard({ user, logout }) {
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* No Batches Message */}
+        {batches.length === 0 && (
+          <div className="mb-8 bg-white rounded-xl shadow-lg p-8 text-center">
+            <p className="text-gray-600">No active batches yet. Batches will be created when 10+ students enroll for the same subject.</p>
+          </div>
+        )}
 
         {/* Curriculum */}
         <div>
