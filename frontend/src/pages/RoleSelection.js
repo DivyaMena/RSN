@@ -51,6 +51,18 @@ export default function RoleSelection({ user }) {
             <h3 className="text-2xl font-bold mb-3 text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Coordinator</h3>
             <p className="text-gray-600">Manage batches and assist tutors</p>
           </button>
+
+          <button
+            data-testid="role-school-btn"
+            onClick={() => navigate('/register/school')}
+            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-orange-500 text-left group"
+          >
+            <div className="h-16 w-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <School className="h-8 w-8 text-orange-600" />
+            </div>
+            <h3 className="text-2xl font-bold mb-3 text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>School</h3>
+            <p className="text-gray-600">Request subject tutors for your school for different classes</p>
+          </button>
         </div>
       </div>
     </div>
