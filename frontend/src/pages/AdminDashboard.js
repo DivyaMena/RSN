@@ -1580,16 +1580,6 @@ export default function AdminDashboard({ user, logout }) {
             </Card>
           </TabsContent>
 
-          {/* Curriculum Tab */}
-          <TabsContent value="curriculum" className="space-y-6">
-            <h2 className="text-2xl font-bold">Curriculum Management</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-center text-gray-500 py-8">Curriculum upload feature coming soon - bulk delete ready when items exist</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           {/* State Boards Tab */}
           <TabsContent value="state-boards" className="space-y-6">
             <div className="flex justify-between items-center">
