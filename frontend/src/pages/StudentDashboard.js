@@ -46,10 +46,11 @@ export default function StudentDashboard({ user, logout }) {
   
   // Remedial request state
   const [showRemedialDialog, setShowRemedialDialog] = useState(false);
-  const [remedialSubject, setRemedialSubject] = useState('');
-  const [remedialTopic, setRemedialTopic] = useState('');
-  const [remedialReason, setRemedialReason] = useState('');
+  const [remedialBatch, setRemedialBatch] = useState('');
+  const [remedialCurriculum, setRemedialCurriculum] = useState('');
+  const [remedialNotes, setRemedialNotes] = useState('');
   const [submittingRemedial, setSubmittingRemedial] = useState(false);
+  const [availableCurriculum, setAvailableCurriculum] = useState([]);
   
   // Join class state
   const [showJoinDialog, setShowJoinDialog] = useState(false);
