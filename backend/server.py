@@ -1884,20 +1884,54 @@ async def bulk_delete_state_boards(input: BulkDeleteInput, request: Request):
 async def register_school(input: RegisterSchoolInput):
     """School registration endpoint"""
     
+    if not input.terms_accepted:
+        raise HTTPException(status_code=400, detail="Please accept terms and conditions")
+    
     # Check if school with same email already exists
-    existing = await db.schools.find_one({"email": input.email}, {"_id": 0})
-    if existing:
+    existing_school = await db.schools.find_one({"email": input.email}, {"_id": 0})
+    if existing_school:
         raise HTTPException(status_code=400, detail="School with this email already registered")
     
+    existing_user = await db.users.find_one({"email": input.email}, {"_id": 0})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already in use")
+    
+    # Hash password
+    hashed_password = pwd_context.hash(input.password)
+    
+    # Create school user account
+    user = User(
+        email=input.email,
+        password=hashed_password,
+        role="school",
+        name=input.school_name
+    )
+    
+    user_doc = user.model_dump()
+    user_doc["created_at"] = user_doc["created_at"].isoformat()
+    await db.users.insert_one(user_doc)
+    
+    # Create school profile
     school = School(
         school_name=input.school_name,
         principal_name=input.principal_name,
         email=input.email,
         phone=input.phone,
+        alternate_phone=input.alternate_phone,
         address=input.address,
         city=input.city,
         state=input.state,
-        pincode=input.pincode
+        state_board=input.state_board,
+        pincode=input.pincode,
+        class_from=input.class_from,
+        class_to=input.class_to,
+        school_board_pic=input.school_board_pic,
+        location_url=input.location_url,
+        tutors_required_subjects=input.tutors_required_subjects,
+        preferred_days=input.preferred_days,
+        time_schedule=input.time_schedule,
+        terms_accepted=input.terms_accepted,
+        approval_status="pending"
     )
     
     doc = school.model_dump()
@@ -1905,7 +1939,7 @@ async def register_school(input: RegisterSchoolInput):
     
     await db.schools.insert_one(doc)
     
-    return {"success": True, "message": "School registration successful. Our team will contact you soon."}
+    return {"success": True, "message": "School registration successful. Waiting for coordinator approval."}
 
 # ============= USER ROUTES =============
 
