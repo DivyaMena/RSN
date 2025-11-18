@@ -1961,7 +1961,8 @@ async def get_my_student_profile(request: Request):
     if user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can access this endpoint")
     
-    student = await db.students.find_one({"user_id": user.id}, {"_id": 0})
+    # For student login, user.id IS the student ID
+    student = await db.students.find_one({"id": user.id}, {"_id": 0})
     if not student:
         raise HTTPException(status_code=404, detail="Student profile not found")
     
