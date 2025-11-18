@@ -900,3 +900,37 @@ agent_communication:
       - Combined arrays sent to backend as single subjects array
       
       🚀 READY FOR USER TESTING (as per user request - no automated testing performed)!
+
+  - agent: "main"
+    message: |
+      🔧 STUDENT PROFILE - NON-ACADEMIC COURSES FIX!
+      
+      ✅ ISSUE FIXED:
+      User reported that non-academic courses added during registration were missing in Student Profile edit page.
+      
+      **CHANGES MADE:**
+      
+      1. Updated StudentProfile.js Constants:
+         - Renamed SUBJECTS to ACADEMIC_SUBJECTS
+         - Added NON_ACADEMIC_COURSES constant with all 4 courses
+         - Renamed getAvailableSubjects to getAvailableAcademicSubjects
+      
+      2. Updated Profile UI:
+         - Split subjects into two sections:
+           * "Academic Subjects *" - Class-based filtered subjects (MAT, SCI, ENG for 6-7; MAT, PHY, BIO, ENG for 8-10)
+           * "Non-Academic Courses (Optional)" - Always available (CHS, CUB, CON, CAR)
+         - Non-academic section has blue background matching registration form
+         - Helper text shows course codes
+         - Both sections use same toggleSubject function and subjects state
+      
+      3. Subject Management:
+         - All subjects (academic + non-academic) stored in single subjects array
+         - Same save logic handles both types
+         - 15-day cooldown applies to both academic and non-academic changes
+      
+      📋 NOW STUDENTS CAN:
+      - View and edit their academic subjects based on class level
+      - View and edit non-academic courses (Chess, Rubik's Cube, Confidence Club, Career Guidance)
+      - Save all changes together with 15-day cooldown
+      
+      🚀 FIXED AND READY FOR TESTING!
