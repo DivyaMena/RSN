@@ -100,20 +100,14 @@ export default function StudentDashboard({ user, logout }) {
       const tutorData = {};
       for (const batch of studentBatches) {
         try {
-          const assignmentsRes = await axios.get(`${API}/batches/${batch.id}/tutor-assignments`, { withCredentials: true });
-          if (assignmentsRes.data && assignmentsRes.data.length > 0) {
-            // Get tutor details for each assignment
-            const tutorIds = [...new Set(assignmentsRes.data.map(a => a.tutor_id))];
-            const tutors = [];
-            for (const tutorId of tutorIds) {
-              try {
-                const tutorRes = await axios.get(`${API}/tutors/${tutorId}`, { withCredentials: true });
-                tutors.push(tutorRes.data);
-              } catch (err) {
-                console.error('Failed to fetch tutor:', err);
-              }
-            }
-            tutorData[batch.id] = tutors;
+          const tutorsRes = await axios.get(`${API}/batches/${batch.id}/tutors`, { withCredentials: true });
+          if (tutorsRes.data && tutorsRes.data.length > 0) {
+            // Extract tutor and user data from the response
+            tutorData[batch.id] = tutorsRes.data.map(item => ({
+              ...item.tutor,
+              name: item.user?.name || 'Unknown',
+              email: item.user?.email
+            }));
           }
         } catch (error) {
           console.error(`Failed to fetch tutors for batch ${batch.id}`);
