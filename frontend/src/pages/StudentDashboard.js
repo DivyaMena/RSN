@@ -33,8 +33,8 @@ export default function StudentDashboard({ user, logout }) {
       let studentData;
       let batchesRes;
       
-      // If studentId is "me", fetch logged-in student's data
-      if (studentId === 'me') {
+      // If studentId is "me" or undefined (direct student login), fetch logged-in student's data
+      if (!studentId || studentId === 'me' || user.role === 'student') {
         const [studentRes, batchesData] = await Promise.all([
           axios.get(`${API}/students/me`, { withCredentials: true }),
           axios.get(`${API}/students/me/batches`, { withCredentials: true })
