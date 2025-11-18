@@ -587,20 +587,6 @@ export default function CoordinatorDashboard({ user, logout }) {
                 </Select>
               </div>
 
-              {/* Filter by Slot */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Slot</label>
-                <Select value={selectedSlot} onValueChange={setSelectedSlot}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All Slots" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Slots</SelectItem>
-                    <SelectItem value="17:00-18:00">5pm - 6pm</SelectItem>
-                    <SelectItem value="18:00-19:00">6pm - 7pm</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
             <div>
