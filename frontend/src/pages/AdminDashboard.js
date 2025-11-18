@@ -1533,16 +1533,37 @@ export default function AdminDashboard({ user, logout }) {
                         </div>
                         {expandedId === school.id && (
                           <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                            <h4 className="font-semibold text-sm mb-2">School Details</h4>
-                            <div className="space-y-1 text-sm">
-                              <p><span className="font-medium">Name:</span> {school.school_name}</p>
-                              <p><span className="font-medium">Principal:</span> {school.principal_name}</p>
-                              <p><span className="font-medium">Email:</span> {school.email}</p>
-                              <p><span className="font-medium">Phone:</span> {school.phone}</p>
-                              <p><span className="font-medium">Address:</span> {school.address}</p>
-                              <p><span className="font-medium">City:</span> {school.city}</p>
-                              <p><span className="font-medium">State:</span> {school.state}</p>
-                              <p><span className="font-medium">Pincode:</span> {school.pincode}</p>
+                            <h4 className="font-semibold text-sm mb-3">Complete School Details</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <p className="font-semibold text-blue-900 mb-1">Basic Information</p>
+                                <p><span className="font-medium">School Name:</span> {school.school_name}</p>
+                                <p><span className="font-medium">Principal:</span> {school.principal_name}</p>
+                                <p><span className="font-medium">Email:</span> {school.email}</p>
+                                <p><span className="font-medium">Phone:</span> {school.phone}</p>
+                                {school.alternate_phone && <p><span className="font-medium">Alt Phone:</span> {school.alternate_phone}</p>}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-blue-900 mb-1">Location</p>
+                                <p><span className="font-medium">Address:</span> {school.address}</p>
+                                <p><span className="font-medium">City:</span> {school.city}</p>
+                                <p><span className="font-medium">State:</span> {school.state}</p>
+                                <p><span className="font-medium">Pincode:</span> {school.pincode}</p>
+                                {school.location_url && (
+                                  <p><span className="font-medium">Map:</span> <a href={school.location_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Location</a></p>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-blue-900 mb-1">Academic Details</p>
+                                <p><span className="font-medium">Board:</span> {school.state_board}</p>
+                                <p><span className="font-medium">Classes:</span> {school.class_from} to {school.class_to}</p>
+                                <p><span className="font-medium">Status:</span> <span className={`px-2 py-0.5 rounded text-xs ${school.approval_status === 'approved' ? 'bg-green-100 text-green-800' : school.approval_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{school.approval_status}</span></p>
+                              </div>
+                              <div>
+                                <p className="font-semibold text-blue-900 mb-1">Tutor Requirements</p>
+                                <p><span className="font-medium">Subjects:</span> {school.tutors_required_subjects?.join(', ')}</p>
+                                <p><span className="font-medium">Preferred Days:</span> {school.preferred_days?.join(', ')}</p>
+                              </div>
                             </div>
                           </div>
                         )}
