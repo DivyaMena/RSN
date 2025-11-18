@@ -208,10 +208,11 @@ export default function CoordinatorDashboard({ user, logout }) {
         { withCredentials: true }
       );
       toast.success('Availability request sent to Admin');
-      // Reset form
+      // Reset form and close dialog
       setAvailabilityRequestType('available');
       setAvailabilityRequestFrom('');
       setAvailabilityRequestTo('');
+      setAvailabilityDialogOpen(false);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to send request');
     } finally {
