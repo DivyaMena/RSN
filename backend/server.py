@@ -1871,10 +1871,14 @@ async def get_my_tutor_profile(request: Request):
     """Get current tutor's profile"""
     user = await require_auth(request)
     
+    print(f"DEBUG /tutors/me - User: {user.email}, Role: {user.role}, ID: {user.id}")
+    
     if user.role != "tutor":
         raise HTTPException(status_code=403, detail="Only tutors can access this endpoint")
     
     tutor = await db.tutors.find_one({"user_id": user.id}, {"_id": 0})
+    print(f"DEBUG /tutors/me - Tutor found: {tutor is not None}")
+    
     if not tutor:
         raise HTTPException(status_code=404, detail="Tutor profile not found")
     
