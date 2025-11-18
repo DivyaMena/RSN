@@ -644,6 +644,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                         }}
                         variant="outline"
                         size="sm"
+                        disabled={batch.status === 'WAITLIST'}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Assign Tutor
@@ -653,6 +654,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                         onClick={() => navigate(`/logboard/${batch.id}`)}
                         className="bg-gradient-to-r from-blue-600 to-green-600 text-white"
                         size="sm"
+                        disabled={batch.status === 'WAITLIST'}
                       >
                         View Log Board
                       </Button>
