@@ -9,10 +9,8 @@ import {
   GraduationCap, 
   BookOpen, 
   School, 
-  Calendar,
   UserPlus,
   Shield,
-  Settings,
   BarChart3,
   LogOut,
   UserCog,
@@ -23,8 +21,12 @@ import {
   Mail,
   Copy,
   Upload,
-  User
+  User,
+  ChevronDown,
+  ChevronRight,
+  Flag
 } from 'lucide-react';
+import { Checkbox } from '../components/ui/checkbox';
 import { toast } from 'sonner';
 import {
   Dialog,
