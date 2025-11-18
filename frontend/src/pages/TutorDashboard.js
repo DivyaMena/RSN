@@ -42,6 +42,9 @@ export default function TutorDashboard({ user, logout }) {
         axios.get(`${API}/tutors/me`, { withCredentials: true })
       ]);
       
+      console.log('Fetched batches:', batchesRes.data);
+      console.log('Tutor profile:', tutorRes.data);
+      
       setBatches(batchesRes.data);
       setTutorProfile(tutorRes.data);
       setSelectedStatus(tutorRes.data.availability_status || 'available');
