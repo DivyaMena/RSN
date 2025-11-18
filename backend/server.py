@@ -1922,6 +1922,15 @@ async def create_log_entry(input: CreateLogEntryInput, request: Request):
     doc["created_at"] = doc["created_at"].isoformat()
     await db.logboard_entries.insert_one(doc)
     
+    # Send email notifications to coordinators and students
+    try:
+        batch = await db.batches.find_one({"id": input.batch_id})
+        if batch:
+            await send_log_entry_notification(doc, batch, user.name)
+    except Exception as e:
+        logging.error(f"Failed to send log entry notifications: {str(e)}")
+        # Continue even if email fails
+    
     return entry
 
 @api_router.get("/logboard/{batch_id}", response_model=List[LogBoardEntry])
