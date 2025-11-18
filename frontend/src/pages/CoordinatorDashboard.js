@@ -727,85 +727,118 @@ export default function CoordinatorDashboard({ user, logout }) {
               <p className="text-gray-600">No schools have registered yet</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {allSchools.map((school) => (
-                <div key={school.id} className="border border-yellow-200 bg-yellow-50 rounded-xl p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <School className="h-6 w-6 text-orange-600" />
-                        <h3 className="text-xl font-bold text-gray-900">{school.school_name}</h3>
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
-                          PENDING
-                        </span>
-                      </div>
-                      <p className="text-gray-700 mb-1"><span className="font-medium">Principal:</span> {school.principal_name}</p>
-                      <p className="text-gray-700 mb-1"><span className="font-medium">Email:</span> {school.email}</p>
-                      <p className="text-gray-700 mb-1"><span className="font-medium">Phone:</span> {school.phone}</p>
-                      {school.alternate_phone && (
-                        <p className="text-gray-700 mb-1"><span className="font-medium">Alt Phone:</span> {school.alternate_phone}</p>
-                      )}
-                      <p className="text-gray-700 mb-1"><span className="font-medium">Location:</span> {school.address}, {school.city}, {school.state} - {school.pincode}</p>
-                      <p className="text-gray-700 mb-1"><span className="font-medium">Board:</span> {school.state_board}</p>
-                      <p className="text-gray-700 mb-2"><span className="font-medium">Classes:</span> {school.class_from} to {school.class_to}</p>
-                      
-                      <div className="mt-3">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Required Subjects:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {school.tutors_required_subjects?.map(subject => (
-                            <span key={subject} className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs font-semibold">
-                              {subject}
+            <div className="space-y-3">
+              {allSchools.map((school) => {
+                const statusColors = {
+                  'pending': 'bg-yellow-50 border-yellow-200',
+                  'approved': 'bg-green-50 border-green-200',
+                  'rejected': 'bg-red-50 border-red-200'
+                };
+                const statusBadgeColors = {
+                  'pending': 'bg-yellow-100 text-yellow-800',
+                  'approved': 'bg-green-100 text-green-800',
+                  'rejected': 'bg-red-100 text-red-800'
+                };
+                
+                return (
+                  <div key={school.id}>
+                    <div className={`border rounded-lg p-4 ${statusColors[school.approval_status] || 'bg-white border-gray-200'}`}>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setExpandedSchoolId(expandedSchoolId === school.id ? null : school.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                        >
+                          {expandedSchoolId === school.id ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </button>
+                        <School className="h-5 w-5 text-orange-600" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-gray-900">{school.school_name}</h3>
+                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadgeColors[school.approval_status] || 'bg-gray-100 text-gray-800'}`}>
+                              {school.approval_status?.toUpperCase() || 'UNKNOWN'}
                             </span>
-                          ))}
+                          </div>
+                          <p className="text-sm text-gray-600">{school.city}, {school.state} | Classes {school.class_from}-{school.class_to}</p>
                         </div>
+                        {school.approval_status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleApproveSchool(school.id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                              size="sm"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              onClick={() => handleRejectSchool(school.id)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                      
-                      <div className="mt-3">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Preferred Days:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {school.preferred_days?.map(day => (
-                            <span key={day} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
-                              {day}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {school.location_url && (
-                        <div className="mt-3">
-                          <a 
-                            href={school.location_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline text-sm"
-                          >
-                            📍 View Location on Map
-                          </a>
-                        </div>
-                      )}
                     </div>
 
-                    <div className="flex gap-2 ml-4">
-                      <Button
-                        onClick={() => handleApproveSchool(school.id)}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        size="sm"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={() => handleRejectSchool(school.id)}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject
-                      </Button>
-                    </div>
+                    {/* Expanded Details */}
+                    {expandedSchoolId === school.id && (
+                      <div className="ml-8 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <h4 className="font-semibold text-sm mb-3">Complete School Details</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <p className="font-semibold text-blue-900 mb-1">Basic Information</p>
+                            <p><span className="font-medium">Principal:</span> {school.principal_name}</p>
+                            <p><span className="font-medium">Email:</span> {school.email}</p>
+                            <p><span className="font-medium">Phone:</span> {school.phone}</p>
+                            {school.alternate_phone && <p><span className="font-medium">Alt Phone:</span> {school.alternate_phone}</p>}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-blue-900 mb-1">Location</p>
+                            <p><span className="font-medium">Address:</span> {school.address}</p>
+                            <p><span className="font-medium">City:</span> {school.city}</p>
+                            <p><span className="font-medium">State:</span> {school.state}</p>
+                            <p><span className="font-medium">Pincode:</span> {school.pincode}</p>
+                            {school.location_url && (
+                              <p><span className="font-medium">Map:</span> <a href={school.location_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View</a></p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-blue-900 mb-1">Academic Details</p>
+                            <p><span className="font-medium">Board:</span> {school.state_board}</p>
+                            <p><span className="font-medium">Classes:</span> {school.class_from} to {school.class_to}</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-blue-900 mb-1">Requirements</p>
+                            <p><span className="font-medium">Subjects:</span></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {school.tutors_required_subjects?.map(subject => (
+                                <span key={subject} className="px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-xs font-semibold">
+                                  {subject}
+                                </span>
+                              ))}
+                            </div>
+                            <p className="mt-2"><span className="font-medium">Days:</span></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {school.preferred_days?.map(day => (
+                                <span key={day} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
+                                  {day}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
