@@ -29,6 +29,7 @@ export default function LogBoard({ user, logout }) {
   const [students, setStudents] = useState([]);
   const [tutors, setTutors] = useState([]);
   const [myTutorId, setMyTutorId] = useState(null);
+  const [myAssignedDays, setMyAssignedDays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
