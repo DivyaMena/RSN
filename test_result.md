@@ -934,3 +934,53 @@ agent_communication:
       - Save all changes together with 15-day cooldown
       
       🚀 FIXED AND READY FOR TESTING!
+
+  - agent: "main"
+    message: |
+      🎯 NON-ACADEMIC COURSES - BATCH CREATION & DASHBOARD DISPLAY FIXED!
+      
+      ✅ CONFIRMED: BATCH CREATION LOGIC ALREADY WORKS!
+      
+      **Backend Batch Creation:**
+      - ✅ `check_and_create_batch` function loops through ALL subjects (academic + non-academic)
+      - ✅ Batch codes automatically generated for non-academic courses
+      - ✅ Example codes:
+        * RSN-TS-2025-26-C6-CHS-001 (Chess)
+        * RSN-TS-2025-26-C6-CUB-001 (Rubik's Cube)
+        * RSN-TS-2025-26-C6-CON-001 (Confidence Club)
+        * RSN-TS-2025-26-C6-CAR-001 (Career Guidance)
+      - ✅ All batch logic applies equally:
+        * Waitlist status when < 10 students
+        * Active status when >= 10 students
+        * Auto-tutor assignment when activated
+        * Full status when >= 25 students
+      
+      **FRONTEND FIX - StudentDashboard.js:**
+      
+      1. Fixed Subject Codes:
+         - OLD: 'CHESS', 'RUBIKS', 'CONFIDENCE', 'CAREER'
+         - NEW: 'CHS', 'CUB', 'CON', 'CAR'
+         - This was causing non-academic batches to not be recognized
+      
+      2. Enhanced Batch Display:
+         - Separated batches into two sections:
+           * "Academic Batches" - Shows MAT, PHY, SCI, BIO, ENG batches
+           * "Non-Academic Courses" - Shows CHS, CUB, CON, CAR batches
+         - Each section only appears if there are batches to show
+         - "No active batches" message shown when no batches exist
+      
+      3. Statistics Card:
+         - Already displays correct count: "Non-Academic Batches: X"
+         - Now shows actual count when students enroll in non-academic courses
+      
+      📋 HOW IT WORKS:
+      1. Parent registers student with non-academic courses (e.g., Chess, Rubik's Cube)
+      2. Backend creates batches for each selected course
+      3. Batch codes generated: RSN-TS-2025-26-C6-CHS-001
+      4. Student Dashboard now correctly:
+         - Counts non-academic batches
+         - Displays them in separate "Non-Academic Courses" section
+         - Shows tutor info, join class, log board buttons
+      5. Same logic applies: 10+ students = active, auto-assign tutor, etc.
+      
+      🚀 NON-ACADEMIC COURSES FULLY INTEGRATED!
