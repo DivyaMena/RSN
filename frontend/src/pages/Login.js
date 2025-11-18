@@ -205,12 +205,12 @@ export default function Login() {
           <Button
             onClick={handleGoogleLogin}
             variant="outline"
-            className="w-full border-2 border-gray-300 hover:bg-gray-50 py-6 text-lg"
+            className="w-full border-2 border-gray-300 hover:bg-gray-50 py-5 sm:py-6 text-base sm:text-lg"
           >
             <img 
               src="https://www.google.com/favicon.ico" 
               alt="Google" 
-              className="h-5 w-5 mr-3"
+              className="h-5 w-5 mr-2 sm:mr-3"
             />
             Login with Google
           </Button>
