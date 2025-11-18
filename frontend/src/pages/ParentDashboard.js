@@ -91,9 +91,13 @@ export default function ParentDashboard({ user, logout }) {
       // In production, you'd upload files to storage and get URLs
       const dobFormatted = `${formData.dob_year}-${formData.dob_month}-${formData.dob_day}`;
 
+      // Combine academic subjects and non-academic courses
+      const allSubjects = [...formData.subjects, ...formData.non_academic_courses];
+
       const dataToSend = {
         ...formData,
         dob: dobFormatted,
+        subjects: allSubjects,
         aadhaar_number: '000000000000' // Placeholder
       };
       delete dataToSend.dob_day;
@@ -102,6 +106,7 @@ export default function ParentDashboard({ user, logout }) {
       delete dataToSend.accept_terms;
       delete dataToSend.aadhaar_page1;
       delete dataToSend.aadhaar_page2;
+      delete dataToSend.non_academic_courses;
       
       await axios.post(`${API}/students`, dataToSend, { withCredentials: true });
       toast.success('Student registered successfully!');
@@ -118,6 +123,7 @@ export default function ParentDashboard({ user, logout }) {
         location: '',
         roll_no: '',
         subjects: [],
+        non_academic_courses: [],
         enrollment_year: new Date().getFullYear()
       });
       fetchData();
