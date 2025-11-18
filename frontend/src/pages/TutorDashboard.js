@@ -151,20 +151,8 @@ export default function TutorDashboard({ user, logout }) {
 
         {/* Tutor Status Card */}
         {tutorProfile && (() => {
-          // Helper function to convert date to IST and format as DD-MM-YYYY
-          const formatDateIST = (dateStr) => {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            // Convert to IST (UTC+5:30)
-            const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-            const day = String(istDate.getDate()).padStart(2, '0');
-            const month = String(istDate.getMonth() + 1).padStart(2, '0');
-            const year = istDate.getFullYear();
-            return `${day}-${month}-${year}`;
-          };
-
           // Get today's date in IST
-          const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+          const todayIST = getCurrentDateIST();
           todayIST.setHours(0, 0, 0, 0);
           
           let actualStatus = tutorProfile.availability_status;
