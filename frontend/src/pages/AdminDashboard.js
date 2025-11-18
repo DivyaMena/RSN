@@ -1311,17 +1311,151 @@ export default function AdminDashboard({ user, logout }) {
             </Card>
           </TabsContent>
 
-          {/* Holidays Tab */}
-          <TabsContent value="holidays" className="space-y-6">
-            <h2 className="text-2xl font-bold">Holiday Management</h2>
+          {/* State Boards Tab */}
+          <TabsContent value="state-boards" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">State Boards Management</h2>
+              <div className="flex gap-2">
+                {selectedBoards.length > 0 && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleOpenDeleteDialog('state-boards', selectedBoards)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Selected ({selectedBoards.length})
+                  </Button>
+                )}
+                <Dialog open={showAddBoardDialog} onOpenChange={setShowAddBoardDialog}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add State Board
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New State Board</DialogTitle>
+                      <DialogDescription>Create a new state board entry</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Name *</label>
+                        <Input
+                          value={boardFormData.name}
+                          onChange={(e) => setBoardFormData({...boardFormData, name: e.target.value})}
+                          placeholder="e.g., Telangana State Board"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Code *</label>
+                        <Input
+                          value={boardFormData.code}
+                          onChange={(e) => setBoardFormData({...boardFormData, code: e.target.value})}
+                          placeholder="e.g., TS"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Description</label>
+                        <Input
+                          value={boardFormData.description}
+                          onChange={(e) => setBoardFormData({...boardFormData, description: e.target.value})}
+                          placeholder="Optional description"
+                        />
+                      </div>
+                      <Button onClick={handleAddStateBoard} className="w-full">Create State Board</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
             <Card>
               <CardContent className="pt-6">
-                <p className="text-center text-gray-500 py-8">Holiday upload feature coming soon</p>
+                <div className="space-y-2">
+                  {stateBoards.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox
+                        checked={selectedBoards.length === stateBoards.length}
+                        onCheckedChange={() => handleSelectAll('boards', stateBoards, selectedBoards, setSelectedBoards)}
+                      />
+                      <span className="text-sm font-medium">Select All ({stateBoards.length})</span>
+                    </div>
+                  )}
+                  {stateBoards.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">No state boards found</p>
+                  ) : (
+                    stateBoards.map((board) => (
+                      <div key={board.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                          <div className="flex items-center gap-3 flex-1">
+                            <Checkbox
+                              checked={selectedBoards.includes(board.id)}
+                              onCheckedChange={() => handleSelectSingle(board.id, selectedBoards, setSelectedBoards)}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleToggleExpand(board.id)}
+                                  className="p-1 hover:bg-gray-200 rounded"
+                                >
+                                  {expandedId === board.id ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </button>
+                                <div>
+                                  <p className="font-semibold">{board.name}</p>
+                                  <p className="text-sm text-gray-600">Code: {board.code}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Expanded Details */}
+                        {expandedId === board.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Board Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Name:</span> {board.name}</p>
+                              <p><span className="font-medium">Code:</span> {board.code}</p>
+                              <p><span className="font-medium">Description:</span> {board.description || 'N/A'}</p>
+                              <p><span className="font-medium">Created:</span> {new Date(board.created_at).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {idsToDelete.length} {deleteType}?
+              <br />
+              <span className="text-red-600 font-semibold">This action cannot be undone.</span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              No, Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Yes, Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
