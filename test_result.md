@@ -297,6 +297,126 @@ backend:
         agent: "main"
         comment: "✅ IMPLEMENTED: PUT /api/students/me/profile endpoint with 15-day edit cooldown. Allows students to update subjects and school_name. Updated to accept school_name parameter. Needs testing."
 
+  - task: "State Boards CRUD endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: GET, POST, PUT, DELETE /api/admin/state-boards endpoints. StateBoard model with name, code, description fields. Includes validation for duplicate codes. Needs testing."
+
+  - task: "School model and registration endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: POST /api/schools/register endpoint. School model with all fields (school_name, principal_name, email, phone, address, city, state, pincode). Email uniqueness validation. Needs testing."
+
+  - task: "Bulk delete coordinators endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/coordinators/bulk endpoint. Prevents deletion if coordinator has active assignments. Returns errors array for failed deletions. Needs testing."
+
+  - task: "Bulk delete parents endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/parents/bulk endpoint. Shows warnings if parent has students. Deletes associated students as well. Returns warnings array. Needs testing."
+
+  - task: "Bulk delete tutors endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/tutors/bulk endpoint. Prevents deletion if tutor is assigned to active batches. Returns errors array for failed deletions. Needs testing."
+
+  - task: "Bulk delete students endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/students/bulk endpoint. Removes students from batches before deletion. Deletes student user accounts if exist. Needs testing."
+
+  - task: "Bulk delete co-admins endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/co-admins/bulk endpoint. Only main admin can delete. Prevents deletion of main admin. Returns errors array. Needs testing."
+
+  - task: "Bulk delete schools endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/schools/bulk endpoint. Deletes associated school-tutor assignments. Needs testing."
+
+  - task: "Bulk delete batches endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/batches/bulk endpoint. Deletes batch tutor assignments, log entries, and attendance records. Needs testing."
+
+  - task: "Bulk delete curriculum endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: DELETE /api/admin/curriculum/bulk endpoint. Simple bulk deletion of curriculum items. Needs testing."
+
   - task: "User model updates for profile fields"
     implemented: true
     working: "NA"
