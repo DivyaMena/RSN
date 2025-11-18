@@ -137,6 +137,7 @@ function App() {
           } />
           <Route path="/student/:studentId" element={user ? <StudentDashboard user={user} logout={logout} /> : <Navigate to="/" />} />
           <Route path="/logboard/:batchId" element={user ? <LogBoard user={user} logout={logout} /> : <Navigate to="/" />} />
+          <Route path="/profile" element={user ? <TutorProfile user={user} logout={logout} /> : <Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors />
