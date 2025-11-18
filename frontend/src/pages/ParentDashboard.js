@@ -455,16 +455,9 @@ export default function ParentDashboard({ user, logout }) {
                         View Details
                       </Button>
                       <Button
-                        onClick={async () => {
-                          if (window.confirm(`Are you sure you want to delete ${student.name}? This action cannot be undone.`)) {
-                            try {
-                              await axios.delete(`${API}/students/${student.id}`, { withCredentials: true });
-                              toast.success('Student deleted successfully');
-                              fetchData();
-                            } catch (error) {
-                              toast.error(error.response?.data?.detail || 'Failed to delete student');
-                            }
-                          }
+                        onClick={() => {
+                          setStudentToDelete(student);
+                          setDeleteDialogOpen(true);
                         }}
                         variant="outline"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
