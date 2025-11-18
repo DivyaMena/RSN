@@ -293,7 +293,7 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "✅ IMPLEMENTED: PUT /api/students/me/profile endpoint with 15-day edit cooldown. Allows students to update subjects only. Needs testing."
+        comment: "✅ IMPLEMENTED: PUT /api/students/me/profile endpoint with 15-day edit cooldown. Allows students to update subjects and school_name. Updated to accept school_name parameter. Needs testing."
 
   - task: "User model updates for profile fields"
     implemented: true
