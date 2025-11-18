@@ -1230,55 +1230,64 @@ export default function AdminDashboard({ user, logout }) {
           <TabsContent value="tutors" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Manage Tutors</h2>
-              <Select value={tutorFilter} onValueChange={setTutorFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Tutors</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                  <SelectItem value="blacklisted">Blacklisted</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                {selectedTutors.length > 0 && (
+                  <Button variant="destructive" onClick={() => handleOpenDeleteDialog('tutors', selectedTutors)}>
+                    <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedTutors.length})
+                  </Button>
+                )}
+                <Select value={tutorFilter} onValueChange={setTutorFilter}>
+                  <SelectTrigger className="w-48"><SelectValue placeholder="Filter by status" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tutors</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                    <SelectItem value="blacklisted">Blacklisted</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-
             <Card>
               <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {filteredTutors.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No tutors found</p>
-                  ) : (
+                <div className="space-y-2">
+                  {filteredTutors.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox checked={selectedTutors.length === filteredTutors.length} onCheckedChange={() => handleSelectAll('tutors', filteredTutors, selectedTutors, setSelectedTutors)} />
+                      <span className="text-sm font-medium">Select All ({filteredTutors.length})</span>
+                    </div>
+                  )}
+                  {filteredTutors.length === 0 ? (<p className="text-center text-gray-500 py-8">No tutors found</p>) : (
                     filteredTutors.map((item) => (
-                      <div key={item.tutor?.id} className="p-4 bg-gray-50 rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div>
+                      <div key={item.tutor?.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox checked={selectedTutors.includes(item.tutor?.id)} onCheckedChange={() => handleSelectSingle(item.tutor?.id, selectedTutors, setSelectedTutors)} />
+                          <button onClick={() => handleToggleExpand(item.tutor?.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === item.tutor?.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
                             <p className="font-semibold">{item.user?.name}</p>
                             <p className="text-sm text-gray-600">{item.user?.email}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              Classes: {item.tutor?.classes_can_teach?.join(', ')} | 
-                              Subjects: {item.tutor?.subjects_can_teach?.join(', ')}
-                            </p>
-                            <div className="flex gap-2 mt-2">
-                              <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                                item.tutor?.approval_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                item.tutor?.approval_status === 'approved' ? 'bg-green-100 text-green-800' :
-                                'bg-red-100 text-red-800'
-                              }`}>
-                                {item.tutor?.approval_status}
-                              </span>
-                              <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                                item.tutor?.status === 'active' ? 'bg-green-100 text-green-800' :
-                                item.tutor?.status === 'suspended' ? 'bg-orange-100 text-orange-800' :
-                                item.tutor?.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {item.tutor?.status}
-                              </span>
+                            <p className="text-sm text-gray-500 mt-1">Classes: {item.tutor?.classes_can_teach?.join(', ')} | Subjects: {item.tutor?.subjects_can_teach?.join(', ')}</p>
+                            <div className="flex gap-2 mt-1">
+                              <span className={`px-2 py-1 text-xs font-semibold rounded ${item.tutor?.approval_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : item.tutor?.approval_status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{item.tutor?.approval_status}</span>
+                              <span className={`px-2 py-1 text-xs font-semibold rounded ${item.tutor?.status === 'active' ? 'bg-green-100 text-green-800' : item.tutor?.status === 'suspended' ? 'bg-orange-100 text-orange-800' : item.tutor?.status === 'blacklisted' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>{item.tutor?.status}</span>
                             </div>
                           </div>
                         </div>
+                        {expandedId === item.tutor?.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Tutor Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Code:</span> {item.tutor?.tutor_code}</p>
+                              <p><span className="font-medium">Board:</span> {item.tutor?.board_preference}</p>
+                              <p><span className="font-medium">Classes:</span> {item.tutor?.classes_can_teach?.join(', ')}</p>
+                              <p><span className="font-medium">Subjects:</span> {item.tutor?.subjects_can_teach?.join(', ')}</p>
+                              <p><span className="font-medium">Days:</span> {item.tutor?.available_days?.join(', ')}</p>
+                              <p><span className="font-medium">About:</span> {item.tutor?.about_yourself || 'N/A'}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
