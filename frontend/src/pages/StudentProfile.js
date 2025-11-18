@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const SUBJECTS = {
+const ACADEMIC_SUBJECTS = {
   'MAT': 'Mathematics',
   'PHY': 'Physics',
   'SCI': 'Science',
@@ -19,22 +19,29 @@ const SUBJECTS = {
   'ENG': 'English'
 };
 
-// Function to get available subjects based on class level
-const getAvailableSubjects = (classLevel) => {
+const NON_ACADEMIC_COURSES = {
+  'CHS': 'Chess',
+  'CUB': "Rubik's Cube",
+  'CON': 'Confidence Club',
+  'CAR': 'Career Guidance'
+};
+
+// Function to get available academic subjects based on class level
+const getAvailableAcademicSubjects = (classLevel) => {
   const subjects = {};
   
   // Classes 6-7: MAT, SCI, ENG (no PHY, no BIO)
   if (classLevel === 6 || classLevel === 7) {
-    subjects['MAT'] = SUBJECTS['MAT'];
-    subjects['SCI'] = SUBJECTS['SCI'];
-    subjects['ENG'] = SUBJECTS['ENG'];
+    subjects['MAT'] = ACADEMIC_SUBJECTS['MAT'];
+    subjects['SCI'] = ACADEMIC_SUBJECTS['SCI'];
+    subjects['ENG'] = ACADEMIC_SUBJECTS['ENG'];
   }
   // Classes 8-10: MAT, PHY, BIO, ENG (no SCI)
   else if (classLevel === 8 || classLevel === 9 || classLevel === 10) {
-    subjects['MAT'] = SUBJECTS['MAT'];
-    subjects['PHY'] = SUBJECTS['PHY'];
-    subjects['BIO'] = SUBJECTS['BIO'];
-    subjects['ENG'] = SUBJECTS['ENG'];
+    subjects['MAT'] = ACADEMIC_SUBJECTS['MAT'];
+    subjects['PHY'] = ACADEMIC_SUBJECTS['PHY'];
+    subjects['BIO'] = ACADEMIC_SUBJECTS['BIO'];
+    subjects['ENG'] = ACADEMIC_SUBJECTS['ENG'];
   }
   
   return subjects;
