@@ -76,7 +76,7 @@ export default function CoordinatorDashboard({ user, logout }) {
       setBatches(batchesRes.data);
       setTutors(tutorsRes.data);
       setPendingTutors(pendingRes.data);
-      setPendingSchools(allSchoolsRes.data); // Fetch ALL schools, not just pending
+      setAllSchools(allSchoolsRes.data); // Store all schools
       
       // Fetch assignments for each batch
       const assignments = {};
