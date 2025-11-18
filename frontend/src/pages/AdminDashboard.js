@@ -858,6 +858,15 @@ export default function AdminDashboard({ user, logout }) {
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Manage Coordinators</h2>
               <div className="flex gap-2">
+                {selectedCoordinators.length > 0 && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleOpenDeleteDialog('coordinators', selectedCoordinators)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Selected ({selectedCoordinators.length})
+                  </Button>
+                )}
                 <Dialog open={showAssignCoordinatorDialog} onOpenChange={setShowAssignCoordinatorDialog}>
                   <DialogTrigger asChild>
                     <Button>
