@@ -95,6 +95,12 @@ export default function AdminDashboard({ user, logout }) {
   // State Boards State
   const [stateBoards, setStateBoards] = useState([]);
 
+  // Curriculum State
+  const [curriculum, setCurriculum] = useState([]);
+  const [curriculumSummary, setCurriculumSummary] = useState([]);
+  const [uploadingCsv, setUploadingCsv] = useState(false);
+  const [selectedCurriculum, setSelectedCurriculum] = useState([]);
+
   // Selection state for bulk operations
   const [selectedCoordinators, setSelectedCoordinators] = useState([]);
   const [selectedTutors, setSelectedTutors] = useState([]);
