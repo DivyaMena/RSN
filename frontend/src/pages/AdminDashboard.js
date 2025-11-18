@@ -57,6 +57,7 @@ export default function AdminDashboard({ user, logout }) {
     totalParents: 0,
     totalBatches: 0,
     totalSchools: 0,
+    totalStateBoards: 0,
     pendingCoordinators: 0,
     pendingTutors: 0
   });
