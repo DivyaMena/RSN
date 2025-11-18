@@ -164,6 +164,7 @@ export default function AdminDashboard({ user, logout }) {
     if (activeTab === 'parents') fetchParents();
     if (activeTab === 'schools') fetchSchools();
     if (activeTab === 'batches') fetchBatches();
+    if (activeTab === 'state-boards') fetchStateBoards();
   }, [activeTab]);
 
   const fetchDashboardStats = async () => {
