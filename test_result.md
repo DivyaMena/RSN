@@ -105,23 +105,25 @@
 user_problem_statement: |
   Rising Stars Nation - A non-profit free online tuition platform with multi-user roles (Parents, Students, Tutors, Coordinators, Schools, RSN Admin).
   
-  CURRENT PHASE: Profile Management System with 15-day edit cooldown
-  1. ✅ COMPLETED: Tutor Profile page with editable fields (availability, subjects, classes, about yourself)
-  2. ✅ COMPLETED: Coordinator Profile page with editable fields (phone, location, alternate phone, availability)
-  3. ✅ COMPLETED: Student Profile page with editable subjects only
-  4. ✅ COMPLETED: Parent Profile page with editable contact details (phone, location, alternate phone)
-  5. ✅ COMPLETED: Admin Profile page (display only - name, email, role, admin type)
-  6. ✅ COMPLETED: 15-day edit restriction implemented for all editable profiles
-  7. ✅ COMPLETED: "My Profile" buttons added to all dashboards
-  8. ✅ COMPLETED: Profile routing in App.js
+  CURRENT PHASE: Admin Dashboard Enhancements - View Details & Bulk Management
+  1. 🔄 IN PROGRESS: Inline "View Details" for all entities (Students, Tutors, Parents, Coordinators, Batches, Schools, Co-Admins, Curriculum, State Boards)
+  2. 🔄 IN PROGRESS: Bulk selection (checkboxes + Select All) for all entity types
+  3. 🔄 IN PROGRESS: Bulk deletion with shadcn/ui confirmation dialogs
+  4. 🔄 IN PROGRESS: Deletion validation (prevent if assigned, warn if has children)
+  5. 🔄 IN PROGRESS: Replace "Holidays" tab with "State Boards" tab
+  6. ✅ BACKEND COMPLETE: State Boards model and CRUD endpoints
+  7. ✅ BACKEND COMPLETE: School model and registration endpoint
+  8. ✅ BACKEND COMPLETE: Bulk delete endpoints for all entity types
   
-  Previous phase features:
+  COMPLETED PREVIOUS PHASES:
+  - Profile Management System with 15-day edit cooldown
   - Role-based login page with dropdown
   - Email/password authentication system
   - Tutor approval/rejection functionality in Coordinator Dashboard
   - View Students feature for batches
   - Tutor status management in Tutor Dashboard
   - Student login via parent email + DOB
+  - Email notifications for log entries
 
 backend:
   - task: "Tutor approval endpoint"
