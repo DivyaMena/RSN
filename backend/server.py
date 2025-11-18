@@ -1606,6 +1606,61 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
         
         return {"success": True, "assignment": assignment}
 
+@api_router.get("/batches/{batch_id}/available-tutors")
+async def get_available_tutors_for_batch(batch_id: str, request: Request):
+    """Get available tutors for a batch based on schedule and qualifications"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators/admins can access this")
+    
+    # Get batch details
+    batch = await db.batches.find_one({"id": batch_id}, {"_id": 0})
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    
+    # Extract days from schedule_slots
+    batch_days = set()
+    if batch.get("schedule_slots"):
+        for slot in batch["schedule_slots"]:
+            batch_days.add(slot["day"])
+    
+    # Find tutors who:
+    # 1. Are active
+    # 2. Are available (not on leave)
+    # 3. Can teach this class level
+    # 4. Can teach this subject
+    # 5. Have at least one available day that matches batch schedule
+    all_tutors = await db.tutors.find({
+        "status": "active",
+        "classes_can_teach": batch["class_level"],
+        "subjects_can_teach": batch["subject"]
+    }, {"_id": 0}).to_list(None)
+    
+    available_tutors = []
+    for tutor in all_tutors:
+        # Check availability status
+        if tutor.get("availability_status") and tutor["availability_status"] != "available":
+            continue
+        
+        # Check if tutor has any matching days
+        tutor_days = set(tutor.get("available_days", []))
+        matching_days = batch_days & tutor_days
+        
+        if not matching_days:
+            continue
+        
+        # Get user details
+        user_doc = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
+        
+        available_tutors.append({
+            "tutor": tutor,
+            "user": user_doc,
+            "matching_days": list(matching_days)
+        })
+    
+    return available_tutors
+
 @api_router.get("/batches/{batch_id}/tutors")
 async def get_batch_tutors(batch_id: str, request: Request):
     """Get tutors assigned to batch"""
