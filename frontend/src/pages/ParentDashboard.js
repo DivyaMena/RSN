@@ -504,6 +504,41 @@ export default function ParentDashboard({ user, logout }) {
           </div>
         )}
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">
+              Are you sure you want to delete <strong>{studentToDelete?.name}</strong>?
+            </p>
+            <p className="text-red-600 text-sm mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setStudentToDelete(null);
+              }}
+            >
+              No
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteStudent}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Yes, Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
