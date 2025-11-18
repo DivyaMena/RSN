@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../components/ui/checkbox';
 import { Textarea } from '../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { BookOpen, LogOut, Plus, Users, CheckCircle, XCircle, Eye, UserCheck, Shield, Ban, UserX, User, School } from 'lucide-react';
+import { BookOpen, LogOut, Plus, Users, CheckCircle, XCircle, Eye, UserCheck, Shield, Ban, UserX, User, School, ChevronDown, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
