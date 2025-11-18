@@ -1461,19 +1461,51 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Batches Tab */}
           <TabsContent value="batches" className="space-y-6">
-            <h2 className="text-2xl font-bold">All Batches</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">All Batches</h2>
+              {selectedBatches.length > 0 && (
+                <Button variant="destructive" onClick={() => handleOpenDeleteDialog('batches', selectedBatches)}>
+                  <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedBatches.length})
+                </Button>
+              )}
+            </div>
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  {batches.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No batches found</p>
-                  ) : (
+                  {batches.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox checked={selectedBatches.length === batches.length} onCheckedChange={() => handleSelectAll('batches', batches, selectedBatches, setSelectedBatches)} />
+                      <span className="text-sm font-medium">Select All ({batches.length})</span>
+                    </div>
+                  )}
+                  {batches.length === 0 ? (<p className="text-center text-gray-500 py-8">No batches found</p>) : (
                     batches.map((batch) => (
-                      <div key={batch.id} className="p-3 bg-gray-50 rounded-lg">
-                        <p className="font-semibold">{batch.batch_code}</p>
-                        <p className="text-sm text-gray-600">
-                          Class {batch.class_level} | {batch.subject} | {batch.status}
-                        </p>
+                      <div key={batch.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox checked={selectedBatches.includes(batch.id)} onCheckedChange={() => handleSelectSingle(batch.id, selectedBatches, setSelectedBatches)} />
+                          <button onClick={() => handleToggleExpand(batch.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === batch.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <p className="font-semibold">{batch.batch_code}</p>
+                            <p className="text-sm text-gray-600">Class {batch.class_level} | {batch.subject} | {batch.status}</p>
+                          </div>
+                        </div>
+                        {expandedId === batch.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Batch Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Code:</span> {batch.batch_code}</p>
+                              <p><span className="font-medium">State:</span> {batch.state}</p>
+                              <p><span className="font-medium">Academic Year:</span> {batch.academic_year}</p>
+                              <p><span className="font-medium">Class Level:</span> {batch.class_level}</p>
+                              <p><span className="font-medium">Subject:</span> {batch.subject}</p>
+                              <p><span className="font-medium">Board:</span> {batch.board}</p>
+                              <p><span className="font-medium">Status:</span> {batch.status}</p>
+                              <p><span className="font-medium">Students:</span> {batch.student_ids?.length || 0}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
@@ -1487,7 +1519,7 @@ export default function AdminDashboard({ user, logout }) {
             <h2 className="text-2xl font-bold">Curriculum Management</h2>
             <Card>
               <CardContent className="pt-6">
-                <p className="text-center text-gray-500 py-8">Curriculum upload feature coming soon</p>
+                <p className="text-center text-gray-500 py-8">Curriculum upload feature coming soon - bulk delete ready when items exist</p>
               </CardContent>
             </Card>
           </TabsContent>
