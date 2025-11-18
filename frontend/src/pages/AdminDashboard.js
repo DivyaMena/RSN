@@ -611,7 +611,7 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium text-gray-600">Total Coordinators</CardTitle>
@@ -651,6 +651,24 @@ export default function AdminDashboard({ user, logout }) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-indigo-600">{stats.totalBatches}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">Total Schools</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-orange-600">{stats.totalSchools}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-600">State Boards</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-teal-600">{stats.totalStateBoards}</div>
                 </CardContent>
               </Card>
             </div>
