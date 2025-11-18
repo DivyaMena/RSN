@@ -157,6 +157,10 @@ export default function ParentDashboard({ user, logout }) {
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-gray-700">Welcome, {user.name}</span>
+            <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
+              <User className="h-4 w-4 mr-2" />
+              My Profile
+            </Button>
             <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
               <LogOut className="h-4 w-4 mr-2" />
               Logout
