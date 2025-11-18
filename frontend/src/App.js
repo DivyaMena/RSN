@@ -7,6 +7,7 @@ import RoleSelection from './pages/RoleSelection';
 import RegisterParent from './pages/RegisterParent';
 import RegisterTutor from './pages/RegisterTutor';
 import RegisterCoordinator from './pages/RegisterCoordinator';
+import RegisterSchool from './pages/RegisterSchool';
 import ParentDashboard from './pages/ParentDashboard';
 import TutorDashboard from './pages/TutorDashboard';
 import TutorProfile from './pages/TutorProfile';
