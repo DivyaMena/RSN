@@ -257,6 +257,18 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  const fetchStateBoards = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/state-boards`, {
+        withCredentials: true
+      });
+      setStateBoards(response.data);
+    } catch (error) {
+      console.error('Error fetching state boards:', error);
+      toast.error('Failed to load state boards');
+    }
+  };
+
   // Admin Management Functions
   const handleAddCoAdmin = async () => {
     if (!newAdminData.email || !newAdminData.password || !newAdminData.name) {
