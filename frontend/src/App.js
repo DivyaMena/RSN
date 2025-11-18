@@ -131,6 +131,7 @@ function App() {
           <Route path="/register/parent" element={user && user.role === 'pending' ? <RegisterParent setUser={setUser} /> : <Navigate to="/" />} />
           <Route path="/register/tutor" element={user && user.role === 'pending' ? <RegisterTutor setUser={setUser} /> : <Navigate to="/" />} />
           <Route path="/register/coordinator" element={user && user.role === 'pending' ? <RegisterCoordinator setUser={setUser} /> : <Navigate to="/" />} />
+          <Route path="/register/school" element={user && user.role === 'pending' ? <RegisterSchool setUser={setUser} /> : <Navigate to="/" />} />
           <Route path="/dashboard" element={
             !user ? <Navigate to="/" /> :
             user.role === 'parent' ? <ParentDashboard user={user} logout={logout} /> :
