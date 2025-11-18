@@ -829,13 +829,25 @@ export default function CoordinatorDashboard({ user, logout }) {
             </div>
 
             {selectedTutorData && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  {selectedTutorData.user?.name}'s Available Days:
-                </p>
-                <p className="text-sm text-blue-800 font-medium">
-                  {selectedTutorData.tutor.available_days?.join(', ')}
-                </p>
+              <div className="space-y-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    {selectedTutorData.user?.name}'s Available Days:
+                  </p>
+                  <p className="text-sm text-blue-800 font-medium">
+                    {selectedTutorData.tutor.available_days?.join(', ')}
+                  </p>
+                </div>
+                {selectedTutorData.matching_days && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Days matching batch schedule:
+                    </p>
+                    <p className="text-sm text-green-800 font-medium">
+                      {selectedTutorData.matching_days.join(', ')}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
