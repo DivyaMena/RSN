@@ -201,7 +201,7 @@ export default function StudentProfile({ user, logout }) {
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
-            <p className="text-sm text-gray-600">Name and email cannot be changed</p>
+            <p className="text-sm text-gray-600">Name and basic details cannot be changed</p>
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-6">
@@ -215,7 +215,7 @@ export default function StudentProfile({ user, logout }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
               <div className="px-4 py-2 bg-gray-100 rounded-lg text-gray-700">Class {profile?.class_level}</div>
@@ -224,25 +224,40 @@ export default function StudentProfile({ user, logout }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">Board</label>
               <div className="px-4 py-2 bg-gray-100 rounded-lg text-gray-700">{profile?.board}</div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">School</label>
-              <div className="px-4 py-2 bg-gray-100 rounded-lg text-gray-700">{profile?.school_name}</div>
-            </div>
           </div>
         </div>
 
-        {/* Editable Subjects */}
+        {/* Editable Fields */}
         <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Subject Preferences</h2>
-            <p className="text-sm text-gray-600">Select the subjects you want to study</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Editable Information</h2>
+            <p className="text-sm text-gray-600">Update your school and subject preferences</p>
+          </div>
+
+          {/* School Name */}
+          <div>
+            <Label htmlFor="school" className="text-gray-900">School Name *</Label>
+            <Input
+              id="school"
+              type="text"
+              value={schoolName}
+              onChange={(e) => setSchoolName(e.target.value)}
+              disabled={!canEdit}
+              placeholder="Enter your school name"
+              className={!canEdit ? 'bg-gray-100' : ''}
+            />
           </div>
 
           {/* Subjects */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-3">Your Subjects *</label>
+            <p className="text-xs text-gray-500 mb-3">
+              {profile?.class_level <= 7 
+                ? 'Available subjects for Classes 6-7: Mathematics, Science, English' 
+                : 'Available subjects for Classes 8-10: Mathematics, Physics, Biology, English'}
+            </p>
             <div className="grid grid-cols-2 gap-4">
-              {Object.entries(SUBJECTS).map(([code, name]) => (
+              {Object.entries(availableSubjects).map(([code, name]) => (
                 <div key={code} className="flex items-center space-x-2">
                   <Checkbox
                     checked={subjects.includes(code)}
