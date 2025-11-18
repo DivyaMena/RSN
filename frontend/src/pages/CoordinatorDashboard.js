@@ -280,30 +280,19 @@ export default function CoordinatorDashboard({ user, logout }) {
     filteredBatches = filteredBatches.filter(batch => batch.subject === selectedSubject);
   }
 
-  // Further filter by Day (uses existing batchAssignments structure)
+  // Filter by Day - check batch schedule_slots
   if (selectedDayFilter !== 'all') {
     filteredBatches = filteredBatches.filter(batch => {
-      const assignments = batchAssignments[batch.id] || [];
-      return assignments.some(a => a.assignment?.assigned_days?.includes(selectedDayFilter));
+      if (!batch.schedule_slots || batch.schedule_slots.length === 0) return false;
+      return batch.schedule_slots.some(slot => slot.day === selectedDayFilter);
     });
   }
 
-  // Further filter by Tutor
+  // Filter by Tutor
   if (selectedTutorFilter !== 'all') {
     filteredBatches = filteredBatches.filter(batch => {
       const assignments = batchAssignments[batch.id] || [];
       return assignments.some(a => a.tutor_id === selectedTutorFilter);
-    });
-  }
-
-  // Filter by Slot using tutor preferred slots
-  if (selectedSlot !== 'all') {
-    filteredBatches = filteredBatches.filter(batch => {
-      const assignments = batchAssignments[batch.id] || [];
-      return assignments.some(a => {
-        const tutorData = tutors.find(t => t.tutor.id === a.tutor_id);
-        return tutorData?.tutor?.available_slots?.includes(selectedSlot);
-      });
     });
   }
 
