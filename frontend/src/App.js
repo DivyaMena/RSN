@@ -14,6 +14,7 @@ import TutorProfile from './pages/TutorProfile';
 import CoordinatorDashboard from './pages/CoordinatorDashboard';
 import CoordinatorProfile from './pages/CoordinatorProfile';
 import AdminDashboard from './pages/AdminDashboard';
+import SchoolDashboard from './pages/SchoolDashboard';
 import AdminProfile from './pages/AdminProfile';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
