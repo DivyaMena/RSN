@@ -1749,6 +1749,20 @@ async def create_log_entry(input: CreateLogEntryInput, request: Request):
     if not assignment:
         raise HTTPException(status_code=403, detail="Tutor not assigned to this batch")
     
+    # Validate that the date matches tutor's assigned days
+    if input.date:
+        from datetime import datetime
+        log_date = datetime.fromisoformat(input.date) if isinstance(input.date, str) else input.date
+        day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        day_of_week = day_names[log_date.weekday()]
+        
+        assigned_days = assignment.get("assigned_days", [])
+        if day_of_week not in assigned_days:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid date! {log_date.strftime('%Y-%m-%d')} is a {day_of_week}, but you are only assigned to: {', '.join(assigned_days)}"
+            )
+    
     entry = LogBoardEntry(
         batch_id=input.batch_id,
         tutor_id=tutor["id"],
