@@ -683,29 +683,65 @@ async def get_session_data(request: Request):
 @api_router.post("/auth/login")
 async def login(input: LoginInput, response: Response):
     """Login with email and password"""
-    # Find user by email
-    user_doc = await db.users.find_one({"email": input.email}, {"_id": 0})
     
-    if not user_doc:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    user = User(**user_doc)
-    
-    # Verify password
-    if not user.password_hash:
-        raise HTTPException(status_code=401, detail="This account uses Google login. Please use 'Login with Google' button.")
-    
-    if not pwd_context.verify(input.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    # Verify role matches (except for pending role users who haven't registered yet)
-    if user.role != "pending" and user.role != input.role:
-        raise HTTPException(status_code=403, detail=f"This account is registered as {user.role}, not {input.role}")
-    
-    # For admin role, check if user is actually admin or co-admin
-    if input.role == "admin" or input.role == "rsn":
-        if not (user.is_main_admin or user.is_co_admin):
-            raise HTTPException(status_code=403, detail="Access denied. This area is restricted to RSN team only.")
+    # Special handling for student login
+    if input.role == "student":
+        # For students: email is parent's email, password is student's DOB
+        # Find parent by email
+        parent_doc = await db.users.find_one({"email": input.email}, {"_id": 0})
+        
+        if not parent_doc:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        parent = User(**parent_doc)
+        
+        # Find student by parent_id and DOB
+        # Try multiple date formats: DD-MM-YYYY, YYYY-MM-DD, etc.
+        student_doc = await db.students.find_one({
+            "parent_id": parent.id,
+            "dob": input.password
+        }, {"_id": 0})
+        
+        if not student_doc:
+            raise HTTPException(status_code=401, detail="Invalid email or password. Please use parent's email and student's date of birth (in format DD-MM-YYYY)")
+        
+        student = Student(**student_doc)
+        
+        # Create a user object for the student session
+        # Use student's data to create the session
+        user = User(
+            id=student.id,  # Use student ID for session
+            email=input.email,
+            name=student.name,
+            role="student",
+            state=student.board,
+            user_code=student.student_code
+        )
+    else:
+        # Regular user login (parent, tutor, coordinator, admin, etc.)
+        # Find user by email
+        user_doc = await db.users.find_one({"email": input.email}, {"_id": 0})
+        
+        if not user_doc:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        user = User(**user_doc)
+        
+        # Verify password
+        if not user.password_hash:
+            raise HTTPException(status_code=401, detail="This account uses Google login. Please use 'Login with Google' button.")
+        
+        if not pwd_context.verify(input.password, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify role matches (except for pending role users who haven't registered yet)
+        if user.role != "pending" and user.role != input.role:
+            raise HTTPException(status_code=403, detail=f"This account is registered as {user.role}, not {input.role}")
+        
+        # For admin role, check if user is actually admin or co-admin
+        if input.role == "admin" or input.role == "rsn":
+            if not (user.is_main_admin or user.is_co_admin):
+                raise HTTPException(status_code=403, detail="Access denied. This area is restricted to RSN team only.")
     
     # Create session
     session_token = str(uuid.uuid4())
