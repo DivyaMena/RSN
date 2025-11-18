@@ -359,6 +359,26 @@ export default function ParentDashboard({ user, logout }) {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium mb-2">Select Non Academic Courses (Optional)</label>
+                    <div className="grid grid-cols-2 gap-3 p-4 bg-blue-50 rounded-lg">
+                      {NON_ACADEMIC_COURSES.map(course => (
+                        <div key={course.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={formData.non_academic_courses.includes(course.value)}
+                            onCheckedChange={() => toggleNonAcademicCourse(course.value)}
+                          />
+                          <label className="text-sm cursor-pointer" onClick={() => toggleNonAcademicCourse(course.value)}>
+                            {course.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Courses: CHS - Chess, CUB - Rubik's Cube, CON - Confidence Club, CAR - Career Guidance
+                    </p>
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium mb-2">School Name</label>
                     <Input
                       data-testid="school-name-input"
