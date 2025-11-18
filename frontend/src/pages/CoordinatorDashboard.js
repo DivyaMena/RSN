@@ -629,6 +629,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                       <Button
                         data-testid={`assign-tutor-${batch.id}`}
                         onClick={async () => {
+                          if (batch.status === 'WAITLIST') return;
                           // Reset state
                           setSelectedTutor('');
                           setSelectedDays([]);
@@ -649,14 +650,21 @@ export default function CoordinatorDashboard({ user, logout }) {
                         variant="outline"
                         size="sm"
                         disabled={batch.status === 'WAITLIST'}
+                        className={batch.status === 'WAITLIST' ? 'opacity-50 cursor-not-allowed' : ''}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Assign Tutor
                       </Button>
                       <Button
                         data-testid={`view-logboard-${batch.id}`}
-                        onClick={() => navigate(`/logboard/${batch.id}`)}
-                        className="bg-gradient-to-r from-blue-600 to-green-600 text-white"
+                        onClick={() => {
+                          if (batch.status === 'WAITLIST') return;
+                          navigate(`/logboard/${batch.id}`);
+                        }}
+                        className={batch.status === 'WAITLIST' 
+                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
+                          : 'bg-gradient-to-r from-blue-600 to-green-600 text-white'
+                        }
                         size="sm"
                         disabled={batch.status === 'WAITLIST'}
                       >
