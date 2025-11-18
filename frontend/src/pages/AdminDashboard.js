@@ -100,6 +100,25 @@ export default function AdminDashboard({ user, logout }) {
     batch_end: ''
   });
 
+  // Helper function to get subjects based on class level
+  const getSubjectsForClass = (classLevel) => {
+    if (classLevel >= 6 && classLevel <= 7) {
+      return [
+        { code: 'MAT', name: 'Mathematics' },
+        { code: 'SCI', name: 'Science' },
+        { code: 'ENG', name: 'English' }
+      ];
+    } else if (classLevel >= 8 && classLevel <= 10) {
+      return [
+        { code: 'MAT', name: 'Mathematics' },
+        { code: 'PHY', name: 'Physics' },
+        { code: 'BIO', name: 'Biology' },
+        { code: 'ENG', name: 'English' }
+      ];
+    }
+    return [];
+  };
+
   useEffect(() => {
     fetchDashboardStats();
     if (activeTab === 'admins') fetchAdmins();
