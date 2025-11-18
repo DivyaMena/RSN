@@ -255,13 +255,13 @@ export default function StudentProfile({ user, logout }) {
             />
           </div>
 
-          {/* Subjects */}
+          {/* Academic Subjects */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">Your Subjects *</label>
+            <label className="block text-sm font-medium text-gray-900 mb-3">Academic Subjects *</label>
             <p className="text-xs text-gray-500 mb-3">
               {profile?.class_level <= 7 
-                ? 'Available subjects for Classes 6-7: Mathematics, Science, English' 
-                : 'Available subjects for Classes 8-10: Mathematics, Physics, Biology, English'}
+                ? 'Available for Classes 6-7: Mathematics, Science, English' 
+                : 'Available for Classes 8-10: Mathematics, Physics, Biology, English'}
             </p>
             <div className="grid grid-cols-2 gap-4">
               {Object.entries(availableSubjects).map(([code, name]) => (
@@ -275,6 +275,26 @@ export default function StudentProfile({ user, logout }) {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Non-Academic Courses */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-3">Non-Academic Courses (Optional)</label>
+            <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+              {Object.entries(NON_ACADEMIC_COURSES).map(([code, name]) => (
+                <div key={code} className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={subjects.includes(code)}
+                    onCheckedChange={() => toggleSubject(code)}
+                    disabled={!canEdit}
+                  />
+                  <Label className={!canEdit ? 'text-gray-400' : 'text-gray-700'}>{name}</Label>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Courses: CHS - Chess, CUB - Rubik's Cube, CON - Confidence Club, CAR - Career Guidance
+            </p>
           </div>
 
           {/* Save Button */}
