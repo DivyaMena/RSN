@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
-import { BookOpen, LogOut, ArrowLeft, GraduationCap, Trophy, Send, ExternalLink, Video } from 'lucide-react';
+import { BookOpen, LogOut, ArrowLeft, GraduationCap, Trophy, Send, ExternalLink, Video, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { Label } from '../components/ui/label';
