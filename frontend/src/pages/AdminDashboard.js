@@ -470,9 +470,37 @@ export default function AdminDashboard({ user, logout }) {
   };
 
   // Delete handlers
-  const handleOpenDeleteDialog = (type, ids) => {
+  const handleOpenDeleteDialog = async (type, ids) => {
     setDeleteType(type);
     setIdsToDelete(ids);
+    setDeleteWarningMessage('');
+
+    // Special check for parents - show student info before confirming
+    if (type === 'parents') {
+      try {
+        const response = await axios.post(`${API}/admin/parents/check-students`, 
+          { ids },
+          { withCredentials: true }
+        );
+
+        if (response.data.has_students) {
+          // Build warning message
+          let warningMsg = 'The following parents have students:\n\n';
+          response.data.details.forEach(detail => {
+            warningMsg += `• ${detail.parent_name} (${detail.student_count} student${detail.student_count > 1 ? 's' : ''}):\n`;
+            detail.students.forEach(student => {
+              warningMsg += `  - ${student}\n`;
+            });
+            warningMsg += '\n';
+          });
+          warningMsg += 'All students will be deleted along with their parents.';
+          setDeleteWarningMessage(warningMsg);
+        }
+      } catch (error) {
+        console.error('Error checking parent students:', error);
+      }
+    }
+
     setDeleteDialogOpen(true);
   };
 
