@@ -199,6 +199,49 @@ export default function RegisterTutor({ setUser }) {
             <p className="text-xs text-gray-500 mt-1">This helps coordinators understand your background</p>
           </div>
 
+          {/* Teaching Preference */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">What would you like to teach? *</label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                onClick={() => setFormData({ ...formData, teaching_preference: 'academic' })}>
+                <input
+                  type="radio"
+                  name="teaching_preference"
+                  value="academic"
+                  checked={formData.teaching_preference === 'academic'}
+                  onChange={() => setFormData({ ...formData, teaching_preference: 'academic' })}
+                  className="w-4 h-4"
+                />
+                <label className="cursor-pointer font-medium">Academic Courses Only</label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                onClick={() => setFormData({ ...formData, teaching_preference: 'non_academic' })}>
+                <input
+                  type="radio"
+                  name="teaching_preference"
+                  value="non_academic"
+                  checked={formData.teaching_preference === 'non_academic'}
+                  onChange={() => setFormData({ ...formData, teaching_preference: 'non_academic' })}
+                  className="w-4 h-4"
+                />
+                <label className="cursor-pointer font-medium">Non-Academic Courses Only</label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                onClick={() => setFormData({ ...formData, teaching_preference: 'both' })}>
+                <input
+                  type="radio"
+                  name="teaching_preference"
+                  value="both"
+                  checked={formData.teaching_preference === 'both'}
+                  onChange={() => setFormData({ ...formData, teaching_preference: 'both' })}
+                  className="w-4 h-4"
+                />
+                <label className="cursor-pointer font-medium">Both Academic & Non-Academic</label>
+              </div>
+            </div>
+          </div>
+
           {/* Photo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Your Photo/Selfie *</label>
