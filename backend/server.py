@@ -596,10 +596,14 @@ async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: 
         
         # Format curriculum items
         curriculum_html = ""
-        if log_entry.get('curriculum_items'):
+        curriculum_items = log_entry.get('curriculum_items', [])
+        if curriculum_items and isinstance(curriculum_items, list):
             curriculum_html = "<ul style='margin: 10px 0;'>"
-            for item in log_entry['curriculum_items']:
-                curriculum_html += f"<li style='margin: 5px 0;'>{item.get('topic', 'N/A')}: {item.get('description', 'N/A')}</li>"
+            for item in curriculum_items:
+                if isinstance(item, dict):
+                    topic = item.get('topic', 'N/A')
+                    description = item.get('description', 'N/A')
+                    curriculum_html += f"<li style='margin: 5px 0;'>{topic}: {description}</li>"
             curriculum_html += "</ul>"
         
         html_body = f"""
