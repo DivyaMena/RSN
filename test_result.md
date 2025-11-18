@@ -429,7 +429,7 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "✅ IMPLEMENTED: StudentProfile.js created with subjects as the only editable field. Displays 15-day cooldown restriction. Needs testing."
+        comment: "✅ IMPLEMENTED: StudentProfile.js created with subjects and school_name as editable fields. Implements class-based subject filtering (Classes 6-7: MAT, SCI, ENG; Classes 8-10: MAT, PHY, BIO, ENG). Displays 15-day cooldown restriction. Needs testing."
 
   - task: "Parent Profile Page"
     implemented: true
