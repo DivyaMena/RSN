@@ -1042,8 +1042,10 @@ async def create_coordinator_assignment(input: dict, request: Request):
         assignment.subject = input.get("subject")
     
     elif assignment_type == "batch_range":
-        if not input.get("batch_start") or not input.get("batch_end"):
-            raise HTTPException(status_code=400, detail="Batch start and end are required")
+        if not input.get("class_level") or not input.get("subject") or not input.get("batch_start") or not input.get("batch_end"):
+            raise HTTPException(status_code=400, detail="Class level, subject, batch start and end are required for batch range")
+        assignment.class_level = input.get("class_level")
+        assignment.subject = input.get("subject")
         assignment.batch_start = input.get("batch_start")
         assignment.batch_end = input.get("batch_end")
     
