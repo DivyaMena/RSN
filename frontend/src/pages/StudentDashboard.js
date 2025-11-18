@@ -137,32 +137,52 @@ export default function StudentDashboard({ user, logout }) {
     }
   };
 
+  const handleBatchSelection = async (batchId) => {
+    setRemedialBatch(batchId);
+    setRemedialCurriculum('');
+    setAvailableCurriculum([]);
+    
+    // Find the selected batch
+    const batch = batches.find(b => b.id === batchId);
+    if (!batch) return;
+    
+    // Fetch curriculum for this batch's subject
+    try {
+      const res = await axios.get(
+        `${API}/curriculum?board=${batch.board}&class_level=${batch.class_level}&subject=${batch.subject}`,
+        { withCredentials: true }
+      );
+      setAvailableCurriculum(res.data || []);
+    } catch (error) {
+      console.error('Failed to fetch curriculum');
+      toast.error('Failed to load curriculum topics');
+    }
+  };
+
   const handleRemedialRequest = async () => {
-    if (!remedialSubject || !remedialTopic || !remedialReason) {
+    if (!remedialBatch || !remedialCurriculum || !remedialNotes) {
       toast.error('Please fill all fields');
       return;
     }
 
     setSubmittingRemedial(true);
     try {
-      // Find a batch for this subject
-      const batch = batches.find(b => b.subject === remedialSubject);
-      if (!batch) {
-        toast.error('No batch found for this subject');
-        return;
-      }
+      // Find the curriculum item to get the topic name
+      const curriculumItem = availableCurriculum.find(c => c.id === remedialCurriculum);
+      const topicName = curriculumItem ? curriculumItem.topic_name : 'Topic';
 
       await axios.post(`${API}/remedial/request`, {
-        batch_id: batch.id,
-        topic: remedialTopic,
-        reason: remedialReason
+        batch_id: remedialBatch,
+        topic: topicName,
+        reason: remedialNotes
       }, { withCredentials: true });
 
       toast.success('Remedial request sent to coordinator');
       setShowRemedialDialog(false);
-      setRemedialSubject('');
-      setRemedialTopic('');
-      setRemedialReason('');
+      setRemedialBatch('');
+      setRemedialCurriculum('');
+      setRemedialNotes('');
+      setAvailableCurriculum([]);
     } catch (error) {
       toast.error('Failed to send remedial request');
     } finally {
