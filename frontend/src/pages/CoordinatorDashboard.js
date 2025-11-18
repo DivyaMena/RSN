@@ -718,17 +718,17 @@ export default function CoordinatorDashboard({ user, logout }) {
       {/* Schools Tab */}
       <TabsContent value="schools">
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">School Registrations</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">All Schools ({allSchools.length})</h2>
           
-          {pendingSchools.length === 0 ? (
+          {allSchools.length === 0 ? (
             <div className="text-center py-20">
               <School className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No pending schools</h3>
-              <p className="text-gray-600">All school registrations have been reviewed</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No schools found</h3>
+              <p className="text-gray-600">No schools have registered yet</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {pendingSchools.map((school) => (
+            <div className="space-y-4">
+              {allSchools.map((school) => (
                 <div key={school.id} className="border border-yellow-200 bg-yellow-50 rounded-xl p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
