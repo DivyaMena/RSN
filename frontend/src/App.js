@@ -141,7 +141,15 @@ function App() {
           } />
           <Route path="/student/:studentId" element={user ? <StudentDashboard user={user} logout={logout} /> : <Navigate to="/" />} />
           <Route path="/logboard/:batchId" element={user ? <LogBoard user={user} logout={logout} /> : <Navigate to="/" />} />
-          <Route path="/profile" element={user ? <TutorProfile user={user} logout={logout} /> : <Navigate to="/" />} />
+          <Route path="/profile" element={
+            !user ? <Navigate to="/" /> :
+            user.role === 'tutor' ? <TutorProfile user={user} logout={logout} /> :
+            user.role === 'coordinator' ? <CoordinatorProfile user={user} logout={logout} /> :
+            user.role === 'parent' ? <ParentProfile user={user} logout={logout} /> :
+            user.role === 'student' ? <StudentProfile user={user} logout={logout} /> :
+            user.role === 'admin' ? <AdminProfile user={user} logout={logout} /> :
+            <Navigate to="/dashboard" />
+          } />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors />
