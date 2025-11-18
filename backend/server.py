@@ -1888,6 +1888,55 @@ async def get_my_tutor_profile(request: Request):
     
     return tutor
 
+@api_router.put("/tutors/me/profile")
+async def update_my_tutor_profile(
+    available_days: Optional[List[str]] = None,
+    subjects_can_teach: Optional[List[str]] = None,
+    classes_can_teach: Optional[List[int]] = None,
+    about_yourself: Optional[str] = None,
+    request: Request = None
+):
+    """Update tutor profile - restricted to once every 15 days"""
+    user = await require_auth(request)
+    
+    if user.role != "tutor":
+        raise HTTPException(status_code=403, detail="Only tutors can access this endpoint")
+    
+    tutor = await db.tutors.find_one({"user_id": user.id})
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor profile not found")
+    
+    # Check 15-day restriction
+    if tutor.get("last_profile_update"):
+        last_update = tutor["last_profile_update"]
+        if isinstance(last_update, str):
+            last_update = datetime.fromisoformat(last_update)
+        
+        days_since_update = (datetime.now(timezone.utc) - last_update).days
+        if days_since_update < 15:
+            days_remaining = 15 - days_since_update
+            raise HTTPException(
+                status_code=400,
+                detail=f"Profile can only be updated once every 15 days. You can edit again in {days_remaining} days."
+            )
+    
+    # Build update data
+    update_data = {}
+    if available_days is not None:
+        update_data["available_days"] = available_days
+    if subjects_can_teach is not None:
+        update_data["subjects_can_teach"] = subjects_can_teach
+    if classes_can_teach is not None:
+        update_data["classes_can_teach"] = classes_can_teach
+    if about_yourself is not None:
+        update_data["about_yourself"] = about_yourself
+    
+    update_data["last_profile_update"] = datetime.now(timezone.utc)
+    
+    await db.tutors.update_one({"user_id": user.id}, {"$set": update_data})
+    
+    return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
+
 @api_router.get("/tutors")
 async def get_tutors(request: Request):
     """Get all tutors (coordinator/admin only)"""
