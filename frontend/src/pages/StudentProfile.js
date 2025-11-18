@@ -104,11 +104,19 @@ export default function StudentProfile({ user, logout }) {
       return;
     }
 
+    if (!schoolName.trim()) {
+      toast.error('School name is required');
+      return;
+    }
+
     setSaving(true);
     try {
       await axios.put(
         `${API}/students/me/profile`,
-        { subjects: subjects },
+        { 
+          subjects: subjects,
+          school_name: schoolName 
+        },
         { withCredentials: true }
       );
       toast.success('Profile updated successfully! Next edit available in 15 days.');
