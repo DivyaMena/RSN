@@ -603,9 +603,9 @@ export default function AdminDashboard({ user, logout }) {
               <Upload className="h-4 w-4 mr-1" />
               Curriculum
             </TabsTrigger>
-            <TabsTrigger value="holidays" className="text-xs">
-              <Calendar className="h-4 w-4 mr-1" />
-              Holidays
+            <TabsTrigger value="state-boards" className="text-xs">
+              <Flag className="h-4 w-4 mr-1" />
+              State Boards
             </TabsTrigger>
           </TabsList>
 
