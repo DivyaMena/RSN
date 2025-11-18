@@ -91,18 +91,24 @@ export default function LogBoard({ user, logout }) {
       try {
         const tutorsRes = await axios.get(`${API}/batches/${batchId}/tutors`, { withCredentials: true });
         setTutors(tutorsRes.data);
+        
+        // Get my tutor ID and assigned days if I'm a tutor
+        if (user.role === 'tutor') {
+          try {
+            const myTutorRes = await axios.get(`${API}/tutors/me`, { withCredentials: true });
+            setMyTutorId(myTutorRes.data.id);
+            
+            // Find my assignment for this batch
+            const myAssignment = tutorsRes.data.find(t => t.tutor?.id === myTutorRes.data.id);
+            if (myAssignment && myAssignment.assignment) {
+              setMyAssignedDays(myAssignment.assignment.assigned_days || []);
+            }
+          } catch (error) {
+            console.log('Could not fetch tutor profile');
+          }
+        }
       } catch (error) {
         console.log('Could not fetch tutors');
-      }
-
-      // Get my tutor ID if I'm a tutor
-      if (user.role === 'tutor') {
-        try {
-          const myTutorRes = await axios.get(`${API}/tutors/me`, { withCredentials: true });
-          setMyTutorId(myTutorRes.data.id);
-        } catch (error) {
-          console.log('Could not fetch tutor profile');
-        }
       }
     } catch (error) {
       toast.error('Failed to fetch data');
