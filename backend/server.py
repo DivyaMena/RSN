@@ -1828,22 +1828,22 @@ async def upload_curriculum(items: List[CurriculumItem], request: Request):
             await db.curriculum.insert_one(doc)
     
 
-@api_router.get("/tutors/{tutor_id}")
-async def get_tutor_by_id(tutor_id: str, request: Request):
-    """Get tutor details (tutor + linked user) by tutor_id"""
-    user = await require_auth(request)
-
-    if user.role not in ["coordinator", "admin", "parent", "student", "tutor"]:
-        raise HTTPException(status_code=403, detail="Not authorized to view tutor details")
-
-    tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0})
-    if not tutor:
-        raise HTTPException(status_code=404, detail="Tutor not found")
-
-    tutor_user = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
-    return {"tutor": tutor, "user": tutor_user}
-
 # ============= TUTOR ROUTES =============
+
+@api_router.get("/tutors/me")
+async def get_my_tutor_profile(request: Request):
+    """Get current tutor's profile - MUST BE BEFORE /tutors/{tutor_id}"""
+    user = await require_auth(request)
+    
+    if user.role != "tutor":
+        raise HTTPException(status_code=403, detail="Only tutors can access this endpoint")
+    
+    tutor = await db.tutors.find_one({"user_id": user.id}, {"_id": 0})
+    
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor profile not found")
+    
+    return tutor
 
 @api_router.get("/tutors")
 async def get_tutors(request: Request):
@@ -1866,23 +1866,20 @@ async def get_tutors(request: Request):
     
     return result
 
-@api_router.get("/tutors/me")
-async def get_my_tutor_profile(request: Request):
-    """Get current tutor's profile"""
+@api_router.get("/tutors/{tutor_id}")
+async def get_tutor_by_id(tutor_id: str, request: Request):
+    """Get tutor details (tutor + linked user) by tutor_id"""
     user = await require_auth(request)
-    
-    print(f"DEBUG /tutors/me - User: {user.email}, Role: {user.role}, ID: {user.id}")
-    
-    if user.role != "tutor":
-        raise HTTPException(status_code=403, detail="Only tutors can access this endpoint")
-    
-    tutor = await db.tutors.find_one({"user_id": user.id}, {"_id": 0})
-    print(f"DEBUG /tutors/me - Tutor found: {tutor is not None}")
-    
+
+    if user.role not in ["coordinator", "admin", "parent", "student", "tutor"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view tutor details")
+
+    tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0})
     if not tutor:
-        raise HTTPException(status_code=404, detail="Tutor profile not found")
-    
-    return tutor
+        raise HTTPException(status_code=404, detail="Tutor not found")
+
+    tutor_user = await db.users.find_one({"id": tutor["user_id"]}, {"_id": 0})
+    return {"tutor": tutor, "user": tutor_user}
 
 @api_router.put("/tutors/{tutor_id}/approve")
 async def approve_tutor(tutor_id: str, request: Request):
