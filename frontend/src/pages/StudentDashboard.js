@@ -239,6 +239,10 @@ export default function StudentDashboard({ user, logout }) {
                   Back
                 </Button>
               )}
+              <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
+                <User className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">My Profile</span>
+              </Button>
               <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
                 <LogOut className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Logout</span>
