@@ -353,7 +353,6 @@ export default function AdminDashboard({ user, logout }) {
       }
       toast.success('All assignments removed');
       fetchCoordinatorAssignments();
-      setShowUnassignCoordinatorDialog(false);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to remove assignments');
     }
