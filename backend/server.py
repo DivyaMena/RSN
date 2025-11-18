@@ -684,6 +684,9 @@ async def get_session_data(request: Request):
 async def login(input: LoginInput, response: Response):
     """Login with email and password"""
     
+    # Debug logging
+    print(f"DEBUG LOGIN - Email: {input.email}, Role: {input.role}, Password: {input.password}")
+    
     # Special handling for student login
     if input.role == "student":
         # For students: email is parent's email, password is student's DOB
