@@ -45,7 +45,7 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedDayFilter, setSelectedDayFilter] = useState('all');
   const [selectedTutorFilter, setSelectedTutorFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('batches');
   const [tutorDetailsDialogOpen, setTutorDetailsDialogOpen] = useState(false);
   const [selectedTutorDetails, setSelectedTutorDetails] = useState(null);
   const [statusChangeDialogOpen, setStatusChangeDialogOpen] = useState(false);
