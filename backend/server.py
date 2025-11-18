@@ -1927,6 +1927,18 @@ async def get_pending_schools(request: Request):
     schools = await db.schools.find({"approval_status": "pending"}, {"_id": 0}).to_list(length=None)
     return schools
 
+@api_router.get("/admin/schools")
+async def get_all_schools(request: Request):
+    """Get all schools - for admin and coordinator"""
+    user = await get_current_user(request)
+    
+    # Allow both admin and coordinator to access
+    if user.role not in ["admin", "coordinator"]:
+        raise HTTPException(status_code=403, detail="Only admin and coordinator can view schools")
+    
+    schools = await db.schools.find({}, {"_id": 0}).to_list(length=None)
+    return schools
+
 @api_router.post("/schools/register")
 async def register_school(input: RegisterSchoolInput):
     """School registration endpoint"""
