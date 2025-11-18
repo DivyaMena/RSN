@@ -853,12 +853,23 @@ export default function CoordinatorDashboard({ user, logout }) {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Assign/Unassign Days {selectedTutorData && '(only from tutor\'s available days)'}
+                Assign/Unassign Days {selectedTutorData && '(matching batch schedule & tutor availability)'}
               </label>
+              {selectedBatch && selectedBatch.schedule_slots && (
+                <div className="mb-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                  Batch schedule: {[...new Set(selectedBatch.schedule_slots.map(s => s.day))].join(', ')}
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 {DAYS.map(day => {
+                  // Check if day is in batch schedule
+                  const batchDays = selectedBatch?.schedule_slots ? 
+                    new Set(selectedBatch.schedule_slots.map(s => s.day)) : 
+                    new Set();
+                  const isInBatchSchedule = batchDays.has(day);
+                  
                   const isAvailable = selectedTutorData?.tutor.available_days?.includes(day);
-                  const isDisabled = !selectedTutorData || !isAvailable;
+                  const isDisabled = !selectedTutorData || !isAvailable || !isInBatchSchedule;
                   
                   return (
                     <div key={day} className="flex items-center space-x-2">
