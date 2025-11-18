@@ -397,40 +397,55 @@ export default function StudentDashboard({ user, logout }) {
 
       {/* Remedial Request Dialog */}
       <Dialog open={showRemedialDialog} onOpenChange={setShowRemedialDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Request Remedial Class</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label>Subject *</Label>
-              <Select value={remedialSubject} onValueChange={setRemedialSubject}>
+              <Label>Select Batch *</Label>
+              <Select value={remedialBatch} onValueChange={handleBatchSelection}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select subject" />
+                  <SelectValue placeholder="Select batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {student.subjects.map(subject => (
-                    <SelectItem key={subject} value={subject}>
-                      {SUBJECTS[subject]}
+                  {batches.map(batch => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      {batch.batch_code} - {SUBJECTS[batch.subject]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            
+            {remedialBatch && (
+              <div>
+                <Label>Select Curriculum Topic *</Label>
+                <Select value={remedialCurriculum} onValueChange={setRemedialCurriculum}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select topic from curriculum" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px] overflow-y-auto">
+                    {availableCurriculum.length > 0 ? (
+                      availableCurriculum.map(item => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.topic_number}. {item.topic_name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="p-2 text-sm text-gray-500">No curriculum available</div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
             <div>
-              <Label>Topic *</Label>
-              <Input 
-                value={remedialTopic}
-                onChange={(e) => setRemedialTopic(e.target.value)}
-                placeholder="Enter topic name"
-              />
-            </div>
-            <div>
-              <Label>Reason *</Label>
+              <Label>Notes / Reason *</Label>
               <Textarea 
-                value={remedialReason}
-                onChange={(e) => setRemedialReason(e.target.value)}
-                placeholder="Explain why you need this remedial class..."
+                value={remedialNotes}
+                onChange={(e) => setRemedialNotes(e.target.value)}
+                placeholder="Explain why you need this remedial class and any specific areas you're struggling with..."
                 rows={4}
               />
             </div>
@@ -441,7 +456,7 @@ export default function StudentDashboard({ user, logout }) {
             </Button>
             <Button 
               onClick={handleRemedialRequest}
-              disabled={submittingRemedial}
+              disabled={submittingRemedial || !remedialBatch || !remedialCurriculum || !remedialNotes}
               className="bg-gradient-to-r from-orange-500 to-red-500"
             >
               {submittingRemedial ? 'Sending...' : 'Send Request'}
