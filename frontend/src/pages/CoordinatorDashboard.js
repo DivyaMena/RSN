@@ -293,7 +293,11 @@ export default function CoordinatorDashboard({ user, logout }) {
   if (selectedTutorFilter !== 'all') {
     filteredBatches = filteredBatches.filter(batch => {
       const assignments = batchAssignments[batch.id] || [];
-      return assignments.some(a => a.tutor_id === selectedTutorFilter);
+      // Check both tutor_id and assignment.tutor_id to handle different data structures
+      return assignments.some(a => 
+        a.tutor_id === selectedTutorFilter || 
+        a.assignment?.tutor_id === selectedTutorFilter
+      );
     });
   }
 
