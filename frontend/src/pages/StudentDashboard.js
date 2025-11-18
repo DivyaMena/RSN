@@ -39,8 +39,20 @@ export default function StudentDashboard({ user, logout }) {
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
   const [batches, setBatches] = useState([]);
+  const [batchTutors, setBatchTutors] = useState({});
   const [curriculum, setCurriculum] = useState({});
   const [loading, setLoading] = useState(true);
+  
+  // Remedial request state
+  const [showRemedialDialog, setShowRemedialDialog] = useState(false);
+  const [remedialSubject, setRemedialSubject] = useState('');
+  const [remedialTopic, setRemedialTopic] = useState('');
+  const [remedialReason, setRemedialReason] = useState('');
+  const [submittingRemedial, setSubmittingRemedial] = useState(false);
+  
+  // Join class state
+  const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState(null);
 
   useEffect(() => {
     fetchData();
