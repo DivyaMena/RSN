@@ -95,12 +95,12 @@ export default function Login() {
             </div>
           </div>
           <h1 
-            className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2"
+            className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2"
             style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             Rising Stars Nation
           </h1>
-          <p className="text-gray-600">Free online tuition for students who need extra support</p>
+          <p className="text-sm sm:text-base text-gray-600">Free online tuition for students who need extra support</p>
         </div>
 
         {/* Login Card */}
