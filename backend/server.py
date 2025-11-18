@@ -2006,7 +2006,7 @@ async def get_pending_tutors(request: Request):
     if user.role not in ["coordinator", "admin"]:
         raise HTTPException(status_code=403, detail="Only coordinators can view pending tutors")
     
-    tutors = await db.tutors.find({"approval_status": "pending"}, {"_id": 0}).to_list(None)
+    tutors = await db.tutors.find({"status": "pending"}, {"_id": 0}).to_list(None)
     
     # Get user details for each tutor
     result = []
