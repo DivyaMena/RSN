@@ -2025,6 +2025,8 @@ async def update_my_student_profile(
     update_data = {}
     if subjects is not None:
         update_data["subjects"] = subjects
+    if school_name is not None:
+        update_data["school_name"] = school_name
     
     update_data["last_profile_update"] = datetime.now(timezone.utc)
     
