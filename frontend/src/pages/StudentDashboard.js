@@ -378,6 +378,89 @@ export default function StudentDashboard({ user, logout }) {
           </div>
         </div>
       </main>
+
+      {/* Remedial Request Dialog */}
+      <Dialog open={showRemedialDialog} onOpenChange={setShowRemedialDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Request Remedial Class</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Subject *</Label>
+              <Select value={remedialSubject} onValueChange={setRemedialSubject}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  {student.subjects.map(subject => (
+                    <SelectItem key={subject} value={subject}>
+                      {SUBJECTS[subject]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Topic *</Label>
+              <Input 
+                value={remedialTopic}
+                onChange={(e) => setRemedialTopic(e.target.value)}
+                placeholder="Enter topic name"
+              />
+            </div>
+            <div>
+              <Label>Reason *</Label>
+              <Textarea 
+                value={remedialReason}
+                onChange={(e) => setRemedialReason(e.target.value)}
+                placeholder="Explain why you need this remedial class..."
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRemedialDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleRemedialRequest}
+              disabled={submittingRemedial}
+              className="bg-gradient-to-r from-orange-500 to-red-500"
+            >
+              {submittingRemedial ? 'Sending...' : 'Send Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Join Class Confirmation Dialog */}
+      <Dialog open={showJoinDialog} onOpenChange={setShowJoinDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Join Class</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">
+              Do you want to join the class for <strong>{selectedBatch?.batch_code}</strong>?
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              This will open the Google Meet link in a new tab.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowJoinDialog(false)}>
+              No, Cancel
+            </Button>
+            <Button 
+              onClick={confirmJoinClass}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Yes, Join Class
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
