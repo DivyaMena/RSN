@@ -372,75 +372,11 @@ export default function CoordinatorDashboard({ user, logout }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="tutors">All Tutors ({tutors.length})</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="batches">All Batches ({batches.length})</TabsTrigger>
+            <TabsTrigger value="tutors">All Tutors ({tutors.length})</TabsTrigger>
             <TabsTrigger value="pending">Pending ({pendingTutors.length})</TabsTrigger>
           </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview">
-            {pendingTutors.length > 0 && (
-              <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Users className="h-5 w-5 mr-2 text-yellow-600" />
-                  Pending Tutor Approvals ({pendingTutors.length})
-          
-
-                </h2>
-                <div className="grid gap-4">
-                  {pendingTutors.slice(0, 3).map(tutorData => (
-                    <div key={tutorData.tutor.id} className="bg-white rounded-lg p-4 flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-900">{tutorData.user?.name}</h3>
-                        <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
-                      </div>
-                      <Button
-                        onClick={() => {
-                          setCurrentTutor(tutorData);
-                          setTutorApprovalDialogOpen(true);
-                        }}
-                        size="sm"
-                        variant="outline"
-                      >
-                        Review
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                {pendingTutors.length > 3 && (
-                  <Button 
-                    onClick={() => setActiveTab('pending')}
-                    variant="link" 
-                    className="mt-4"
-                  >
-                    View all {pendingTutors.length} pending tutors →
-                  </Button>
-                )}
-              </div>
-            )}
-            
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent Batches</h2>
-              <div className="grid gap-4">
-                {batches.slice(0, 3).map(batch => (
-                  <div key={batch.id} className="bg-white rounded-xl shadow-lg p-6">
-                    <h3 className="text-xl font-bold">{batch.batch_code}</h3>
-                    <p className="text-gray-600">{SUBJECTS[batch.subject]} | Class {batch.class_level}</p>
-                    <p className="text-sm text-gray-500">Students: {batch.student_ids.length}/25</p>
-                  </div>
-                ))}
-              </div>
-              <Button 
-                onClick={() => setActiveTab('batches')}
-                variant="link" 
-                className="mt-4"
-              >
-                View all batches →
-              </Button>
-            </div>
-          </TabsContent>
 
           {/* All Tutors Tab */}
           <TabsContent value="tutors">
