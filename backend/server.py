@@ -1343,6 +1343,7 @@ async def create_student(input: RegisterStudentInput, request: Request):
         name=input.name,
         student_code=student_code,
         aadhaar_number=input.aadhaar_number,
+        dob=input.dob,
         class_level=input.class_level,
         board=input.board,
         school_name=input.school_name,
