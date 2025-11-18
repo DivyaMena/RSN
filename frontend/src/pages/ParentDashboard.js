@@ -426,13 +426,32 @@ export default function ParentDashboard({ user, logout }) {
                       <p className="text-sm text-gray-600 mt-1">Code: {student.student_code}</p>
                       <p className="text-sm text-gray-600">Class {student.class_level} | {student.board} Board</p>
                     </div>
-                    <Button
-                      data-testid={`view-student-${student.id}-btn`}
-                      onClick={() => navigate(`/student/${student.id}`)}
-                      variant="outline"
-                    >
-                      View Details
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        data-testid={`view-student-${student.id}-btn`}
+                        onClick={() => navigate(`/student/${student.id}`)}
+                        variant="outline"
+                      >
+                        View Details
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          if (window.confirm(`Are you sure you want to delete ${student.name}? This action cannot be undone.`)) {
+                            try {
+                              await axios.delete(`${API}/students/${student.id}`, { withCredentials: true });
+                              toast.success('Student deleted successfully');
+                              fetchData();
+                            } catch (error) {
+                              toast.error(error.response?.data?.detail || 'Failed to delete student');
+                            }
+                          }
+                        }}
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
