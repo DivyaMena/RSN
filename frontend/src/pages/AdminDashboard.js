@@ -90,7 +90,7 @@ export default function AdminDashboard({ user, logout }) {
   // Coordinator Assignments State
   const [coordinatorAssignments, setCoordinatorAssignments] = useState([]);
   const [showAssignCoordinatorDialog, setShowAssignCoordinatorDialog] = useState(false);
-  const [showUnassignCoordinatorDialog, setShowUnassignCoordinatorDialog] = useState(false);
+  const [assignmentMode, setAssignmentMode] = useState('create'); // 'create' or 'delete'
   const [assignmentData, setAssignmentData] = useState({
     coordinator_id: '',
     assignment_type: 'class',
