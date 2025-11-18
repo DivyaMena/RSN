@@ -150,9 +150,21 @@ export default function TutorDashboard({ user, logout }) {
 
         {/* Tutor Status Card */}
         {tutorProfile && (() => {
-          // Calculate actual current availability based on dates
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
+          // Helper function to convert date to IST and format as DD-MM-YYYY
+          const formatDateIST = (dateStr) => {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            // Convert to IST (UTC+5:30)
+            const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+            const day = String(istDate.getDate()).padStart(2, '0');
+            const month = String(istDate.getMonth() + 1).padStart(2, '0');
+            const year = istDate.getFullYear();
+            return `${day}-${month}-${year}`;
+          };
+
+          // Get today's date in IST
+          const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+          todayIST.setHours(0, 0, 0, 0);
           
           let actualStatus = tutorProfile.availability_status;
           let isCurrentlyUnavailable = false;
@@ -164,13 +176,13 @@ export default function TutorDashboard({ user, logout }) {
             toDate.setHours(0, 0, 0, 0);
             
             // Check if today falls within the unavailable range
-            if (today >= fromDate && today <= toDate) {
+            if (todayIST >= fromDate && todayIST <= toDate) {
               actualStatus = 'unavailable';
               isCurrentlyUnavailable = true;
-            } else if (today < fromDate) {
+            } else if (todayIST < fromDate) {
               // Future unavailability - currently available
               actualStatus = 'available';
-            } else if (today > toDate) {
+            } else if (todayIST > toDate) {
               // Past unavailability - currently available
               actualStatus = 'available';
             }
@@ -182,7 +194,7 @@ export default function TutorDashboard({ user, logout }) {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Your Status</h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Today's Date: <span className="font-medium">{today.toISOString().split('T')[0]}</span>
+                    Today's Date: <span className="font-medium">{formatDateIST(todayIST)}</span>
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
                     Current availability: <span className={`font-semibold capitalize ${
@@ -196,11 +208,11 @@ export default function TutorDashboard({ user, logout }) {
                   {tutorProfile.unavailable_from && tutorProfile.unavailable_to && (
                     <p className="text-sm text-gray-600 mt-1">
                       {isCurrentlyUnavailable ? (
-                        <>Unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
-                      ) : today < new Date(tutorProfile.unavailable_from) ? (
-                        <>Will be unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
+                        <>Unavailable from <span className="font-medium">{formatDateIST(tutorProfile.unavailable_from)}</span> to <span className="font-medium">{formatDateIST(tutorProfile.unavailable_to)}</span></>
+                      ) : todayIST < new Date(tutorProfile.unavailable_from) ? (
+                        <>Will be unavailable from <span className="font-medium">{formatDateIST(tutorProfile.unavailable_from)}</span> to <span className="font-medium">{formatDateIST(tutorProfile.unavailable_to)}</span></>
                       ) : (
-                        <>Was unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
+                        <>Was unavailable from <span className="font-medium">{formatDateIST(tutorProfile.unavailable_from)}</span> to <span className="font-medium">{formatDateIST(tutorProfile.unavailable_to)}</span></>
                       )}
                     </p>
                   )}
