@@ -61,12 +61,26 @@ export default function RegisterTutor({ setUser }) {
     // Validation
     if (!formData.board_preference || !formData.current_address || !formData.pincode || 
         !formData.about_yourself || !formData.tutor_photo || !formData.aadhaar_page1 ||
-        formData.classes_can_teach.length === 0 || 
-        formData.subjects_can_teach.length === 0 || 
+        !formData.teaching_preference ||
         formData.available_days.length === 0 ||
         !formData.preferred_slot) {
-      toast.error('Please fill all required fields including photo and preferred slot');
+      toast.error('Please fill all required fields including teaching preference');
       return;
+    }
+
+    // Validate based on teaching preference
+    if (formData.teaching_preference === 'academic' || formData.teaching_preference === 'both') {
+      if (formData.classes_can_teach.length === 0 || formData.subjects_can_teach.length === 0) {
+        toast.error('Please select classes and subjects for academic teaching');
+        return;
+      }
+    }
+
+    if (formData.teaching_preference === 'non_academic' || formData.teaching_preference === 'both') {
+      if (formData.non_academic_courses.length === 0) {
+        toast.error('Please select at least one non-academic course');
+        return;
+      }
     }
 
     setLoading(true);
@@ -81,6 +95,9 @@ export default function RegisterTutor({ setUser }) {
         slots = ['17:00-18:00', '18:00-19:00'];
       }
 
+      // Combine academic and non-academic subjects
+      const allSubjects = [...formData.subjects_can_teach, ...formData.non_academic_courses];
+
       const dataToSend = {
         board_preference: formData.board_preference,
         current_address: formData.current_address,
@@ -88,7 +105,7 @@ export default function RegisterTutor({ setUser }) {
         about_yourself: formData.about_yourself,
         aadhaar_number: '000000000000', // Placeholder since backend expects it
         classes_can_teach: formData.classes_can_teach,
-        subjects_can_teach: formData.subjects_can_teach,
+        subjects_can_teach: allSubjects,
         available_days: formData.available_days,
         available_slots: slots
       };
