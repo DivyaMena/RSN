@@ -1880,6 +1880,53 @@ async def bulk_delete_state_boards(input: BulkDeleteInput, request: Request):
 
 # ============= SCHOOLS ENDPOINTS =============
 
+@api_router.put("/coordinator/schools/{school_id}/approve")
+async def approve_school(school_id: str, request: Request):
+    """Coordinator approves school registration"""
+    user = await get_current_user(request)
+    
+    if user.role != "coordinator":
+        raise HTTPException(status_code=403, detail="Only coordinators can approve schools")
+    
+    result = await db.schools.update_one(
+        {"id": school_id},
+        {"$set": {"approval_status": "approved", "approved_by": user.id}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="School not found")
+    
+    return {"success": True, "message": "School approved successfully"}
+
+@api_router.put("/coordinator/schools/{school_id}/reject")
+async def reject_school(school_id: str, request: Request):
+    """Coordinator rejects school registration"""
+    user = await get_current_user(request)
+    
+    if user.role != "coordinator":
+        raise HTTPException(status_code=403, detail="Only coordinators can reject schools")
+    
+    result = await db.schools.update_one(
+        {"id": school_id},
+        {"$set": {"approval_status": "rejected", "approved_by": user.id}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="School not found")
+    
+    return {"success": True, "message": "School rejected"}
+
+@api_router.get("/coordinator/schools/pending")
+async def get_pending_schools(request: Request):
+    """Get schools waiting for approval"""
+    user = await get_current_user(request)
+    
+    if user.role != "coordinator":
+        raise HTTPException(status_code=403, detail="Only coordinators can view pending schools")
+    
+    schools = await db.schools.find({"approval_status": "pending"}, {"_id": 0}).to_list(length=None)
+    return schools
+
 @api_router.post("/schools/register")
 async def register_school(input: RegisterSchoolInput):
     """School registration endpoint"""
