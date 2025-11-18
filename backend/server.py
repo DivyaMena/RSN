@@ -383,11 +383,22 @@ class RegisterSchoolInput(BaseModel):
     school_name: str
     principal_name: str
     email: EmailStr
+    password: str
     phone: str
+    alternate_phone: Optional[str] = None
     address: str
     city: str
     state: str
+    state_board: str
     pincode: str
+    class_from: int
+    class_to: int
+    school_board_pic: Optional[str] = None
+    location_url: Optional[str] = None
+    tutors_required_subjects: List[str]
+    preferred_days: List[str]
+    time_schedule: Optional[dict] = None
+    terms_accepted: bool
 
 # ============= HELPER FUNCTIONS =============
 
