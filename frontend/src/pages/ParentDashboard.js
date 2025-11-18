@@ -68,6 +68,14 @@ export default function ParentDashboard({ user, logout }) {
     }
   };
 
+  const toggleNonAcademicCourse = (course) => {
+    if (formData.non_academic_courses.includes(course)) {
+      setFormData({ ...formData, non_academic_courses: formData.non_academic_courses.filter(c => c !== course) });
+    } else {
+      setFormData({ ...formData, non_academic_courses: [...formData.non_academic_courses, course] });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
