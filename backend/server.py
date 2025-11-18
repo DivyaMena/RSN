@@ -547,8 +547,8 @@ async def require_auth(request: Request) -> User:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
-async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: str):
-    """Send email notification to coordinators and students when log entry is created"""
+async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: str, tutor_email: str = None):
+    """Send email notification to coordinators, students, and tutor when log entry is created"""
     try:
         # Get SMTP configuration from environment
         smtp_host = os.environ.get('SMTP_HOST')
@@ -575,8 +575,11 @@ async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: 
         parents = await db.users.find({"id": {"$in": parent_user_ids}}, {"_id": 0}).to_list(None)
         parent_emails = [p["email"] for p in parents if p.get("email")]
         
+        # Add tutor email to recipients
+        tutor_emails = [tutor_email] if tutor_email else []
+        
         # Combine all recipient emails
-        all_recipients = list(set(coordinator_emails + parent_emails))  # Remove duplicates
+        all_recipients = list(set(coordinator_emails + parent_emails + tutor_emails))  # Remove duplicates
         
         if not all_recipients:
             logging.info("No recipients found for log entry notification")
