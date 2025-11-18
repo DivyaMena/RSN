@@ -1540,6 +1540,20 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
     if not tutor:
         raise HTTPException(status_code=404, detail="Tutor not found")
     
+    # Get batch schedule days
+    batch_days = set()
+    if batch.get("schedule_slots"):
+        for slot in batch["schedule_slots"]:
+            batch_days.add(slot["day"])
+    
+    # Validate that assigned days are in the batch schedule
+    for day in input.assigned_days:
+        if day not in batch_days:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Cannot assign tutor to {day}. This batch only has classes on: {', '.join(sorted(batch_days))}"
+            )
+    
     # Find existing assignment (if any) - use the most recent one
     existing_cursor = db.batch_tutor_assignments.find({
         "batch_id": input.batch_id,
