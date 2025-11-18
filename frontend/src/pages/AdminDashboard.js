@@ -293,6 +293,29 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  const fetchCurriculum = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/curriculum`, {
+        withCredentials: true
+      });
+      setCurriculum(response.data);
+    } catch (error) {
+      console.error('Error fetching curriculum:', error);
+      toast.error('Failed to load curriculum');
+    }
+  };
+
+  const fetchCurriculumSummary = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/curriculum/summary`, {
+        withCredentials: true
+      });
+      setCurriculumSummary(response.data);
+    } catch (error) {
+      console.error('Error fetching curriculum summary:', error);
+    }
+  };
+
   // Admin Management Functions
   const handleAddCoAdmin = async () => {
     if (!newAdminData.email || !newAdminData.password || !newAdminData.name) {
