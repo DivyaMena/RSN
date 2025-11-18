@@ -141,6 +141,58 @@ export default function StudentDashboard({ user, logout }) {
     }
   };
 
+  const handleRemedialRequest = async () => {
+    if (!remedialSubject || !remedialTopic || !remedialReason) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    setSubmittingRemedial(true);
+    try {
+      // Find a batch for this subject
+      const batch = batches.find(b => b.subject === remedialSubject);
+      if (!batch) {
+        toast.error('No batch found for this subject');
+        return;
+      }
+
+      await axios.post(`${API}/remedial/request`, {
+        batch_id: batch.id,
+        topic: remedialTopic,
+        reason: remedialReason
+      }, { withCredentials: true });
+
+      toast.success('Remedial request sent to coordinator');
+      setShowRemedialDialog(false);
+      setRemedialSubject('');
+      setRemedialTopic('');
+      setRemedialReason('');
+    } catch (error) {
+      toast.error('Failed to send remedial request');
+    } finally {
+      setSubmittingRemedial(false);
+    }
+  };
+
+  const handleJoinClass = (batch) => {
+    setSelectedBatch(batch);
+    setShowJoinDialog(true);
+  };
+
+  const confirmJoinClass = () => {
+    if (selectedBatch && selectedBatch.gmeet_link) {
+      window.open(selectedBatch.gmeet_link, '_blank');
+      setShowJoinDialog(false);
+      setSelectedBatch(null);
+    } else {
+      toast.error('No meeting link available for this batch');
+    }
+  };
+
+  // Calculate statistics
+  const academicBatches = batches.filter(b => ACADEMIC_SUBJECTS.includes(b.subject));
+  const nonAcademicBatches = batches.filter(b => NON_ACADEMIC_SUBJECTS.includes(b.subject));
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
