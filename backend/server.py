@@ -103,6 +103,7 @@ class Tutor(BaseModel):
     availability_status: str = "available"  # available, unavailable, not_interested
     unavailable_from: Optional[str] = None
     unavailable_to: Optional[str] = None
+    last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated
     registration_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
