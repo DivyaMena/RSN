@@ -1990,8 +1990,8 @@ async def create_remedial_request(input: CreateRemedialRequestInput, request: Re
     if user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can request remedial classes")
     
-    # Get student profile
-    student = await db.students.find_one({"user_id": user.id})
+    # For student login, user.id IS the student ID
+    student = await db.students.find_one({"id": user.id})
     if not student:
         raise HTTPException(status_code=404, detail="Student profile not found")
     
@@ -2001,7 +2001,7 @@ async def create_remedial_request(input: CreateRemedialRequestInput, request: Re
         raise HTTPException(status_code=404, detail="Batch not found")
     
     remedial_request = RemedialRequest(
-        student_id=student["id"],
+        student_id=user.id,
         batch_id=input.batch_id,
         subject=batch["subject"],
         class_level=batch["class_level"],
