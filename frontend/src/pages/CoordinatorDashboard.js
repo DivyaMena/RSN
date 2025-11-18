@@ -1184,13 +1184,15 @@ export default function CoordinatorDashboard({ user, logout }) {
                   const tutorBatches = [];
                   batches.forEach(batch => {
                     const assignments = batchAssignments[batch.id] || [];
-                    const tutorAssignment = assignments.find(a => 
-                      a.tutor_id === selectedTutorDetails.tutor.id
-                    );
+                    // Check both tutor_id and assignment.tutor_id structure
+                    const tutorAssignment = assignments.find(a => {
+                      const assignmentTutorId = a.tutor_id || a.assignment?.tutor_id;
+                      return assignmentTutorId === selectedTutorDetails.tutor.id;
+                    });
                     if (tutorAssignment) {
                       tutorBatches.push({
                         batch,
-                        days: tutorAssignment.assignment?.assigned_days || []
+                        days: tutorAssignment.assignment?.assigned_days || tutorAssignment.assigned_days || []
                       });
                     }
                   });
