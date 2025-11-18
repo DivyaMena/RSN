@@ -242,10 +242,22 @@ class School(BaseModel):
     principal_name: str
     email: EmailStr
     phone: str
+    alternate_phone: Optional[str] = None
     address: str
     city: str
     state: str
+    state_board: str  # Which board (TS, AP, etc.)
     pincode: str
+    class_from: int  # Starting class (1-10)
+    class_to: int    # Ending class (1-10)
+    school_board_pic: Optional[str] = None  # Image URL/path
+    location_url: Optional[str] = None  # Google Maps link
+    tutors_required_subjects: List[str] = Field(default_factory=list)  # MAT, SCI, ENG, etc.
+    preferred_days: List[str] = Field(default_factory=list)  # Mon, Tue, etc.
+    time_schedule: Optional[dict] = None  # {"class_6": {"MAT": "10:00-11:00"}}
+    terms_accepted: bool = False
+    approval_status: str = "pending"  # pending, approved, rejected
+    approved_by: Optional[str] = None  # Coordinator ID
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class StateBoard(BaseModel):
