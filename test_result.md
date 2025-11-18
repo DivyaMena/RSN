@@ -259,6 +259,54 @@ backend:
         agent: "main"
         comment: "✅ IMPLEMENTED: Created seed_admin.py to create/update main RSN admin (idonateforneedy@gmail.com). Successfully tested - admin can log in with password 'RisingStars@2025'."
 
+  - task: "Tutor profile update endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: PUT /api/tutors/me/profile endpoint with 15-day edit cooldown. Allows tutors to update available_days, subjects_can_teach, classes_can_teach, and about_yourself. Needs testing."
+
+  - task: "Coordinator/Parent profile update endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: PUT /api/users/me/profile endpoint with 15-day edit cooldown for coordinators and parents. Allows updating phone_number, location, alternate_phone, and availability_status. Needs testing."
+
+  - task: "Student profile update endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: PUT /api/students/me/profile endpoint with 15-day edit cooldown. Allows students to update subjects only. Needs testing."
+
+  - task: "User model updates for profile fields"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Added phone_number, location, and alternate_phone fields to User model for parent/coordinator profile management. Needs testing."
+
 frontend:
   - task: "Coordinator Dashboard - Tutor approval UI"
     implemented: true
