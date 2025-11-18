@@ -71,9 +71,9 @@ export default function StudentProfile({ user, logout }) {
       setSubjects(res.data.subjects || []);
       setSchoolName(res.data.school_name || '');
       
-      // Set available subjects based on class level
-      const availSubjects = getAvailableSubjects(res.data.class_level);
-      setAvailableSubjects(availSubjects);
+      // Set available academic subjects based on class level
+      const availAcademicSubjects = getAvailableAcademicSubjects(res.data.class_level);
+      setAvailableSubjects(availAcademicSubjects);
       
       // Calculate if editing is allowed
       if (res.data.last_profile_update) {
