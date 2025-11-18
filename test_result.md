@@ -984,3 +984,86 @@ agent_communication:
       5. Same logic applies: 10+ students = active, auto-assign tutor, etc.
       
       🚀 NON-ACADEMIC COURSES FULLY INTEGRATED!
+
+  - agent: "main"
+    message: |
+      🎯 MAJOR UPDATES - SCHOOL REGISTRATION, TUTOR PREFERENCES & AVAILABILITY FIX!
+      
+      ✅ 1. SCHOOL REGISTRATION ADDED:
+      
+      **RoleSelection Page:**
+      - Added "School" as 4th registration option (alongside Parent, Tutor, Coordinator)
+      - Orange colored card with School icon
+      - Description: "Request subject tutors for your school for different classes"
+      
+      **RegisterSchool.js Created:**
+      - New registration page with form fields:
+        * School Name *
+        * Principal Name *
+        * Email *
+        * Phone *
+        * Address *
+        * City, State, Pincode *
+      - Orange gradient button matching school theme
+      - Submission shows success message: "Our team will contact you soon"
+      - Route added: /register/school
+      
+      ✅ 2. TUTOR REGISTRATION - TEACHING PREFERENCE SYSTEM:
+      
+      **New Feature: "What would you like to teach?"**
+      - 3 radio button options:
+        1. Academic Courses Only
+        2. Non-Academic Courses Only
+        3. Both Academic & Non-Academic
+      
+      **Conditional Form Display:**
+      - **Academic selected:**
+        * Shows: Classes (6-10) checkboxes
+        * Shows: Academic Subjects (MAT, PHY, SCI, BIO, ENG)
+      
+      - **Non-Academic selected:**
+        * Shows: Non-Academic Courses only (CHS, CUB, CON, CAR)
+        * Purple background section
+      
+      - **Both selected:**
+        * Shows: All fields (Classes, Academic Subjects, Non-Academic Courses)
+      
+      **Backend Integration:**
+      - Combines academic subjects + non-academic courses into subjects_can_teach array
+      - Validation enforces selections based on preference
+      - All courses stored in same format for batch creation
+      
+      ✅ 3. TUTOR DASHBOARD - AVAILABILITY LOGIC FIX:
+      
+      **Issue Fixed:**
+      - Old: Showed "unavailable" even when dates were in the future
+      - User example: Today 2025-11-18, unavailable_from 2025-11-19 showed "unavailable"
+      
+      **New Logic:**
+      - Calculates actual availability based on today's date
+      - Three states:
+        1. **Currently Unavailable:** Today falls within date range
+           - Shows: "Current availability: unavailable"
+           - Message: "Unavailable from [date] to [date]"
+        
+        2. **Future Unavailability:** Today is before unavailable_from
+           - Shows: "Current availability: available"
+           - Message: "Will be unavailable from [date] to [date]"
+        
+        3. **Past Unavailability:** Today is after unavailable_to
+           - Shows: "Current availability: available"
+           - Message: "Was unavailable from [date] to [date]"
+      
+      **Display Enhancements:**
+      - Added "Today's Date" display for clarity
+      - Dynamic status color (green/yellow/red)
+      - Clear messaging about unavailability timing
+      
+      📋 SUMMARY OF CHANGES:
+      - ✅ School registration flow complete
+      - ✅ Tutor can choose Academic/Non-Academic/Both
+      - ✅ Form adapts based on teaching preference
+      - ✅ Availability status now accurately reflects current date
+      - ✅ Better UX with clear date-based messaging
+      
+      🚀 ALL UPDATES DEPLOYED AND READY FOR TESTING!
