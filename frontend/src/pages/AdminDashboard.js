@@ -1853,7 +1853,7 @@ export default function AdminDashboard({ user, logout }) {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
@@ -1862,12 +1862,20 @@ export default function AdminDashboard({ user, logout }) {
               <span className="text-red-600 font-semibold">This action cannot be undone.</span>
             </DialogDescription>
           </DialogHeader>
+          
+          {deleteWarningMessage && (
+            <div className="my-4 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+              <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Warning: Students Will Be Deleted</h4>
+              <pre className="text-sm text-yellow-900 whitespace-pre-wrap font-sans">{deleteWarningMessage}</pre>
+            </div>
+          )}
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               No, Cancel
             </Button>
             <Button variant="destructive" onClick={handleConfirmDelete}>
-              Yes, Delete
+              Yes, Delete All
             </Button>
           </DialogFooter>
         </DialogContent>
