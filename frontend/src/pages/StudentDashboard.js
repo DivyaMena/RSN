@@ -302,18 +302,18 @@ export default function StudentDashboard({ user, logout }) {
                   data-testid={`batch-${batch.id}`}
                   className="bg-white rounded-xl shadow-lg p-6"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">{batch.batch_code}</h3>
-                      <p className="text-gray-600">{SUBJECTS[batch.subject]} | Status: {batch.status}</p>
-                      <p className="text-sm text-gray-500">Class {batch.class_level} | {batch.board} Board</p>
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">{batch.batch_code}</h3>
+                      <p className="text-sm sm:text-base text-gray-600">{SUBJECTS[batch.subject]} | Status: {batch.status}</p>
+                      <p className="text-xs sm:text-sm text-gray-500">Class {batch.class_level} | {batch.board} Board</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                       <Button 
                         onClick={() => handleJoinClass(batch)} 
                         variant="outline" 
                         size="sm"
-                        className="bg-green-50 hover:bg-green-100"
+                        className="bg-green-50 hover:bg-green-100 w-full sm:w-auto"
                       >
                         <Video className="h-4 w-4 mr-2" />
                         Join Class
@@ -323,6 +323,7 @@ export default function StudentDashboard({ user, logout }) {
                         onClick={() => navigate(`/logboard/${batch.id}`)} 
                         variant="outline"
                         size="sm"
+                        className="w-full sm:w-auto"
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
                         View Log Board
