@@ -26,14 +26,14 @@ const SUBJECTS = {
   'SCI': 'Science',
   'BIO': 'Biology',
   'ENG': 'English',
-  'CHESS': 'Chess',
-  'RUBIKS': "Rubik's Cube",
-  'CONFIDENCE': 'Confidence Club',
-  'CAREER': 'Career Guidance'
+  'CHS': 'Chess',
+  'CUB': "Rubik's Cube",
+  'CON': 'Confidence Club',
+  'CAR': 'Career Guidance'
 };
 
 const ACADEMIC_SUBJECTS = ['MAT', 'PHY', 'SCI', 'BIO', 'ENG'];
-const NON_ACADEMIC_SUBJECTS = ['CHESS', 'RUBIKS', 'CONFIDENCE', 'CAREER'];
+const NON_ACADEMIC_SUBJECTS = ['CHS', 'CUB', 'CON', 'CAR'];
 
 export default function StudentDashboard({ user, logout }) {
   const { studentId } = useParams();
