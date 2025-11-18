@@ -490,7 +490,7 @@ agent_communication:
       ✅ ALL PRIORITY TESTS PASSED (6/6):
       
       **TEST 1: Dashboard Load & Display** ✅
-      - Dashboard loads without errors at https://rising-stars-app.preview.emergentagent.com
+      - Dashboard loads without errors at https://admin-portal-168.preview.emergentagent.com
       - Pending Tutor Approvals section visible with correct count (2)
       - Statistics cards display correctly: 4 Total Batches, 3 Active, 4 Approved Tutors, 2 Pending
       - All 4 batch cards displayed properly
