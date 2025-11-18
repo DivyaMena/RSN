@@ -184,7 +184,7 @@ export default function TutorDashboard({ user, logout }) {
               return (
                 <div key={batch.id} data-testid={`tutor-batch-${batch.id}`} className="bg-white rounded-2xl shadow-lg p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{batch.batch_code}</h3>
                       <p className="text-gray-600 mt-1">
                         {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
@@ -192,6 +192,35 @@ export default function TutorDashboard({ user, logout }) {
                       <p className="text-sm text-gray-500 mt-1">
                         Status: <span className="capitalize">{batch.status}</span> | Students: {batch.student_ids.length}/25
                       </p>
+                      
+                      {/* Batch Schedule */}
+                      {batch.schedule_slots && batch.schedule_slots.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-sm font-semibold text-gray-700 mb-2">Batch Schedule:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {batch.schedule_slots.map((slot, idx) => {
+                              // Check if this tutor is assigned to this day
+                              const myAssignment = tutors.find(t => t.tutor?.user_id === user.id);
+                              const isMyDay = myAssignment?.assignment?.assigned_days?.includes(slot.day);
+                              
+                              return (
+                                <span
+                                  key={idx}
+                                  className={`px-3 py-1 rounded-md text-xs font-semibold border shadow-sm ${
+                                    isMyDay
+                                      ? 'bg-green-100 text-green-700 border-green-300'
+                                      : 'bg-gray-100 text-gray-600 border-gray-300'
+                                  }`}
+                                >
+                                  {slot.day.substring(0, 3)} {slot.slot}
+                                  {isMyDay && ' ✓'}
+                                </span>
+                              );
+                            })}
+                          </div>
+                          <p className="text-xs text-green-600 mt-1">✓ = You are assigned to teach this day</p>
+                        </div>
+                      )}
                     </div>
                     <Button
                       data-testid={`view-logboard-${batch.id}`}
