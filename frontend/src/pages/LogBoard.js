@@ -145,11 +145,31 @@ export default function LogBoard({ user, logout }) {
     }
   };
 
+  // Helper function to check if a date matches assigned days
+  const isValidDate = (dateString) => {
+    if (!dateString || myAssignedDays.length === 0) return true;
+    
+    const date = new Date(dateString);
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = dayNames[date.getDay()];
+    
+    return myAssignedDays.includes(dayOfWeek);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.topic_covered || !formData.google_meet_link) {
       toast.error('Please fill all required fields');
+      return;
+    }
+
+    // Validate date against assigned days
+    if (user.role === 'tutor' && !isValidDate(formData.date)) {
+      const date = new Date(formData.date);
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const selectedDay = dayNames[date.getDay()];
+      toast.error(`Invalid date! ${selectedDay} is not one of your assigned days (${myAssignedDays.join(', ')})`);
       return;
     }
 
