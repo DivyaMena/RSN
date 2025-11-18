@@ -783,33 +783,68 @@ export default function AdminDashboard({ user, logout }) {
 
             <Card>
               <CardContent className="pt-6">
-                <div className="space-y-4">
+                <div className="space-y-2">
+                  {admins.filter(a => !a.is_main_admin).length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox
+                        checked={selectedAdmins.length === admins.filter(a => !a.is_main_admin).length}
+                        onCheckedChange={() => handleSelectAll('admins', admins.filter(a => !a.is_main_admin), selectedAdmins, setSelectedAdmins)}
+                      />
+                      <span className="text-sm font-medium">Select All Co-Admins ({admins.filter(a => !a.is_main_admin).length})</span>
+                    </div>
+                  )}
                   {admins.map((admin) => (
-                    <div key={admin.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold">{admin.name}</p>
-                        <p className="text-sm text-gray-600">{admin.email}</p>
-                        <div className="mt-1">
-                          {admin.is_main_admin ? (
-                            <span className="inline-block px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-green-600 rounded">
-                              Main Admin
-                            </span>
-                          ) : (
-                            <span className="inline-block px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-200 rounded">
-                              Co-Admin
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {user.can_manage_admins && !admin.is_main_admin && (
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRemoveCoAdmin(admin.id)}
+                    <div key={admin.id}>
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        {!admin.is_main_admin && (
+                          <Checkbox
+                            checked={selectedAdmins.includes(admin.id)}
+                            onCheckedChange={() => handleSelectSingle(admin.id, selectedAdmins, setSelectedAdmins)}
+                          />
+                        )}
+                        <button
+                          onClick={() => handleToggleExpand(admin.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Remove
-                        </Button>
+                          {expandedId === admin.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        </button>
+                        <div className="flex-1">
+                          <p className="font-semibold">{admin.name}</p>
+                          <p className="text-sm text-gray-600">{admin.email}</p>
+                          <div className="mt-1">
+                            {admin.is_main_admin ? (
+                              <span className="inline-block px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-green-600 rounded">
+                                Main Admin
+                              </span>
+                            ) : (
+                              <span className="inline-block px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-200 rounded">
+                                Co-Admin
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {user.can_manage_admins && !admin.is_main_admin && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveCoAdmin(admin.id)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                      {expandedId === admin.id && (
+                        <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                          <h4 className="font-semibold text-sm mb-2">Admin Details</h4>
+                          <div className="space-y-1 text-sm">
+                            <p><span className="font-medium">Name:</span> {admin.name}</p>
+                            <p><span className="font-medium">Email:</span> {admin.email}</p>
+                            <p><span className="font-medium">Role:</span> {admin.is_main_admin ? 'Main Admin' : 'Co-Admin'}</p>
+                            <p><span className="font-medium">Can Manage Admins:</span> {admin.can_manage_admins ? 'Yes' : 'No'}</p>
+                            <p><span className="font-medium">Created:</span> {new Date(admin.created_at).toLocaleString()}</p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   ))}
