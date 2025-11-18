@@ -12,12 +12,18 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const CLASSES = [6, 7, 8, 9, 10];
-const SUBJECTS = [
+const ACADEMIC_SUBJECTS = [
   { value: 'MAT', label: 'Mathematics' },
   { value: 'PHY', label: 'Physics' },
   { value: 'SCI', label: 'Science' },
   { value: 'BIO', label: 'Biology' },
   { value: 'ENG', label: 'English' }
+];
+const NON_ACADEMIC_COURSES = [
+  { value: 'CHS', label: 'Chess' },
+  { value: 'CUB', label: "Rubik's Cube" },
+  { value: 'CON', label: 'Confidence Club' },
+  { value: 'CAR', label: 'Career Guidance' }
 ];
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
