@@ -1219,21 +1219,10 @@ export default function CoordinatorDashboard({ user, logout }) {
                 })()}
               </div>
 
-              <div className="flex space-x-3">
-                <Button
-                  onClick={() => {
-                    setTutorDetailsDialogOpen(false);
-                    handleChangeStatus(selectedTutorDetails);
-                  }}
-                  className="flex-1"
-                >
-                  <Shield className="h-4 w-4 mr-2" />
-                  Change Status
-                </Button>
+              <div className="flex justify-end">
                 <Button
                   onClick={() => setTutorDetailsDialogOpen(false)}
                   variant="outline"
-                  className="flex-1"
                 >
                   Close
                 </Button>
