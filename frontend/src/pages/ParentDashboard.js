@@ -19,6 +19,8 @@ export default function ParentDashboard({ user, logout }) {
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     dob_day: '',
