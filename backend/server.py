@@ -54,7 +54,12 @@ class User(BaseModel):
     availability_status: Optional[str] = None  # for coordinator/admin availability
     unavailable_from: Optional[str] = None
     unavailable_to: Optional[str] = None
-    last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated (for coordinator)
+    last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated (for coordinator/parent)
+    
+    # Parent/Coordinator editable fields
+    phone_number: Optional[str] = None
+    location: Optional[str] = None
+    alternate_phone: Optional[str] = None
 
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
