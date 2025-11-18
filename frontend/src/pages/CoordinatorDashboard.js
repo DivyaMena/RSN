@@ -600,16 +600,37 @@ export default function CoordinatorDashboard({ user, logout }) {
                 </div>
               ) : (
                 <div className="grid gap-6">
-                  {filteredBatches.map(batch => (
-                    <div key={batch.id} data-testid={`coordinator-batch-${batch.id}`} className="bg-white rounded-2xl shadow-lg p-6">
+                  {filteredBatches.map(batch => {
+                    // Determine border and status colors
+                    const statusColors = {
+                      'waitlist': 'border-l-yellow-500 bg-yellow-50',
+                      'active': 'border-l-green-500 bg-green-50',
+                      'full': 'border-l-blue-500 bg-blue-50'
+                    };
+                    const statusBadgeColors = {
+                      'waitlist': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                      'active': 'bg-green-100 text-green-800 border-green-300',
+                      'full': 'bg-blue-100 text-blue-800 border-blue-300'
+                    };
+                    
+                    return (
+                    <div 
+                      key={batch.id} 
+                      data-testid={`coordinator-batch-${batch.id}`} 
+                      className={`bg-white rounded-2xl shadow-lg p-6 border-l-4 ${statusColors[batch.status] || 'border-l-gray-400'}`}
+                    >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{batch.batch_code}</h3>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{batch.batch_code}</h3>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusBadgeColors[batch.status] || 'bg-gray-100 text-gray-800'}`}>
+                              {batch.status.toUpperCase()}
+                            </span>
+                          </div>
                           <p className="text-gray-600 mt-1">
                             {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
                           </p>
                           <p className="text-sm text-gray-500 mt-1">
-                            Status: <span className="capitalize font-medium">{batch.status}</span> | 
                             Academic Year: {batch.academic_year}
                           </p>
                           
