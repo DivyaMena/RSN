@@ -172,6 +172,10 @@ export default function AdminDashboard({ user, logout }) {
     if (activeTab === 'schools') fetchSchools();
     if (activeTab === 'batches') fetchBatches();
     if (activeTab === 'state-boards') fetchStateBoards();
+    if (activeTab === 'curriculum') {
+      fetchCurriculum();
+      fetchCurriculumSummary();
+    }
   }, [activeTab]);
 
   const fetchDashboardStats = async () => {
