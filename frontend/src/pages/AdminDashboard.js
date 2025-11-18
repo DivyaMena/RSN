@@ -1298,21 +1298,51 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Students Tab */}
           <TabsContent value="students" className="space-y-6">
-            <h2 className="text-2xl font-bold">All Students</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">All Students</h2>
+              {selectedStudents.length > 0 && (
+                <Button variant="destructive" onClick={() => handleOpenDeleteDialog('students', selectedStudents)}>
+                  <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedStudents.length})
+                </Button>
+              )}
+            </div>
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  {students.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No students found</p>
-                  ) : (
+                  {students.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox checked={selectedStudents.length === students.length} onCheckedChange={() => handleSelectAll('students', students, selectedStudents, setSelectedStudents)} />
+                      <span className="text-sm font-medium">Select All ({students.length})</span>
+                    </div>
+                  )}
+                  {students.length === 0 ? (<p className="text-center text-gray-500 py-8">No students found</p>) : (
                     students.map((student) => (
-                      <div key={student.id} className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold">{student.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {student.student_code} | Class {student.class_level} | {student.board}
-                          </p>
+                      <div key={student.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox checked={selectedStudents.includes(student.id)} onCheckedChange={() => handleSelectSingle(student.id, selectedStudents, setSelectedStudents)} />
+                          <button onClick={() => handleToggleExpand(student.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === student.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
+                            <p className="font-semibold">{student.name}</p>
+                            <p className="text-sm text-gray-600">{student.student_code} | Class {student.class_level} | {student.board}</p>
+                          </div>
                         </div>
+                        {expandedId === student.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Student Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Code:</span> {student.student_code}</p>
+                              <p><span className="font-medium">School:</span> {student.school_name}</p>
+                              <p><span className="font-medium">Class:</span> {student.class_level}</p>
+                              <p><span className="font-medium">Board:</span> {student.board}</p>
+                              <p><span className="font-medium">Roll No:</span> {student.roll_no}</p>
+                              <p><span className="font-medium">Subjects:</span> {student.subjects?.join(', ')}</p>
+                              <p><span className="font-medium">Location:</span> {student.location}</p>
+                              <p><span className="font-medium">Enrollment Year:</span> {student.enrollment_year}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
