@@ -90,10 +90,35 @@ export default function StudentDashboard({ user, logout }) {
       setStudent(studentData);
       
       // For "me", batches are already filtered; for parent view, filter them
-      const studentBatches = studentId === 'me' 
+      const studentBatches = (!studentId || studentId === 'me' || user.role === 'student')
         ? batchesRes.data 
-        : batchesRes.data.filter(batch => batch.student_ids.includes(studentId));
+        : batchesRes.data.filter(batch => batch.student_ids && batch.student_ids.includes(studentId));
       setBatches(studentBatches);
+
+      // Fetch tutor information for each batch
+      const tutorData = {};
+      for (const batch of studentBatches) {
+        try {
+          const assignmentsRes = await axios.get(`${API}/batches/${batch.id}/tutor-assignments`, { withCredentials: true });
+          if (assignmentsRes.data && assignmentsRes.data.length > 0) {
+            // Get tutor details for each assignment
+            const tutorIds = [...new Set(assignmentsRes.data.map(a => a.tutor_id))];
+            const tutors = [];
+            for (const tutorId of tutorIds) {
+              try {
+                const tutorRes = await axios.get(`${API}/tutors/${tutorId}`, { withCredentials: true });
+                tutors.push(tutorRes.data);
+              } catch (err) {
+                console.error('Failed to fetch tutor:', err);
+              }
+            }
+            tutorData[batch.id] = tutors;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch tutors for batch ${batch.id}`);
+        }
+      }
+      setBatchTutors(tutorData);
 
       // Fetch curriculum for student's subjects
       const curriculumData = {};
