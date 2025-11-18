@@ -80,6 +80,7 @@ class Student(BaseModel):
     subjects: List[str]  # ["MAT", "PHY", "SCI", "BIO", "ENG"]
     enrollment_year: int
     user_id: Optional[str] = None  # Linked user account for student login
+    last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Tutor(BaseModel):
