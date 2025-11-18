@@ -1442,6 +1442,30 @@ async def bulk_delete_coordinators(input: BulkDeleteInput, request: Request):
         "errors": errors
     }
 
+@api_router.post("/admin/parents/check-students")
+async def check_parent_students(input: BulkDeleteInput, request: Request):
+    """Check which students belong to parents before deletion"""
+    await require_admin(request)
+    
+    parent_student_info = []
+    
+    for parent_id in input.ids:
+        # Check if parent has students
+        students = await db.students.find({"parent_id": parent_id}, {"_id": 0, "name": 1, "student_code": 1}).to_list(length=None)
+        if students:
+            parent = await db.users.find_one({"id": parent_id}, {"_id": 0, "name": 1})
+            student_names = [f"{s['name']} ({s.get('student_code', 'N/A')})" for s in students]
+            parent_student_info.append({
+                "parent_name": parent.get('name', 'Unknown'),
+                "student_count": len(students),
+                "students": student_names
+            })
+    
+    return {
+        "has_students": len(parent_student_info) > 0,
+        "details": parent_student_info
+    }
+
 @api_router.delete("/admin/parents/bulk")
 async def bulk_delete_parents(input: BulkDeleteInput, request: Request):
     """Bulk delete parents (shows warning if has students)"""
