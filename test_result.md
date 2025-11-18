@@ -820,3 +820,39 @@ agent_communication:
          - Admin: Dashboard → My Profile → Verify read-only display
       
       🚀 READY FOR TESTING!
+
+  - agent: "main"
+    message: |
+      🎯 STUDENT PROFILE ENHANCEMENTS COMPLETED!
+      
+      ✅ UPDATED FEATURES:
+      
+      **BACKEND CHANGES:**
+      1. Student Profile Endpoint Updated:
+         - PUT /api/students/me/profile now accepts both 'subjects' and 'school_name' parameters
+         - Students can now edit their school name along with subjects
+         - 15-day edit cooldown applies to both fields together
+      
+      **FRONTEND CHANGES:**
+      1. StudentProfile.js Enhanced:
+         - Added school_name as an editable field with Input component
+         - Implemented class-based subject filtering:
+           * Classes 6-7: Show only Mathematics, Science, English (Physics and Biology hidden)
+           * Classes 8-10: Show only Mathematics, Physics, Biology, English (Science hidden)
+         - Added helper function getAvailableSubjects(classLevel) for dynamic filtering
+         - Updated UI to show which subjects are available based on class
+         - Added validation for school name (required field)
+      
+      📋 SUBJECT FILTERING LOGIC:
+      - Class 6-7: MAT, SCI, ENG only
+      - Class 8-10: MAT, PHY, BIO, ENG only
+      - This ensures students only see subjects relevant to their class level
+      
+      🔧 CHANGES SUMMARY:
+      - ✅ School name now editable in Student Profile
+      - ✅ Subject options filtered by class level (no irrelevant subjects shown)
+      - ✅ Class 6-7 students cannot see Physics/Biology
+      - ✅ Class 8-10 students cannot see Science
+      - ✅ Better UX with contextual subject display
+      
+      🚀 READY FOR USER TESTING!
