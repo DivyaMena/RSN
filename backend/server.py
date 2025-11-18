@@ -2129,6 +2129,34 @@ async def get_my_student_profile(request: Request):
     
     return student
 
+@api_router.delete("/students/{student_id}")
+async def delete_student(student_id: str, request: Request):
+    """Delete a student (parent only - can only delete their own children)"""
+    user = await require_auth(request)
+    
+    if user.role != "parent":
+        raise HTTPException(status_code=403, detail="Only parents can delete students")
+    
+    # Find the student
+    student = await db.students.find_one({"id": student_id})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Verify the student belongs to this parent
+    if student["parent_id"] != user.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own children")
+    
+    # Remove student from all batches
+    await db.batches.update_many(
+        {"student_ids": student_id},
+        {"$pull": {"student_ids": student_id}}
+    )
+    
+    # Delete the student
+    await db.students.delete_one({"id": student_id})
+    
+    return {"message": "Student deleted successfully"}
+
 @api_router.get("/students/me/batches")
 async def get_my_batches(request: Request):
     """Get batches for logged-in student"""
