@@ -1136,17 +1136,33 @@ export default function AdminDashboard({ user, logout }) {
 
             <Card>
               <CardContent className="pt-6">
-                <div className="space-y-4">
+                <div className="space-y-2">
+                  {filteredCoordinators.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                      <Checkbox
+                        checked={selectedCoordinators.length === filteredCoordinators.length}
+                        onCheckedChange={() => handleSelectAll('coordinators', filteredCoordinators, selectedCoordinators, setSelectedCoordinators)}
+                      />
+                      <span className="text-sm font-medium">Select All ({filteredCoordinators.length})</span>
+                    </div>
+                  )}
                   {filteredCoordinators.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No coordinators found</p>
                   ) : (
                     filteredCoordinators.map((coordinator) => (
-                      <div key={coordinator.id} className="p-4 bg-gray-50 rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div>
+                      <div key={coordinator.id}>
+                        <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedCoordinators.includes(coordinator.id)}
+                            onCheckedChange={() => handleSelectSingle(coordinator.id, selectedCoordinators, setSelectedCoordinators)}
+                          />
+                          <button onClick={() => handleToggleExpand(coordinator.id)} className="p-1 hover:bg-gray-200 rounded">
+                            {expandedId === coordinator.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          </button>
+                          <div className="flex-1">
                             <p className="font-semibold">{coordinator.name}</p>
                             <p className="text-sm text-gray-600">{coordinator.email}</p>
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex gap-2 mt-1">
                               <span className={`px-2 py-1 text-xs font-semibold rounded ${
                                 coordinator.approval_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                 coordinator.approval_status === 'approved' ? 'bg-green-100 text-green-800' :
@@ -1167,45 +1183,41 @@ export default function AdminDashboard({ user, logout }) {
                           <div className="flex gap-2">
                             {coordinator.approval_status === 'pending' && (
                               <>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleCoordinatorAction(coordinator.id, 'approve')}
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  Approve
+                                <Button size="sm" onClick={() => handleCoordinatorAction(coordinator.id, 'approve')}>
+                                  <CheckCircle className="h-4 w-4 mr-1" />Approve
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleCoordinatorAction(coordinator.id, 'reject')}
-                                >
-                                  <XCircle className="h-4 w-4 mr-1" />
-                                  Reject
+                                <Button size="sm" variant="destructive" onClick={() => handleCoordinatorAction(coordinator.id, 'reject')}>
+                                  <XCircle className="h-4 w-4 mr-1" />Reject
                                 </Button>
                               </>
                             )}
                             {coordinator.status === 'active' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleCoordinatorAction(coordinator.id, 'suspend')}
-                              >
-                                <Ban className="h-4 w-4 mr-1" />
-                                Suspend
+                              <Button size="sm" variant="outline" onClick={() => handleCoordinatorAction(coordinator.id, 'suspend')}>
+                                <Ban className="h-4 w-4 mr-1" />Suspend
                               </Button>
                             )}
                             {(coordinator.status === 'active' || coordinator.status === 'suspended') && (
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleCoordinatorAction(coordinator.id, 'blacklist')}
-                              >
-                                <Ban className="h-4 w-4 mr-1" />
-                                Blacklist
+                              <Button size="sm" variant="destructive" onClick={() => handleCoordinatorAction(coordinator.id, 'blacklist')}>
+                                <Ban className="h-4 w-4 mr-1" />Blacklist
                               </Button>
                             )}
                           </div>
                         </div>
+                        {expandedId === coordinator.id && (
+                          <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <h4 className="font-semibold text-sm mb-2">Coordinator Details</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Name:</span> {coordinator.name}</p>
+                              <p><span className="font-medium">Email:</span> {coordinator.email}</p>
+                              <p><span className="font-medium">Phone:</span> {coordinator.phone_number || 'N/A'}</p>
+                              <p><span className="font-medium">Location:</span> {coordinator.location || 'N/A'}</p>
+                              <p><span className="font-medium">State:</span> {coordinator.state || 'N/A'}</p>
+                              <p><span className="font-medium">Status:</span> {coordinator.status}</p>
+                              <p><span className="font-medium">Approval Status:</span> {coordinator.approval_status}</p>
+                              <p><span className="font-medium">Created:</span> {new Date(coordinator.created_at).toLocaleString()}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
