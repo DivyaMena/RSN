@@ -298,14 +298,89 @@ export default function StudentDashboard({ user, logout }) {
           </div>
         </div>
 
-        {/* Batches */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>My Batches</h2>
-          {batches.length === 0 ? (
-            <p className="text-gray-600">No active batches yet.</p>
-          ) : (
+        {/* Academic Batches */}
+        {academicBatches.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Academic Batches</h2>
             <div className="grid gap-4">
-              {batches.map(batch => (
+              {academicBatches.map(batch => (
+                <div
+                  key={batch.id}
+                  data-testid={`batch-${batch.id}`}
+                  className="bg-white rounded-xl shadow-lg p-6"
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900">{batch.batch_code}</h3>
+                      <p className="text-sm sm:text-base text-gray-600">{SUBJECTS[batch.subject]} | Status: {batch.status}</p>
+                      <p className="text-xs sm:text-sm text-gray-500">Class {batch.class_level} | {batch.board} Board</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <Button 
+                        onClick={() => handleJoinClass(batch)} 
+                        variant="outline" 
+                        size="sm"
+                        className="bg-green-50 hover:bg-green-100 w-full sm:w-auto"
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        Join Class
+                      </Button>
+                      <Button 
+                        data-testid={`view-logboard-${batch.id}`} 
+                        onClick={() => navigate(`/logboard/${batch.id}`)} 
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        View Log Board
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Tutor Information */}
+                  {batchTutors[batch.id] && batchTutors[batch.id].length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                        <GraduationCap className="h-5 w-5 mr-2 text-blue-600" />
+                        Your Tutors
+                      </h4>
+                      <div className="space-y-3">
+                        {batchTutors[batch.id].map(tutor => (
+                          <div key={tutor.id} className="bg-blue-50 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              {tutor.photo_url ? (
+                                <img src={tutor.photo_url} alt={tutor.name} className="w-12 h-12 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center">
+                                  <GraduationCap className="h-6 w-6 text-blue-600" />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900">{tutor.name}</p>
+                                <p className="text-sm text-gray-600">{tutor.tutor_code}</p>
+                                {tutor.about_yourself && (
+                                  <p className="text-sm text-gray-700 mt-2 italic">"{tutor.about_yourself}"</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Non-Academic Batches */}
+        {nonAcademicBatches.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Non-Academic Courses</h2>
+            <div className="grid gap-4">
+              {nonAcademicBatches.map(batch => (
                 <div
                   key={batch.id}
                   data-testid={`batch-${batch.id}`}
