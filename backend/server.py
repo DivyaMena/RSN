@@ -1976,11 +1976,8 @@ async def get_my_batches(request: Request):
     if user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can access this endpoint")
     
-    student = await db.students.find_one({"user_id": user.id})
-    if not student:
-        raise HTTPException(status_code=404, detail="Student profile not found")
-    
-    batches = await db.batches.find({"student_ids": student["id"]}, {"_id": 0}).to_list(None)
+    # For student login, user.id IS the student ID
+    batches = await db.batches.find({"student_ids": user.id}, {"_id": 0}).to_list(None)
     return [Batch(**b) for b in batches]
 
 # ============= REMEDIAL CLASS ROUTES =============
