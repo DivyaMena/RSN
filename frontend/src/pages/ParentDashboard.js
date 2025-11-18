@@ -379,6 +379,27 @@ export default function ParentDashboard({ user, logout }) {
                     )}
                   </div>
 
+                  {/* Terms & Conditions Checkbox */}
+                  <div className="flex items-center space-x-2 pt-4">
+                    <Checkbox
+                      data-testid="accept-terms-checkbox"
+                      checked={formData.accept_terms || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, accept_terms: !!checked })}
+                    />
+                    <label className="text-sm text-gray-600 cursor-pointer">
+                      I accept the{' '}
+                      <a 
+                        href="https://risingstarsnation.org/terms" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        terms and conditions
+                      </a>
+                      {' '}for student registration *
+                    </label>
+                  </div>
+
                   <Button data-testid="submit-student-btn" type="submit" className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white">
                     Register Student
                   </Button>
