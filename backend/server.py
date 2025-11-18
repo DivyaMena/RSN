@@ -1414,6 +1414,318 @@ async def delete_school_tutor_assignment(assignment_id: str, request: Request):
     
     return {"success": True, "message": "Tutor assignment removed"}
 
+# ============= BULK DELETE ENDPOINTS =============
+
+@api_router.delete("/admin/coordinators/bulk")
+async def bulk_delete_coordinators(input: BulkDeleteInput, request: Request):
+    """Bulk delete coordinators (prevents deletion if assigned to batches)"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    errors = []
+    
+    for coordinator_id in input.ids:
+        # Check if coordinator has assignments
+        has_assignments = await db.coordinator_assignments.find_one({"coordinator_id": coordinator_id})
+        if has_assignments:
+            coordinator = await db.users.find_one({"id": coordinator_id, "role": "coordinator"}, {"_id": 0, "name": 1})
+            errors.append(f"{coordinator.get('name', coordinator_id)} has active assignments")
+            continue
+        
+        # Delete coordinator user
+        result = await db.users.delete_one({"id": coordinator_id, "role": "coordinator"})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count,
+        "errors": errors
+    }
+
+@api_router.delete("/admin/parents/bulk")
+async def bulk_delete_parents(input: BulkDeleteInput, request: Request):
+    """Bulk delete parents (shows warning if has students)"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    warnings = []
+    
+    for parent_id in input.ids:
+        # Check if parent has students
+        students = await db.students.find({"parent_id": parent_id}, {"_id": 0, "name": 1}).to_list(length=None)
+        if students:
+            parent = await db.users.find_one({"id": parent_id}, {"_id": 0, "name": 1})
+            student_names = [s["name"] for s in students]
+            warnings.append(f"{parent.get('name', parent_id)} has {len(students)} student(s): {', '.join(student_names)}")
+            # Delete associated students as well
+            await db.students.delete_many({"parent_id": parent_id})
+        
+        # Delete parent user
+        result = await db.users.delete_one({"id": parent_id, "role": "parent"})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count,
+        "warnings": warnings
+    }
+
+@api_router.delete("/admin/tutors/bulk")
+async def bulk_delete_tutors(input: BulkDeleteInput, request: Request):
+    """Bulk delete tutors (prevents deletion if assigned to active batches)"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    errors = []
+    
+    for tutor_id in input.ids:
+        # Check if tutor has batch assignments
+        has_assignments = await db.batch_tutor_assignments.find_one({"tutor_id": tutor_id})
+        if has_assignments:
+            tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0, "user_id": 1})
+            if tutor:
+                user = await db.users.find_one({"id": tutor.get("user_id")}, {"_id": 0, "name": 1})
+                errors.append(f"{user.get('name', tutor_id)} is assigned to active batches")
+            continue
+        
+        # Delete tutor profile and user
+        await db.tutors.delete_one({"id": tutor_id})
+        tutor_doc = await db.tutors.find_one({"id": tutor_id}, {"_id": 0, "user_id": 1})
+        if tutor_doc:
+            await db.users.delete_one({"id": tutor_doc.get("user_id")})
+        deleted_count += 1
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count,
+        "errors": errors
+    }
+
+@api_router.delete("/admin/students/bulk")
+async def bulk_delete_students(input: BulkDeleteInput, request: Request):
+    """Bulk delete students"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    
+    for student_id in input.ids:
+        # Remove student from batches
+        await db.batches.update_many(
+            {"student_ids": student_id},
+            {"$pull": {"student_ids": student_id}}
+        )
+        
+        # Delete student record
+        result = await db.students.delete_one({"id": student_id})
+        deleted_count += result.deleted_count
+        
+        # Delete student user if exists
+        student = await db.students.find_one({"id": student_id}, {"_id": 0, "user_id": 1})
+        if student and student.get("user_id"):
+            await db.users.delete_one({"id": student.get("user_id")})
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count
+    }
+
+@api_router.delete("/admin/co-admins/bulk")
+async def bulk_delete_co_admins(input: BulkDeleteInput, request: Request):
+    """Bulk delete co-admins (only main admin can do this)"""
+    user = await require_admin(request)
+    
+    if not user.can_manage_admins:
+        raise HTTPException(status_code=403, detail="Only main admin can delete co-admins")
+    
+    deleted_count = 0
+    errors = []
+    
+    for admin_id in input.ids:
+        # Check if it's the main admin
+        admin = await db.users.find_one({"id": admin_id, "role": "admin"})
+        if admin and admin.get("is_main_admin"):
+            errors.append(f"Cannot delete main admin")
+            continue
+        
+        result = await db.users.delete_one({"id": admin_id, "role": "admin", "is_co_admin": True})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count,
+        "errors": errors
+    }
+
+@api_router.delete("/admin/schools/bulk")
+async def bulk_delete_schools(input: BulkDeleteInput, request: Request):
+    """Bulk delete schools"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    
+    for school_id in input.ids:
+        # Delete school-tutor assignments for this school
+        await db.school_tutor_assignments.delete_many({"school_id": school_id})
+        
+        # Delete school record
+        result = await db.schools.delete_one({"id": school_id})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count
+    }
+
+@api_router.delete("/admin/batches/bulk")
+async def bulk_delete_batches(input: BulkDeleteInput, request: Request):
+    """Bulk delete batches"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    
+    for batch_id in input.ids:
+        # Delete batch tutor assignments
+        await db.batch_tutor_assignments.delete_many({"batch_id": batch_id})
+        
+        # Delete log entries for this batch
+        await db.logboard.delete_many({"batch_id": batch_id})
+        
+        # Delete attendance records
+        await db.attendance.delete_many({"batch_id": batch_id})
+        
+        # Delete batch record
+        result = await db.batches.delete_one({"id": batch_id})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count
+    }
+
+@api_router.delete("/admin/curriculum/bulk")
+async def bulk_delete_curriculum(input: BulkDeleteInput, request: Request):
+    """Bulk delete curriculum items"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    
+    for curriculum_id in input.ids:
+        result = await db.curriculum_items.delete_one({"id": curriculum_id})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count
+    }
+
+# ============= STATE BOARDS ENDPOINTS =============
+
+@api_router.get("/admin/state-boards")
+async def get_state_boards(request: Request):
+    """Get all state boards"""
+    await require_admin(request)
+    
+    boards = await db.state_boards.find({}, {"_id": 0}).to_list(length=None)
+    return boards
+
+@api_router.post("/admin/state-boards")
+async def create_state_board(input: CreateStateBoardInput, request: Request):
+    """Create a new state board"""
+    await require_admin(request)
+    
+    # Check if code already exists
+    existing = await db.state_boards.find_one({"code": input.code}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="State board with this code already exists")
+    
+    board = StateBoard(
+        name=input.name,
+        code=input.code,
+        description=input.description
+    )
+    
+    doc = board.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    
+    await db.state_boards.insert_one(doc)
+    
+    return {"success": True, "message": "State board created successfully", "board": board}
+
+@api_router.put("/admin/state-boards/{board_id}")
+async def update_state_board(board_id: str, input: UpdateStateBoardInput, request: Request):
+    """Update a state board"""
+    await require_admin(request)
+    
+    update_data = {}
+    if input.name:
+        update_data["name"] = input.name
+    if input.code:
+        # Check if new code already exists
+        existing = await db.state_boards.find_one({"code": input.code, "id": {"$ne": board_id}}, {"_id": 0})
+        if existing:
+            raise HTTPException(status_code=400, detail="State board with this code already exists")
+        update_data["code"] = input.code
+    if input.description is not None:
+        update_data["description"] = input.description
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = await db.state_boards.update_one(
+        {"id": board_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="State board not found")
+    
+    return {"success": True, "message": "State board updated successfully"}
+
+@api_router.delete("/admin/state-boards/bulk")
+async def bulk_delete_state_boards(input: BulkDeleteInput, request: Request):
+    """Bulk delete state boards"""
+    await require_admin(request)
+    
+    deleted_count = 0
+    
+    for board_id in input.ids:
+        result = await db.state_boards.delete_one({"id": board_id})
+        deleted_count += result.deleted_count
+    
+    return {
+        "success": True,
+        "deleted_count": deleted_count
+    }
+
+# ============= SCHOOLS ENDPOINTS =============
+
+@api_router.post("/schools/register")
+async def register_school(input: RegisterSchoolInput):
+    """School registration endpoint"""
+    
+    # Check if school with same email already exists
+    existing = await db.schools.find_one({"email": input.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="School with this email already registered")
+    
+    school = School(
+        school_name=input.school_name,
+        principal_name=input.principal_name,
+        email=input.email,
+        phone=input.phone,
+        address=input.address,
+        city=input.city,
+        state=input.state,
+        pincode=input.pincode
+    )
+    
+    doc = school.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    
+    await db.schools.insert_one(doc)
+    
+    return {"success": True, "message": "School registration successful. Our team will contact you soon."}
+
 # ============= USER ROUTES =============
 
 @api_router.post("/users/register/parent")
