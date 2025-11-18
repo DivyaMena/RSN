@@ -1618,6 +1618,140 @@ async def bulk_delete_curriculum(input: BulkDeleteInput, request: Request):
         "deleted_count": deleted_count
     }
 
+# ============= CURRICULUM ENDPOINTS =============
+
+@api_router.get("/admin/curriculum")
+async def get_all_curriculum(request: Request):
+    """Get all curriculum items"""
+    await require_admin(request)
+    
+    items = await db.curriculum_items.find({}, {"_id": 0}).to_list(length=None)
+    return items
+
+@api_router.post("/admin/curriculum/upload-csv")
+async def upload_curriculum_csv(request: Request):
+    """Upload curriculum CSV file and populate database"""
+    await require_admin(request)
+    
+    try:
+        form = await request.form()
+        csv_file = form.get("file")
+        
+        if not csv_file:
+            raise HTTPException(status_code=400, detail="No file uploaded")
+        
+        # Read CSV content
+        content = await csv_file.read()
+        csv_content = content.decode('utf-8')
+        
+        import csv
+        import io
+        
+        csv_reader = csv.DictReader(io.StringIO(csv_content))
+        
+        items_added = 0
+        items_updated = 0
+        errors = []
+        
+        for row in csv_reader:
+            try:
+                # Validate required fields
+                if not all(key in row for key in ['board', 'class_level', 'subject', 'lesson_number', 'lesson_title']):
+                    errors.append(f"Missing required fields in row: {row}")
+                    continue
+                
+                # Check if item already exists
+                existing = await db.curriculum_items.find_one({
+                    "board": row['board'],
+                    "class_level": int(row['class_level']),
+                    "subject": row['subject'],
+                    "topic_number": int(row['lesson_number'])
+                }, {"_id": 0})
+                
+                item_data = {
+                    "board": row['board'],
+                    "class_level": int(row['class_level']),
+                    "subject": row['subject'],
+                    "topic_number": int(row['lesson_number']),
+                    "topic_name": row['lesson_title'],
+                    "description": row.get('lesson_summary', '')
+                }
+                
+                if existing:
+                    # Update existing item
+                    await db.curriculum_items.update_one(
+                        {"id": existing["id"]},
+                        {"$set": item_data}
+                    )
+                    items_updated += 1
+                else:
+                    # Create new item
+                    curriculum_item = CurriculumItem(**item_data)
+                    doc = curriculum_item.model_dump()
+                    doc["created_at"] = datetime.now(timezone.utc).isoformat() if hasattr(curriculum_item, 'created_at') else None
+                    await db.curriculum_items.insert_one(doc)
+                    items_added += 1
+                    
+            except Exception as e:
+                errors.append(f"Error processing row {row}: {str(e)}")
+        
+        return {
+            "success": True,
+            "items_added": items_added,
+            "items_updated": items_updated,
+            "errors": errors
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process CSV: {str(e)}")
+
+@api_router.get("/admin/curriculum/summary")
+async def get_curriculum_summary(request: Request):
+    """Get curriculum summary grouped by board, class, subject"""
+    await require_admin(request)
+    
+    pipeline = [
+        {
+            "$group": {
+                "_id": {
+                    "board": "$board",
+                    "class_level": "$class_level",
+                    "subject": "$subject"
+                },
+                "lesson_count": {"$sum": 1}
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "board": "$_id.board",
+                    "class_level": "$_id.class_level"
+                },
+                "subjects": {
+                    "$push": {
+                        "subject": "$_id.subject",
+                        "lesson_count": "$lesson_count"
+                    }
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": "$_id.board",
+                "classes": {
+                    "$push": {
+                        "class_level": "$_id.class_level",
+                        "subjects": "$subjects"
+                    }
+                }
+            }
+        },
+        {"$sort": {"_id": 1}}
+    ]
+    
+    result = await db.curriculum_items.aggregate(pipeline).to_list(length=None)
+    return result
+
 # ============= STATE BOARDS ENDPOINTS =============
 
 @api_router.get("/admin/state-boards")
