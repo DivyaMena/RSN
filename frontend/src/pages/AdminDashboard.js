@@ -91,6 +91,35 @@ export default function AdminDashboard({ user, logout }) {
   // Batches State
   const [batches, setBatches] = useState([]);
 
+  // State Boards State
+  const [stateBoards, setStateBoards] = useState([]);
+
+  // Selection state for bulk operations
+  const [selectedCoordinators, setSelectedCoordinators] = useState([]);
+  const [selectedTutors, setSelectedTutors] = useState([]);
+  const [selectedParents, setSelectedParents] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectedAdmins, setSelectedAdmins] = useState([]);
+  const [selectedSchools, setSelectedSchools] = useState([]);
+  const [selectedBatches, setSelectedBatches] = useState([]);
+  const [selectedBoards, setSelectedBoards] = useState([]);
+
+  // Expanded details state
+  const [expandedId, setExpandedId] = useState(null);
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteType, setDeleteType] = useState('');
+  const [idsToDelete, setIdsToDelete] = useState([]);
+
+  // State Board form
+  const [showAddBoardDialog, setShowAddBoardDialog] = useState(false);
+  const [boardFormData, setBoardFormData] = useState({
+    name: '',
+    code: '',
+    description: ''
+  });
+
   // Coordinator Assignments State
   const [coordinatorAssignments, setCoordinatorAssignments] = useState([]);
   const [showAssignCoordinatorDialog, setShowAssignCoordinatorDialog] = useState(false);
