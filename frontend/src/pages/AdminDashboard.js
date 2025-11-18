@@ -548,6 +548,39 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  // Curriculum handlers
+  const handleCsvUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setUploadingCsv(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post(`${API}/admin/curriculum/upload-csv`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      });
+
+      toast.success(`Added ${response.data.items_added} lessons, Updated ${response.data.items_updated} lessons`);
+      
+      if (response.data.errors.length > 0) {
+        console.error('CSV errors:', response.data.errors);
+        toast.warning(`${response.data.errors.length} rows had errors`);
+      }
+
+      fetchCurriculum();
+      fetchCurriculumSummary();
+      fetchDashboardStats();
+      event.target.value = '';
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to upload CSV');
+    } finally {
+      setUploadingCsv(false);
+    }
+  };
+
   // Toggle expand/collapse for details view
   const handleToggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
