@@ -822,7 +822,8 @@ export default function CoordinatorDashboard({ user, logout }) {
                         {isFullyAssigned && ' - Fully Assigned'}
                       </SelectItem>
                     );
-                  })}
+                  })
+                  )}
                 </SelectContent>
               </Select>
             </div>
