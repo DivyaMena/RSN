@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { Checkbox } from '../components/ui/checkbox';
 import { Label } from '../components/ui/label';
+import { Input } from '../components/ui/input';
 import { BookOpen, LogOut, ArrowLeft, Save, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,6 +19,27 @@ const SUBJECTS = {
   'ENG': 'English'
 };
 
+// Function to get available subjects based on class level
+const getAvailableSubjects = (classLevel) => {
+  const subjects = {};
+  
+  // Classes 6-7: MAT, SCI, ENG (no PHY, no BIO)
+  if (classLevel === 6 || classLevel === 7) {
+    subjects['MAT'] = SUBJECTS['MAT'];
+    subjects['SCI'] = SUBJECTS['SCI'];
+    subjects['ENG'] = SUBJECTS['ENG'];
+  }
+  // Classes 8-10: MAT, PHY, BIO, ENG (no SCI)
+  else if (classLevel === 8 || classLevel === 9 || classLevel === 10) {
+    subjects['MAT'] = SUBJECTS['MAT'];
+    subjects['PHY'] = SUBJECTS['PHY'];
+    subjects['BIO'] = SUBJECTS['BIO'];
+    subjects['ENG'] = SUBJECTS['ENG'];
+  }
+  
+  return subjects;
+};
+
 export default function StudentProfile({ user, logout }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -25,6 +47,8 @@ export default function StudentProfile({ user, logout }) {
   const [saving, setSaving] = useState(false);
   
   const [subjects, setSubjects] = useState([]);
+  const [schoolName, setSchoolName] = useState('');
+  const [availableSubjects, setAvailableSubjects] = useState({});
   
   const [daysUntilNextEdit, setDaysUntilNextEdit] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
