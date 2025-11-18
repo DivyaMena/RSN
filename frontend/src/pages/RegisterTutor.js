@@ -37,8 +37,10 @@ export default function RegisterTutor({ setUser }) {
     tutor_photo: null,
     aadhaar_page1: null,
     aadhaar_page2: null,
+    teaching_preference: '', // 'academic', 'non_academic', 'both'
     classes_can_teach: [],
     subjects_can_teach: [],
+    non_academic_courses: [],
     available_days: [],
     preferred_slot: '' // '5pm-6pm' | '6pm-7pm' | 'any'
   });
