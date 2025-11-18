@@ -657,11 +657,11 @@ export default function CoordinatorDashboard({ user, logout }) {
                                     return days.includes(slotObj.day);
                                   });
 
-                                  let classes = 'px-2 py-1 rounded text-xs font-medium border ';
+                                  let classes = 'px-2.5 py-1 rounded-md text-xs font-semibold border shadow-sm ';
                                   if (isAssigned) {
-                                    classes += 'bg-green-100 text-green-800 border-green-300';
+                                    classes += 'bg-emerald-100 text-emerald-700 border-emerald-300';
                                   } else {
-                                    classes += 'bg-yellow-100 text-yellow-800 border-yellow-300';
+                                    classes += 'bg-amber-100 text-amber-700 border-amber-300';
                                   }
 
                                   return (
