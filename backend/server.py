@@ -235,6 +235,27 @@ class SchoolTutorAssignment(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # Admin user ID
 
+class School(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    school_name: str
+    principal_name: str
+    email: EmailStr
+    phone: str
+    address: str
+    city: str
+    state: str
+    pincode: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class StateBoard(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str  # e.g., "Telangana State Board"
+    code: str  # e.g., "TS"
+    description: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # ============= INPUT MODELS =============
 
 class LoginInput(BaseModel):
