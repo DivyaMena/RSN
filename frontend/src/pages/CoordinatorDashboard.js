@@ -341,15 +341,6 @@ export default function CoordinatorDashboard({ user, logout }) {
           <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Coordinator Dashboard</h1>
           <p className="text-gray-600 mt-2">Coordinate free tuition support - manage batches and assign volunteer tutors</p>
         </div>
-        <div className="mb-4 flex justify-end items-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAvailabilityDialogOpen(true)}
-          >
-            Manage Availability
-          </Button>
-        </div>
 
 
 
