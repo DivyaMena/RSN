@@ -782,7 +782,7 @@ export default function AdminDashboard({ user, logout }) {
                           <p className="text-sm text-gray-600">
                             {assignment.assignment_type === 'class' && `Class ${assignment.class_level}`}
                             {assignment.assignment_type === 'class_subject' && `Class ${assignment.class_level} - ${assignment.subject}`}
-                            {assignment.assignment_type === 'batch_range' && `Batches: ${assignment.batch_start} to ${assignment.batch_end}`}
+                            {assignment.assignment_type === 'batch_range' && `Class ${assignment.class_level} ${assignment.subject}: ${assignment.batch_start} to ${assignment.batch_end}`}
                           </p>
                         </div>
                         <Button
@@ -790,7 +790,8 @@ export default function AdminDashboard({ user, logout }) {
                           variant="destructive"
                           onClick={() => handleDeleteAssignment(assignment.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Unassign
                         </Button>
                       </div>
                     ))}
