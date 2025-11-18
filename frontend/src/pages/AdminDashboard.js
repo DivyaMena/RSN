@@ -638,28 +638,43 @@ export default function AdminDashboard({ user, logout }) {
                       {coordinatorAssignments.length === 0 ? (
                         <p className="text-center text-gray-500 py-8">No coordinator assignments found</p>
                       ) : (
-                        <div className="max-h-96 overflow-y-auto space-y-2">
-                          {coordinatorAssignments.map((assignment) => (
-                            <div key={assignment.id} className="flex justify-between items-center p-4 bg-red-50 border border-red-200 rounded-lg">
-                              <div>
-                                <p className="font-semibold text-red-900">{assignment.coordinator?.name}</p>
-                                <p className="text-sm text-red-700">
-                                  {assignment.assignment_type === 'class' && `Class ${assignment.class_level}`}
-                                  {assignment.assignment_type === 'class_subject' && `Class ${assignment.class_level} - ${assignment.subject}`}
-                                  {assignment.assignment_type === 'batch_range' && `Class ${assignment.class_level} ${assignment.subject}: ${assignment.batch_start} to ${assignment.batch_end}`}
-                                </p>
+                        <>
+                          <div className="flex justify-between items-center">
+                            <p className="text-sm text-gray-600">
+                              {coordinatorAssignments.length} assignment(s) found
+                            </p>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={handleBulkUnassign}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove All
+                            </Button>
+                          </div>
+                          <div className="max-h-96 overflow-y-auto space-y-2">
+                            {coordinatorAssignments.map((assignment) => (
+                              <div key={assignment.id} className="flex justify-between items-center p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <div>
+                                  <p className="font-semibold text-red-900">{assignment.coordinator?.name}</p>
+                                  <p className="text-sm text-red-700">
+                                    {assignment.assignment_type === 'class' && `Class ${assignment.class_level}`}
+                                    {assignment.assignment_type === 'class_subject' && `Class ${assignment.class_level} - ${assignment.subject}`}
+                                    {assignment.assignment_type === 'batch_range' && `Class ${assignment.class_level} ${assignment.subject}: ${assignment.batch_start} to ${assignment.batch_end}`}
+                                  </p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteAssignment(assignment.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Remove
+                                </Button>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteAssignment(assignment.id)}
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Remove
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                        </>
                       )}
                     </div>
                   </DialogContent>
