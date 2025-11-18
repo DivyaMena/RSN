@@ -1994,9 +1994,10 @@ async def update_my_user_profile(
 @api_router.put("/students/me/profile")
 async def update_my_student_profile(
     subjects: Optional[List[str]] = None,
+    school_name: Optional[str] = None,
     request: Request = None
 ):
-    """Update student profile (subjects only) - restricted to once every 15 days"""
+    """Update student profile (subjects and school_name) - restricted to once every 15 days"""
     user = await require_auth(request)
     
     if user.role != "student":
