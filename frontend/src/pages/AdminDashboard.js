@@ -324,6 +324,24 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  const handleBulkUnassign = async () => {
+    if (!confirm('Are you sure you want to remove ALL coordinator assignments?')) return;
+
+    try {
+      // Delete all assignments one by one
+      for (const assignment of coordinatorAssignments) {
+        await axios.delete(`${API}/admin/coordinator-assignments/${assignment.id}`, {
+          withCredentials: true
+        });
+      }
+      toast.success('All assignments removed');
+      fetchCoordinatorAssignments();
+      setShowUnassignCoordinatorDialog(false);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to remove assignments');
+    }
+  };
+
   const filteredCoordinators = coordinatorFilter === 'all' 
     ? coordinators 
     : coordinators.filter(c => c.status === coordinatorFilter || c.approval_status === coordinatorFilter);
