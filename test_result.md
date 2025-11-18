@@ -523,10 +523,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Frontend: Verify Tutor Registration for React rendering errors"
-    - "Frontend: Implement Tutor status management UI in Tutor Dashboard"
-    - "Backend: Implement notification system endpoints"
-    - "Frontend: Implement notification system UI"
+    - "Backend: Test Tutor profile update endpoint with 15-day cooldown"
+    - "Backend: Test Coordinator/Parent profile update endpoint with 15-day cooldown"
+    - "Backend: Test Student profile update endpoint with 15-day cooldown"
+    - "Frontend: Test Tutor Profile page functionality"
+    - "Frontend: Test Coordinator Profile page functionality"
+    - "Frontend: Test Student Profile page functionality"
+    - "Frontend: Test Parent Profile page functionality"
+    - "Frontend: Test Admin Profile page (read-only)"
+    - "Frontend: Test My Profile buttons in all dashboards"
+    - "Frontend: Test profile routing based on user role"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
