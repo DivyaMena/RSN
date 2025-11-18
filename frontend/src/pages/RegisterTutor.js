@@ -287,41 +287,68 @@ export default function RegisterTutor({ setUser }) {
             </div>
           </div>
 
-          {/* Classes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Classes You Can Teach *</label>
-            <div className="grid grid-cols-5 gap-3">
-              {CLASSES.map(cls => (
-                <div key={cls} className="flex items-center space-x-2">
-                  <Checkbox
-                    data-testid={`class-${cls}-checkbox`}
-                    id={`class-${cls}`}
-                    checked={formData.classes_can_teach.includes(cls)}
-                    onCheckedChange={() => toggleItem(cls, 'classes_can_teach')}
-                  />
-                  <label htmlFor={`class-${cls}`} className="text-sm cursor-pointer">Class {cls}</label>
+          {/* Academic Courses Section */}
+          {(formData.teaching_preference === 'academic' || formData.teaching_preference === 'both') && (
+            <>
+              {/* Classes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Classes You Can Teach *</label>
+                <div className="grid grid-cols-5 gap-3">
+                  {CLASSES.map(cls => (
+                    <div key={cls} className="flex items-center space-x-2">
+                      <Checkbox
+                        data-testid={`class-${cls}-checkbox`}
+                        id={`class-${cls}`}
+                        checked={formData.classes_can_teach.includes(cls)}
+                        onCheckedChange={() => toggleItem(cls, 'classes_can_teach')}
+                      />
+                      <label htmlFor={`class-${cls}`} className="text-sm cursor-pointer">Class {cls}</label>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Subjects */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Subjects You Can Teach *</label>
-            <div className="space-y-2">
-              {SUBJECTS.map(subject => (
-                <div key={subject.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    data-testid={`subject-${subject.value}-checkbox`}
-                    id={`subject-${subject.value}`}
-                    checked={formData.subjects_can_teach.includes(subject.value)}
-                    onCheckedChange={() => toggleItem(subject.value, 'subjects_can_teach')}
-                  />
-                  <label htmlFor={`subject-${subject.value}`} className="text-sm cursor-pointer">{subject.label}</label>
+              {/* Academic Subjects */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Academic Subjects You Can Teach *</label>
+                <div className="space-y-2">
+                  {ACADEMIC_SUBJECTS.map(subject => (
+                    <div key={subject.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        data-testid={`subject-${subject.value}-checkbox`}
+                        id={`subject-${subject.value}`}
+                        checked={formData.subjects_can_teach.includes(subject.value)}
+                        onCheckedChange={() => toggleItem(subject.value, 'subjects_can_teach')}
+                      />
+                      <label htmlFor={`subject-${subject.value}`} className="text-sm cursor-pointer">{subject.label}</label>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            </>
+          )}
+
+          {/* Non-Academic Courses Section */}
+          {(formData.teaching_preference === 'non_academic' || formData.teaching_preference === 'both') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Non-Academic Courses You Can Teach *</label>
+              <div className="grid grid-cols-2 gap-3 p-4 bg-purple-50 rounded-lg">
+                {NON_ACADEMIC_COURSES.map(course => (
+                  <div key={course.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`course-${course.value}`}
+                      checked={formData.non_academic_courses.includes(course.value)}
+                      onCheckedChange={() => toggleItem(course.value, 'non_academic_courses')}
+                    />
+                    <label htmlFor={`course-${course.value}`} className="text-sm cursor-pointer">{course.label}</label>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Chess, Rubik's Cube, Confidence Club, Career Guidance
+              </p>
             </div>
-          </div>
+          )}
 
           {/* Preferred Slot */}
           <div>
