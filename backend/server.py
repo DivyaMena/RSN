@@ -69,6 +69,7 @@ class Student(BaseModel):
     name: str
     student_code: str  # RSN-TS-S-2025-12345
     aadhaar_number: str  # 12-digit Aadhaar
+    dob: Optional[str] = None  # Date of birth (used as password for student login)
     photo_url: Optional[str] = None  # Student photo/selfie
     class_level: int  # 6-10
     board: str  # TS, AP, TN
