@@ -104,8 +104,8 @@ export default function Login() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center">
             {isLoginMode ? 'Login to Your Account' : 'Create New Account'}
           </h2>
 
