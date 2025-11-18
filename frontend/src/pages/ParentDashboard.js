@@ -138,6 +138,20 @@ export default function ParentDashboard({ user, logout }) {
     return batches.filter(batch => batch.student_ids.includes(studentId));
   };
 
+  const handleDeleteStudent = async () => {
+    if (!studentToDelete) return;
+    
+    try {
+      await axios.delete(`${API}/students/${studentToDelete.id}`, { withCredentials: true });
+      toast.success('Student deleted successfully');
+      setDeleteDialogOpen(false);
+      setStudentToDelete(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete student');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
