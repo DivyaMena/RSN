@@ -54,6 +54,7 @@ class User(BaseModel):
     availability_status: Optional[str] = None  # for coordinator/admin availability
     unavailable_from: Optional[str] = None
     unavailable_to: Optional[str] = None
+    last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated (for coordinator)
 
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
