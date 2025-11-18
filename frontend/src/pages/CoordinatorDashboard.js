@@ -726,7 +726,8 @@ export default function CoordinatorDashboard({ user, logout }) {
                     </div>
                   </div>
                 </div>
-              ))}
+                    );
+                  })}
             </div>
           )}
         </div>
