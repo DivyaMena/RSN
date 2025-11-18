@@ -66,14 +66,16 @@ export default function CoordinatorDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
-      const [batchesRes, tutorsRes, pendingRes] = await Promise.all([
+      const [batchesRes, tutorsRes, pendingRes, pendingSchoolsRes] = await Promise.all([
         axios.get(`${API}/batches`, { withCredentials: true }),
         axios.get(`${API}/tutors`, { withCredentials: true }),
-        axios.get(`${API}/tutors/pending`, { withCredentials: true }).catch(() => ({ data: [] }))
+        axios.get(`${API}/tutors/pending`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/coordinator/schools/pending`, { withCredentials: true }).catch(() => ({ data: [] }))
       ]);
       setBatches(batchesRes.data);
       setTutors(tutorsRes.data);
       setPendingTutors(pendingRes.data);
+      setPendingSchools(pendingSchoolsRes.data);
       
       // Fetch assignments for each batch
       const assignments = {};
