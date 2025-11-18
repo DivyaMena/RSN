@@ -135,6 +135,13 @@ export default function ParentDashboard({ user, logout }) {
     { value: 'ENG', label: 'English' }
   ];
 
+  const NON_ACADEMIC_COURSES = [
+    { value: 'CHS', label: 'Chess' },
+    { value: 'CUB', label: "Rubik's Cube" },
+    { value: 'CON', label: 'Confidence Club' },
+    { value: 'CAR', label: 'Career Guidance' }
+  ];
+
   const getStudentBatches = (studentId) => {
     return batches.filter(batch => batch.student_ids.includes(studentId));
   };
