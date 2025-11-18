@@ -354,6 +354,29 @@ class CreateBatchInput(BaseModel):
     subject: str
     board: str
 
+class BulkDeleteInput(BaseModel):
+    ids: List[str]  # List of entity IDs to delete
+
+class CreateStateBoardInput(BaseModel):
+    name: str
+    code: str
+    description: Optional[str] = None
+
+class UpdateStateBoardInput(BaseModel):
+    name: Optional[str] = None
+    code: Optional[str] = None
+    description: Optional[str] = None
+
+class RegisterSchoolInput(BaseModel):
+    school_name: str
+    principal_name: str
+    email: EmailStr
+    phone: str
+    address: str
+    city: str
+    state: str
+    pincode: str
+
 # ============= HELPER FUNCTIONS =============
 
 def generate_user_code(state: str, role: str) -> str:
