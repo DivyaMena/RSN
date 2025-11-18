@@ -1540,11 +1540,13 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
     if not tutor:
         raise HTTPException(status_code=404, detail="Tutor not found")
     
-    # Find existing assignment (if any)
-    existing = await db.batch_tutor_assignments.find_one({
+    # Find existing assignment (if any) - use the most recent one
+    existing_cursor = db.batch_tutor_assignments.find({
         "batch_id": input.batch_id,
         "tutor_id": input.tutor_id
-    })
+    }).sort("created_at", -1)
+    existing = await existing_cursor.to_list(length=1)
+    existing = existing[0] if existing else None
 
     # Ensure global schedule exists on batch
     if not batch.get("schedule_slots"):
