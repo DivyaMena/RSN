@@ -1265,7 +1265,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                     </SelectItem>
       {/* Coordinator Availability Dialog - Submit Request to Admin */}
       <Dialog open={availabilityDialogOpen} onOpenChange={setAvailabilityDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Manage Availability</DialogTitle>
             <DialogDescription>
