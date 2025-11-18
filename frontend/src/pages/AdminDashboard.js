@@ -118,6 +118,7 @@ export default function AdminDashboard({ user, logout }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteType, setDeleteType] = useState('');
   const [idsToDelete, setIdsToDelete] = useState([]);
+  const [deleteWarningMessage, setDeleteWarningMessage] = useState('');
 
   // State Board form
   const [showAddBoardDialog, setShowAddBoardDialog] = useState(false);
