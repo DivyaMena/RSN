@@ -1280,46 +1280,82 @@ export default function CoordinatorDashboard({ user, logout }) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <Select value={availabilityRequestType} onValueChange={setAvailabilityRequestType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select availability option" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="available">I am Available</SelectItem>
-                <SelectItem value="unavailable">I am Unavailable from a date to a date</SelectItem>
-                <SelectItem value="delete_account">Delete my account</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {availabilityRequestType === 'unavailable' && (
-              <div className="space-y-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm font-medium text-gray-700">Unavailability Period</p>
-                <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4">
+              <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => setAvailabilityRequestType('available')}>
+                <div className="flex items-start">
+                  <input 
+                    type="radio" 
+                    checked={availabilityRequestType === 'available'} 
+                    onChange={() => setAvailabilityRequestType('available')}
+                    className="mt-1 mr-3"
+                  />
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
-                    <Input
-                      type="date"
-                      value={availabilityRequestFrom}
-                      onChange={(e) => setAvailabilityRequestFrom(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
-                    <Input
-                      type="date"
-                      value={availabilityRequestTo}
-                      onChange={(e) => setAvailabilityRequestTo(e.target.value)}
-                    />
+                    <p className="font-semibold text-gray-900">Available</p>
+                    <p className="text-sm text-gray-600">I am ready to teach and take new batches</p>
                   </div>
                 </div>
               </div>
-            )}
 
-            {availabilityRequestType === 'delete_account' && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                ⚠️ This will send a request to Admin to delete your coordinator account and reassign your batches.
+              <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => setAvailabilityRequestType('unavailable')}>
+                <div className="flex items-start">
+                  <input 
+                    type="radio" 
+                    checked={availabilityRequestType === 'unavailable'} 
+                    onChange={() => setAvailabilityRequestType('unavailable')}
+                    className="mt-1 mr-3"
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">Temporarily Unavailable</p>
+                    <p className="text-sm text-gray-600">I need a break for a specific period</p>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {availabilityRequestType === 'unavailable' && (
+                <div className="ml-8 space-y-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm font-semibold text-gray-700">Unavailability Period</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">From Date</label>
+                      <Input
+                        type="date"
+                        value={availabilityRequestFrom}
+                        onChange={(e) => setAvailabilityRequestFrom(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">To Date</label>
+                      <Input
+                        type="date"
+                        value={availabilityRequestTo}
+                        onChange={(e) => setAvailabilityRequestTo(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="border border-red-200 rounded-lg p-4 hover:bg-red-50 cursor-pointer" onClick={() => setAvailabilityRequestType('delete_account')}>
+                <div className="flex items-start">
+                  <input 
+                    type="radio" 
+                    checked={availabilityRequestType === 'delete_account'} 
+                    onChange={() => setAvailabilityRequestType('delete_account')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold text-red-900">Not Interested / Delete Account</p>
+                    <p className="text-sm text-red-700">I no longer wish to volunteer</p>
+                  </div>
+                </div>
+              </div>
+
+              {availabilityRequestType === 'delete_account' && (
+                <div className="ml-8 p-4 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800">
+                  ⚠️ <strong>Warning:</strong> This will send a request to Admin to delete your account and reassign your batches.
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end space-x-3 mt-2">
               <Button variant="outline" onClick={() => setAvailabilityDialogOpen(false)}>
