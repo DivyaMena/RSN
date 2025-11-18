@@ -256,6 +256,30 @@ export default function CoordinatorDashboard({ user, logout }) {
     setStatusChangeDialogOpen(true);
   };
 
+  const handleApproveSchool = async (schoolId) => {
+    try {
+      await axios.put(`${API}/coordinator/schools/${schoolId}/approve`, {}, {
+        withCredentials: true
+      });
+      toast.success('School approved successfully');
+      fetchData(); // Refresh data
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to approve school');
+    }
+  };
+
+  const handleRejectSchool = async (schoolId) => {
+    try {
+      await axios.put(`${API}/coordinator/schools/${schoolId}/reject`, {}, {
+        withCredentials: true
+      });
+      toast.success('School rejected');
+      fetchData(); // Refresh data
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to reject school');
+    }
+  };
+
   // Group batches by class
   const groupedBatches = batches.reduce((acc, batch) => {
     const classKey = `class_${batch.class_level}`;
