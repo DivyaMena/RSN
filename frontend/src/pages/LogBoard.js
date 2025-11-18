@@ -327,14 +327,53 @@ export default function LogBoard({ user, logout }) {
                     <DialogTitle>Create Log Board Entry</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Show batch schedule and assigned days */}
+                    {user.role === 'tutor' && batch && batch.schedule_slots && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p className="text-sm font-semibold text-gray-900 mb-2">Batch Schedule:</p>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {batch.schedule_slots.map((slot, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
+                            >
+                              {slot.day.substring(0, 3)} {slot.slot}
+                            </span>
+                          ))}
+                        </div>
+                        {myAssignedDays.length > 0 && (
+                          <>
+                            <p className="text-sm font-semibold text-green-700 mb-2">Your Assigned Days:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {myAssignedDays.map((day, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700 border border-green-300"
+                                >
+                                  {day} ✓
+                                </span>
+                              ))}
+                            </div>
+                            <p className="text-xs text-gray-600 mt-2">You can only create log entries for dates that fall on your assigned days.</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    
                     <div>
-                      <label className="block text-sm font-medium mb-2">Date</label>
+                      <label className="block text-sm font-medium mb-2">Date *</label>
                       <Input
                         data-testid="log-date-input"
                         type="date"
                         value={formData.date}
                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        className={!isValidDate(formData.date) && user.role === 'tutor' ? 'border-red-500' : ''}
                       />
+                      {user.role === 'tutor' && !isValidDate(formData.date) && (
+                        <p className="text-xs text-red-600 mt-1">
+                          ⚠️ This date doesn't match your assigned days ({myAssignedDays.join(', ')})
+                        </p>
+                      )}
                     </div>
 
                     <div>
