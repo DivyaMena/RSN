@@ -107,6 +107,17 @@ export default function CoordinatorDashboard({ user, logout }) {
       return;
     }
 
+    // Validate that all selected days are in the batch schedule
+    const batchDays = selectedBatch?.schedule_slots ? 
+      new Set(selectedBatch.schedule_slots.map(s => s.day)) : 
+      new Set();
+    
+    const invalidDays = selectedDays.filter(day => !batchDays.has(day));
+    if (invalidDays.length > 0) {
+      toast.error(`Cannot assign to ${invalidDays.join(', ')}. Not in batch schedule.`);
+      return;
+    }
+
     try {
       await axios.post(
         `${API}/batches/assign-tutor`,
@@ -123,6 +134,8 @@ export default function CoordinatorDashboard({ user, logout }) {
       setSelectedBatch(null);
       setSelectedTutor('');
       setSelectedDays([]);
+      setSelectedTutorData(null);
+      setAvailableTutorsForBatch([]);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to assign tutor');
