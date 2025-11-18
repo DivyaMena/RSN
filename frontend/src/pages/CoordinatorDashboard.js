@@ -884,7 +884,9 @@ export default function CoordinatorDashboard({ user, logout }) {
                         htmlFor={`assign-day-${day}`} 
                         className={`text-sm ${isDisabled ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer'}`}
                       >
-                        {day} {!isAvailable && selectedTutorData && '(Not available)'}
+                        {day}
+                        {!isInBatchSchedule && ' (Not in batch schedule)'}
+                        {isInBatchSchedule && !isAvailable && selectedTutorData && ' (Tutor not available)'}
                       </label>
                     </div>
                   );
