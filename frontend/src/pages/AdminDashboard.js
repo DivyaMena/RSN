@@ -390,6 +390,10 @@ export default function AdminDashboard({ user, logout }) {
                 {user.is_main_admin ? 'Main Admin' : 'Co-Admin'}
               </p>
             </div>
+            <Button onClick={() => window.location.href = '/profile'} variant="outline" size="sm">
+              <User className="h-4 w-4 mr-2" />
+              My Profile
+            </Button>
             <Button onClick={logout} variant="outline" size="sm">
               <LogOut className="h-4 w-4 mr-2" />
               Logout
