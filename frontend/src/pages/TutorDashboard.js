@@ -149,30 +149,67 @@ export default function TutorDashboard({ user, logout }) {
         </div>
 
         {/* Tutor Status Card */}
-        {tutorProfile && (
-          <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Your Status</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Current availability: <span className={`font-semibold capitalize ${
-                    tutorProfile.availability_status === 'available' ? 'text-green-600' :
-                    tutorProfile.availability_status === 'unavailable' ? 'text-yellow-600' :
-                    'text-red-600'
-                  }`}>
-                    {tutorProfile.availability_status === 'not_interested' ? 'Not Interested' : tutorProfile.availability_status}
-                  </span>
-                </p>
-                {tutorProfile.availability_status === 'unavailable' && tutorProfile.unavailable_from && (
+        {tutorProfile && (() => {
+          // Calculate actual current availability based on dates
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          let actualStatus = tutorProfile.availability_status;
+          let isCurrentlyUnavailable = false;
+          
+          if (tutorProfile.unavailable_from && tutorProfile.unavailable_to) {
+            const fromDate = new Date(tutorProfile.unavailable_from);
+            fromDate.setHours(0, 0, 0, 0);
+            const toDate = new Date(tutorProfile.unavailable_to);
+            toDate.setHours(0, 0, 0, 0);
+            
+            // Check if today falls within the unavailable range
+            if (today >= fromDate && today <= toDate) {
+              actualStatus = 'unavailable';
+              isCurrentlyUnavailable = true;
+            } else if (today < fromDate) {
+              // Future unavailability - currently available
+              actualStatus = 'available';
+            } else if (today > toDate) {
+              // Past unavailability - currently available
+              actualStatus = 'available';
+            }
+          }
+          
+          return (
+            <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Your Status</h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span>
+                    Today's Date: <span className="font-medium">{today.toISOString().split('T')[0]}</span>
                   </p>
-                )}
+                  <p className="text-sm text-gray-600 mt-1">
+                    Current availability: <span className={`font-semibold capitalize ${
+                      actualStatus === 'available' ? 'text-green-600' :
+                      actualStatus === 'unavailable' ? 'text-yellow-600' :
+                      'text-red-600'
+                    }`}>
+                      {actualStatus === 'not_interested' ? 'Not Interested' : actualStatus}
+                    </span>
+                  </p>
+                  {tutorProfile.unavailable_from && tutorProfile.unavailable_to && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {isCurrentlyUnavailable ? (
+                        <>Unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
+                      ) : today < new Date(tutorProfile.unavailable_from) ? (
+                        <>Will be unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
+                      ) : (
+                        <>Was unavailable from <span className="font-medium">{tutorProfile.unavailable_from}</span> to <span className="font-medium">{tutorProfile.unavailable_to}</span></>
+                      )}
+                    </p>
+                  )}
+                </div>
+                <Calendar className="h-8 w-8 text-blue-600" />
               </div>
-              <Calendar className="h-8 w-8 text-blue-600" />
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {batches.length === 0 ? (
           <div data-testid="no-batches-message" className="text-center py-20">
