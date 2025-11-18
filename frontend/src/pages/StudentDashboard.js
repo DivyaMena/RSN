@@ -2,8 +2,19 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
-import { BookOpen, LogOut, ArrowLeft } from 'lucide-react';
+import { BookOpen, LogOut, ArrowLeft, GraduationCap, Trophy, Send, ExternalLink, Video } from 'lucide-react';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
+import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,8 +24,15 @@ const SUBJECTS = {
   'PHY': 'Physics',
   'SCI': 'Science',
   'BIO': 'Biology',
-  'ENG': 'English'
+  'ENG': 'English',
+  'CHESS': 'Chess',
+  'RUBIKS': "Rubik's Cube",
+  'CONFIDENCE': 'Confidence Club',
+  'CAREER': 'Career Guidance'
 };
+
+const ACADEMIC_SUBJECTS = ['MAT', 'PHY', 'SCI', 'BIO', 'ENG'];
+const NON_ACADEMIC_SUBJECTS = ['CHESS', 'RUBIKS', 'CONFIDENCE', 'CAREER'];
 
 export default function StudentDashboard({ user, logout }) {
   const { studentId } = useParams();
