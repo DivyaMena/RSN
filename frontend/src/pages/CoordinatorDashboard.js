@@ -683,8 +683,16 @@ export default function CoordinatorDashboard({ user, logout }) {
                     <div className="flex space-x-2">
                       <Button
                         data-testid={`assign-tutor-${batch.id}`}
-                        onClick={() => {
+                        onClick={async () => {
                           setSelectedBatch(batch);
+                          // Fetch available tutors for this batch
+                          try {
+                            const res = await axios.get(`${API}/batches/${batch.id}/available-tutors`, { withCredentials: true });
+                            setAvailableTutorsForBatch(res.data);
+                          } catch (error) {
+                            console.error('Failed to fetch available tutors:', error);
+                            setAvailableTutorsForBatch([]);
+                          }
                           setAssignDialogOpen(true);
                         }}
                         variant="outline"
