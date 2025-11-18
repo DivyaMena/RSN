@@ -234,6 +234,45 @@ export default function StudentDashboard({ user, logout }) {
           <p className="text-gray-600">Code: {student.student_code} | Class {student.class_level} | {student.board} Board</p>
         </div>
 
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Batches</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{batches.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Academic Batches</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{academicBatches.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Non-Academic Batches</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">{nonAcademicBatches.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Quick Actions</h2>
+          <div className="flex gap-4">
+            <Button onClick={() => setShowRemedialDialog(true)} className="bg-gradient-to-r from-orange-500 to-red-500">
+              <Send className="h-4 w-4 mr-2" />
+              Request Remedial Class
+            </Button>
+          </div>
+        </div>
+
         {/* Batches */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>My Batches</h2>
@@ -245,16 +284,67 @@ export default function StudentDashboard({ user, logout }) {
                 <div
                   key={batch.id}
                   data-testid={`batch-${batch.id}`}
-                  className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/logboard/${batch.id}`)}
+                  className="bg-white rounded-xl shadow-lg p-6"
                 >
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{batch.batch_code}</h3>
                       <p className="text-gray-600">{SUBJECTS[batch.subject]} | Status: {batch.status}</p>
+                      <p className="text-sm text-gray-500">Class {batch.class_level} | {batch.board} Board</p>
                     </div>
-                    <Button data-testid={`view-logboard-${batch.id}`} variant="outline">View Log Board</Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => handleJoinClass(batch)} 
+                        variant="outline" 
+                        size="sm"
+                        className="bg-green-50 hover:bg-green-100"
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        Join Class
+                      </Button>
+                      <Button 
+                        data-testid={`view-logboard-${batch.id}`} 
+                        onClick={() => navigate(`/logboard/${batch.id}`)} 
+                        variant="outline"
+                        size="sm"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        View Log Board
+                      </Button>
+                    </div>
                   </div>
+                  
+                  {/* Tutor Information */}
+                  {batchTutors[batch.id] && batchTutors[batch.id].length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                        <GraduationCap className="h-5 w-5 mr-2 text-blue-600" />
+                        Your Tutors
+                      </h4>
+                      <div className="space-y-3">
+                        {batchTutors[batch.id].map(tutor => (
+                          <div key={tutor.id} className="bg-blue-50 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              {tutor.photo_url ? (
+                                <img src={tutor.photo_url} alt={tutor.name} className="w-12 h-12 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center">
+                                  <GraduationCap className="h-6 w-6 text-blue-600" />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900">{tutor.name}</p>
+                                <p className="text-sm text-gray-600">{tutor.tutor_code}</p>
+                                {tutor.about_yourself && (
+                                  <p className="text-sm text-gray-700 mt-2 italic">"{tutor.about_yourself}"</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
