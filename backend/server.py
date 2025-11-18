@@ -1722,6 +1722,19 @@ async def create_log_entry(input: CreateLogEntryInput, request: Request):
     if user.role != "tutor":
         raise HTTPException(status_code=403, detail="Only tutors can create log entries")
     
+    # Validate Google Meet URL
+    if input.google_meet_link:
+        google_meet_link = input.google_meet_link.strip()
+        valid_patterns = [
+            google_meet_link.startswith("https://meet.google.com/"),
+            google_meet_link.startswith("http://meet.google.com/")
+        ]
+        if not any(valid_patterns):
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid Google Meet URL. URL must start with 'https://meet.google.com/' or 'http://meet.google.com/'"
+            )
+    
     # Get tutor profile
     tutor = await db.tutors.find_one({"user_id": user.id})
     if not tutor:
