@@ -1789,6 +1789,19 @@ async def update_log_entry(entry_id: str, input: UpdateLogEntryInput, request: R
     if not entry:
         raise HTTPException(status_code=404, detail="Log entry not found")
     
+    # Validate Google Meet URL if provided
+    if input.google_meet_link:
+        google_meet_link = input.google_meet_link.strip()
+        valid_patterns = [
+            google_meet_link.startswith("https://meet.google.com/"),
+            google_meet_link.startswith("http://meet.google.com/")
+        ]
+        if not any(valid_patterns):
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid Google Meet URL. URL must start with 'https://meet.google.com/' or 'http://meet.google.com/'"
+            )
+    
     update_data = {k: v for k, v in input.model_dump().items() if v is not None}
     
     if update_data:
