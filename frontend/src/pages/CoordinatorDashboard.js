@@ -964,46 +964,123 @@ export default function CoordinatorDashboard({ user, logout }) {
         </div>
       </TabsContent>
 
-      {/* Pending Tutors Tab */}
+      {/* Pending Approvals Tab - All Pending Items */}
       <TabsContent value="pending">
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Pending Tutor Approvals</h2>
-          {pendingTutors.length === 0 ? (
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Pending Approvals</h2>
+          
+          {(pendingTutors.length === 0 && pendingSchools.length === 0 && remedialRequests.filter(r => r.status === 'pending').length === 0) ? (
             <div className="text-center py-20">
               <UserCheck className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No pending approvals</h3>
-              <p className="text-gray-600">All tutor applications have been reviewed</p>
+              <p className="text-gray-600">All items have been reviewed</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {pendingTutors.map(tutorData => (
-                <div key={tutorData.tutor.id} className="border rounded-lg p-6 hover:bg-gray-50">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
-                      <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
-                      <p className="text-sm text-gray-600 mt-2">
-                        <strong>Board:</strong> {tutorData.tutor.board_preference} | 
-                        <strong className="ml-2">Classes:</strong> {tutorData.tutor.classes_can_teach?.join(', ')} | 
-                        <strong className="ml-2">Subjects:</strong> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
-                      </p>
-                      <p className="text-sm text-gray-600"><strong>Available Days:</strong> {tutorData.tutor.available_days?.join(', ')}</p>
-                      <p className="text-sm text-gray-600 mt-1"><strong>Address:</strong> {tutorData.tutor.current_address || 'Not provided'}</p>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setCurrentTutor(tutorData);
-                        setTutorApprovalDialogOpen(true);
-                      }}
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Review Application
-                    </Button>
+            <div className="space-y-8">
+              {/* Pending Tutors */}
+              {pendingTutors.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <UserCheck className="h-5 w-5" />
+                    Pending Tutor Approvals ({pendingTutors.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {pendingTutors.map(tutorData => (
+                      <div key={tutorData.tutor.id} className="border rounded-lg p-4 hover:bg-gray-50 bg-yellow-50 border-yellow-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="font-bold text-gray-900">{tutorData.user?.name}</h4>
+                            <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              <strong>Board:</strong> {tutorData.tutor.board_preference} | 
+                              <strong className="ml-2">Classes:</strong> {tutorData.tutor.classes_can_teach?.join(', ')} | 
+                              <strong className="ml-2">Subjects:</strong> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
+                            </p>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              setCurrentTutor(tutorData);
+                              setTutorApprovalDialogOpen(true);
+                            }}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Review
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
+              
+              {/* Pending Schools */}
+              {pendingSchools.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <School className="h-5 w-5" />
+                    Pending School Approvals ({pendingSchools.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {pendingSchools.map(school => (
+                      <div key={school.id} className="border rounded-lg p-4 hover:bg-gray-50 bg-yellow-50 border-yellow-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="font-bold text-gray-900">{school.school_name}</h4>
+                            <p className="text-sm text-gray-600">{school.city}, {school.state} | Classes {school.class_from}-{school.class_to}</p>
+                            <p className="text-sm text-gray-600">Principal: {school.principal_name}</p>
+                          </div>
+                          <Button
+                            onClick={() => setActiveTab('schools')}
+                            size="sm"
+                            variant="outline"
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Pending Remedial Requests */}
+              {remedialRequests.filter(r => r.status === 'pending').length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    Pending Remedial Requests ({remedialRequests.filter(r => r.status === 'pending').length})
+                  </h3>
+                  <div className="space-y-3">
+                    {remedialRequests.filter(r => r.status === 'pending').slice(0, 5).map(req => (
+                      <div key={req.id} className="border rounded-lg p-4 hover:bg-gray-50 bg-yellow-50 border-yellow-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">
+                              {req.board} - Class {req.class_level} - {SUBJECTS[req.subject] || req.subject}
+                            </p>
+                            <p className="text-sm text-gray-600">Topic: {req.topic}</p>
+                            <p className="text-xs text-gray-500 mt-1">Student ID: {req.student_id}</p>
+                          </div>
+                          <Button
+                            onClick={() => setActiveTab('remedial')}
+                            size="sm"
+                            variant="outline"
+                          >
+                            View All
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {remedialRequests.filter(r => r.status === 'pending').length > 5 && (
+                      <p className="text-sm text-gray-500 text-center">
+                        +{remedialRequests.filter(r => r.status === 'pending').length - 5} more remedial requests
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
