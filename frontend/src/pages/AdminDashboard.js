@@ -656,7 +656,7 @@ export default function AdminDashboard({ user, logout }) {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-10 gap-2 bg-white p-2 rounded-lg shadow-sm">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1 sm:gap-2 bg-white p-2 rounded-lg shadow-sm overflow-x-auto">
             <TabsTrigger value="overview" className="text-xs">
               <BarChart3 className="h-4 w-4 mr-1" />
               Overview
