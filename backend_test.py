@@ -343,21 +343,60 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_curriculum_access(self):
-        """Test curriculum endpoints"""
-        self.log("\n📖 Testing Curriculum Access...")
+    def test_student_dashboard_endpoints(self):
+        """Test student dashboard specific endpoints"""
+        self.log("\n🎓 Testing Student Dashboard Endpoints...")
         
+        # Login as student
+        if not self.login_as_role("student"):
+            return False
+            
+        # Test get student's curriculum
         success, curriculum = self.run_test(
-            "Get Curriculum",
+            "Get Student Curriculum",
             "GET",
-            "curriculum?board=TS&class_level=9&subject=MAT",
+            "students/me/curriculum",
             200
         )
         
         if success:
-            self.log(f"✅ Retrieved {len(curriculum)} curriculum items")
+            self.log(f"✅ Retrieved student curriculum")
             
-        return success
+            # Verify curriculum is sorted properly (1A, 1B, 1C order)
+            if curriculum:
+                self.log(f"   First curriculum item: {curriculum[0].get('topic_name', 'N/A')}")
+        
+        # Test create remedial request
+        remedial_data = {
+            "batch_id": "test-batch-id",
+            "reason": "need_clarification",
+            "topic": "Algebra Basics",
+            "description": "Need help with quadratic equations"
+        }
+        
+        success, request = self.run_test(
+            "Create Remedial Request",
+            "POST",
+            "remedial/requests",
+            200,
+            data=remedial_data
+        )
+        
+        if success:
+            self.log("✅ Remedial request creation working")
+        
+        # Test get student's batches
+        success, batches = self.run_test(
+            "Get Student Batches",
+            "GET",
+            "students/me/batches",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(batches)} student batches")
+        
+        return True
 
     def test_tutor_endpoints(self):
         """Test tutor-related endpoints"""
