@@ -506,6 +506,42 @@ export default function TutorDashboard({ user, logout }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Student List Dialog */}
+      <Dialog open={studentListDialog.open} onOpenChange={(open) => setStudentListDialog({ ...studentListDialog, open })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Student List</DialogTitle>
+            <DialogDescription>
+              Students enrolled in this batch
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-3 max-h-96 overflow-y-auto">
+            {studentListDialog.students.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No students found</p>
+            ) : (
+              studentListDialog.students.map((student, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {student.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{student.name}</p>
+                      <p className="text-sm text-gray-600">{student.student_code}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Class {student.class_level}</p>
+                    <p className="text-xs text-gray-500">{student.school_name}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
