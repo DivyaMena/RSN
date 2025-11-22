@@ -1909,13 +1909,21 @@ export default function AdminDashboard({ user, logout }) {
                   )}
                   {curriculum.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No curriculum items found. Upload a CSV to get started!</p>
-                  ) : (
-                    curriculum
-                      .filter(item => 
-                        (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
-                        (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
-                      )
-                      .map((item) => (
+                  ) : (() => {
+                    const filteredCurriculum = curriculum.filter(item => 
+                      (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                      (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                    );
+                    
+                    if (filteredCurriculum.length === 0) {
+                      return (
+                        <p className="text-center text-gray-500 py-8">
+                          No curriculum items match the selected filters. Try changing your filter criteria.
+                        </p>
+                      );
+                    }
+                    
+                    return filteredCurriculum.map((item) => (
                       <div key={item.id}>
                         <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
                           <Checkbox
@@ -1946,8 +1954,8 @@ export default function AdminDashboard({ user, logout }) {
                           </div>
                         )}
                       </div>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </div>
               </CardContent>
             </Card>
