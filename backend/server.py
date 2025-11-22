@@ -2910,6 +2910,7 @@ async def update_my_student_profile(
     return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
 
 @api_router.get("/tutors")
+@api_router.get("/admin/tutors")
 async def get_tutors(request: Request):
     """Get all tutors (coordinator/admin only)"""
     user = await require_auth(request)
