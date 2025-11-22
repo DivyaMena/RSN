@@ -1940,11 +1940,20 @@ export default function AdminDashboard({ user, logout }) {
                   {curriculum.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No curriculum items found. Upload a CSV to get started!</p>
                   ) : (() => {
-                    const filteredCurriculum = curriculum.filter(item => 
-                      (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
-                      (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
-                      (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
-                    );
+                    const filteredCurriculum = curriculum
+                      .filter(item => 
+                        (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
+                        (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                        (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                      )
+                      .sort((a, b) => {
+                        // First sort by lesson number
+                        if (a.topic_number !== b.topic_number) {
+                          return a.topic_number - b.topic_number;
+                        }
+                        // Then sort alphabetically by topic name (handles A, B, C)
+                        return a.topic_name.localeCompare(b.topic_name);
+                      });
                     
                     if (filteredCurriculum.length === 0) {
                       return (
