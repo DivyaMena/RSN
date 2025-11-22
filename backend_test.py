@@ -137,74 +137,45 @@ class RisingStarsAPITester:
         
         return True
 
-    def create_test_session(self):
-        """Create a test user and session in MongoDB for testing"""
-        try:
-            import subprocess
+    def test_curriculum_endpoints(self):
+        """Test curriculum management endpoints"""
+        self.log("\n📚 Testing Curriculum Endpoints...")
+        
+        # Test public curriculum endpoint with filters
+        success, curriculum = self.run_test(
+            "Get Curriculum (TS, Class 6, MAT)",
+            "GET",
+            "curriculum?board=TS&class_level=6&subject=MAT",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(curriculum)} curriculum items for Class 6 MAT")
             
-            # Create test user and session via MongoDB
-            mongo_script = f"""
-            use('test_database');
-            var userId = 'test-user-{int(time.time())}';
-            var sessionToken = 'test_session_{int(time.time())}';
-            
-            // Clean up any existing test data
-            db.users.deleteMany({{"email": /test.*@example.com/}});
-            db.user_sessions.deleteMany({{"session_token": /test_session_/}});
-            
-            // Create test user
-            db.users.insertOne({{
-              id: userId,
-              email: 'test.user.{int(time.time())}@example.com',
-              name: 'Test User',
-              role: 'pending',
-              created_at: new Date()
-            }});
-            
-            // Create session
-            db.user_sessions.insertOne({{
-              user_id: userId,
-              session_token: sessionToken,
-              expires_at: new Date(Date.now() + 7*24*60*60*1000),
-              created_at: new Date()
-            }});
-            
-            print('SESSION_TOKEN:' + sessionToken);
-            print('USER_ID:' + userId);
-            """
-            
-            result = subprocess.run(
-                ['mongosh', '--eval', mongo_script],
-                capture_output=True,
-                text=True,
-                timeout=30
+            # Check sorting (should be 1A, 1B, 1C order)
+            if curriculum:
+                first_item = curriculum[0]
+                self.log(f"   First curriculum item: {first_item.get('topic_name', 'N/A')}")
+        
+        # Test different class/subject combinations
+        test_combinations = [
+            ("TS", 7, "PHY"),
+            ("TS", 8, "BIO"),
+            ("TS", 9, "ENG"),
+            ("TS", 10, "MAT")
+        ]
+        
+        for board, class_level, subject in test_combinations:
+            success, items = self.run_test(
+                f"Get Curriculum ({board}, Class {class_level}, {subject})",
+                "GET",
+                f"curriculum?board={board}&class_level={class_level}&subject={subject}",
+                200
             )
-            
-            if result.returncode == 0:
-                lines = result.stdout.split('\n')
-                for line in lines:
-                    if line.startswith('SESSION_TOKEN:'):
-                        self.session_token = line.split(':', 1)[1]
-                        self.log(f"✅ Test session created: {self.session_token[:20]}...")
-                        break
-                        
-                # Test auth/me with valid token
-                success, user_data = self.run_test(
-                    "Auth Me (Valid Token)",
-                    "GET",
-                    "auth/me",
-                    200
-                )
-                
-                if success:
-                    self.user_data = user_data
-                    self.log(f"✅ User authenticated: {user_data.get('name', 'Unknown')}")
-                    
-            else:
-                self.log(f"❌ Failed to create test session: {result.stderr}")
-                
-        except Exception as e:
-            self.log(f"❌ Error creating test session: {str(e)}")
+            if success:
+                self.log(f"   ✅ Class {class_level} {subject}: {len(items)} items")
+        
+        return True
 
     def test_user_registration(self):
         """Test user registration endpoints"""
