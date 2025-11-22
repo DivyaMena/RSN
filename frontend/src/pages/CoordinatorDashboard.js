@@ -1081,17 +1081,54 @@ export default function CoordinatorDashboard({ user, logout }) {
                                 </div>
 
                                 {/* Expanded Student Details */}
-                                {isExpanded && student && (
-                                  <div className="mt-3 p-3 bg-white rounded border border-blue-200">
-                                    <h5 className="font-semibold text-sm mb-2">Student Details</h5>
-                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                      <div><strong>Name:</strong> {student.name}</div>
-                                      <div><strong>Code:</strong> {student.student_code}</div>
-                                      <div><strong>Class:</strong> {student.class_level}</div>
-                                      <div><strong>School:</strong> {student.school_name}</div>
-                                      <div><strong>Board:</strong> {student.board}</div>
-                                      <div><strong>Location:</strong> {student.location}</div>
-                                    </div>
+                                {isExpanded && (
+                                  <div className="mt-3 p-4 bg-white rounded-lg border-2 border-blue-300 shadow-sm">
+                                    <h5 className="font-semibold text-base text-gray-900 mb-3 flex items-center gap-2">
+                                      <User className="h-4 w-4" />
+                                      Complete Student Profile
+                                    </h5>
+                                    {student ? (
+                                      <div className="space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">Name:</span>
+                                            <span className="text-gray-900">{student.name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">Code:</span>
+                                            <span className="text-gray-900 font-mono">{student.student_code}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">Class:</span>
+                                            <span className="text-gray-900">Class {student.class_level}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">Board:</span>
+                                            <span className="text-gray-900">{student.board}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">School:</span>
+                                            <span className="text-gray-900">{student.school_name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-700 min-w-[80px]">Location:</span>
+                                            <span className="text-gray-900">{student.location}</span>
+                                          </div>
+                                        </div>
+                                        <div className="pt-2 border-t">
+                                          <span className="font-medium text-gray-700 text-sm">Enrolled Subjects:</span>
+                                          <div className="flex flex-wrap gap-2 mt-2">
+                                            {student.subjects && student.subjects.map(subj => (
+                                              <span key={subj} className="px-3 py-1 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-full text-xs font-medium">
+                                                {SUBJECTS[subj] || subj}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p className="text-gray-500 text-sm">Loading student details...</p>
+                                    )}
                                   </div>
                                 )}
                               </div>
