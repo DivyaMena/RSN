@@ -104,10 +104,12 @@ export default function CoordinatorDashboard({ user, logout }) {
         try {
           const studentRes = await axios.get(`${API}/students/${req.student_id}`, { withCredentials: true });
           studentDetailsMap[req.student_id] = studentRes.data;
+          console.log(`Fetched student: ${studentRes.data.name} (${studentRes.data.student_code})`);
         } catch (error) {
-          console.error(`Failed to fetch student ${req.student_id}`);
+          console.error(`Failed to fetch student ${req.student_id}:`, error);
         }
       }
+      console.log('Total student details fetched:', Object.keys(studentDetailsMap).length);
       setRemedialStudentDetails(studentDetailsMap);
       
       // Fetch assignments for each batch
