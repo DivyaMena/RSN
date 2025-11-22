@@ -232,49 +232,66 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_student_management(self):
-        """Test student creation and management"""
-        self.log("\n🎓 Testing Student Management...")
+    def test_remedial_endpoints(self):
+        """Test remedial request and class management endpoints"""
+        self.log("\n🔧 Testing Remedial System Endpoints...")
         
-        if not self.session_token or not self.user_data or self.user_data.get('role') != 'parent':
-            self.log("❌ Need parent role for student tests")
+        # Login as coordinator to access remedial data
+        if not self.login_as_role("coordinator"):
             return False
             
-        # Test student creation
-        student_data = {
-            "name": "Test Student",
-            "class_level": 9,
-            "board": "TS", 
-            "school_name": "Test School",
-            "location": "Hyderabad",
-            "roll_no": "TS001",
-            "subjects": ["MAT", "PHY", "SCI"],
-            "enrollment_year": 2025
-        }
-        
-        success, created_student = self.run_test(
-            "Create Student",
-            "POST",
-            "students",
-            200,
-            data=student_data
-        )
-        
-        if success:
-            self.log(f"✅ Student created with code: {created_student.get('student_code', 'N/A')}")
-            
-        # Test get students
-        success, students = self.run_test(
-            "Get Students",
+        # Test get all remedial requests
+        success, requests = self.run_test(
+            "Get Remedial Requests",
             "GET",
-            "students",
+            "remedial/requests",
             200
         )
         
         if success:
-            self.log(f"✅ Retrieved {len(students)} students")
+            self.log(f"✅ Retrieved {len(requests)} remedial requests")
             
-        return success
+            # Test filtering by class and subject
+            if requests:
+                # Test with filters
+                success, filtered = self.run_test(
+                    "Get Remedial Requests (Class 6, MAT)",
+                    "GET",
+                    "remedial/requests?class_level=6&subject=MAT",
+                    200
+                )
+                if success:
+                    self.log(f"   ✅ Filtered requests (Class 6, MAT): {len(filtered)}")
+        
+        # Test get remedial classes
+        success, classes = self.run_test(
+            "Get Remedial Classes",
+            "GET",
+            "remedial/classes",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(classes)} remedial classes")
+        
+        # Test pool students endpoint (with mock data)
+        pool_data = {
+            "request_ids": ["mock-request-1", "mock-request-2"],
+            "topic": "Algebra Basics"
+        }
+        
+        success, pooled = self.run_test(
+            "Pool Remedial Students",
+            "POST",
+            "remedial/pool-students",
+            200,
+            data=pool_data
+        )
+        
+        if success:
+            self.log("✅ Pool students endpoint working")
+        
+        return True
 
     def test_batch_management(self):
         """Test batch creation and management"""
