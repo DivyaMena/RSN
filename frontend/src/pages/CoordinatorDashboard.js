@@ -313,6 +313,70 @@ export default function CoordinatorDashboard({ user, logout }) {
     }
   };
 
+  const handleSelectRemedialRequest = (requestId) => {
+    if (selectedRemedialRequests.includes(requestId)) {
+      setSelectedRemedialRequests(selectedRemedialRequests.filter(id => id !== requestId));
+    } else {
+      setSelectedRemedialRequests([...selectedRemedialRequests, requestId]);
+    }
+  };
+
+  const handleSelectAllRemedialRequests = (requests) => {
+    if (selectedRemedialRequests.length === requests.length) {
+      setSelectedRemedialRequests([]);
+    } else {
+      setSelectedRemedialRequests(requests.map(r => r.id));
+    }
+  };
+
+  const handlePoolStudents = async () => {
+    if (selectedRemedialRequests.length === 0) {
+      toast.error('Please select at least one request');
+      return;
+    }
+    if (!poolTopic) {
+      toast.error('Please enter a topic for this remedial class');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/remedial/pool-students`, {
+        request_ids: selectedRemedialRequests,
+        topic: poolTopic
+      }, { withCredentials: true });
+      
+      toast.success('Remedial class created successfully');
+      setPoolDialogOpen(false);
+      setSelectedRemedialRequests([]);
+      setPoolTopic('');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to pool students');
+    }
+  };
+
+  const handleAssignTutor = async () => {
+    if (!selectedRemedialTutor) {
+      toast.error('Please select a tutor');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/remedial/assign-tutor`, {
+        remedial_class_id: selectedRemedialClass.id,
+        tutor_id: selectedRemedialTutor
+      }, { withCredentials: true });
+      
+      toast.success('Tutor assigned successfully');
+      setAssignTutorDialogOpen(false);
+      setSelectedRemedialClass(null);
+      setSelectedRemedialTutor('');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to assign tutor');
+    }
+  };
+
   // Group batches by class
   const groupedBatches = batches.reduce((acc, batch) => {
     const classKey = `class_${batch.class_level}`;
