@@ -31,6 +31,9 @@ export default function TutorDashboard({ user, logout }) {
   const [selectedStatus, setSelectedStatus] = useState('available');
   const [unavailableFrom, setUnavailableFrom] = useState('');
   const [unavailableTo, setUnavailableTo] = useState('');
+  const [studentListDialog, setStudentListDialog] = useState({ open: false, batchId: null, students: [] });
+  const [curriculum, setCurriculum] = useState({});
+  const [expandedCurriculum, setExpandedCurriculum] = useState({});
 
   useEffect(() => {
     fetchData();
