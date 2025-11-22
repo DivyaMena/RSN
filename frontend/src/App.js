@@ -20,7 +20,6 @@ import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
 import ParentProfile from './pages/ParentProfile';
 import LogBoard from './pages/LogBoard';
-import TestLogin from './pages/TestLogin';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
