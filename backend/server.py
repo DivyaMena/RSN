@@ -1736,12 +1736,13 @@ async def upload_curriculum_csv(request: Request):
                     errors.append(f"Missing required fields in row: {row}")
                     continue
                 
-                # Check if item already exists
+                # Check if item already exists (including topic_name to handle sub-lessons like 1A, 1B, 1C)
                 existing = await db.curriculum_items.find_one({
                     "board": row['board'],
                     "class_level": int(row['class_level']),
                     "subject": row['subject'],
-                    "topic_number": int(row['lesson_number'])
+                    "topic_number": int(row['lesson_number']),
+                    "topic_name": row['lesson_title']
                 }, {"_id": 0})
                 
                 item_data = {
