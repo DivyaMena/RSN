@@ -355,7 +355,7 @@ export default function CoordinatorDashboard({ user, logout }) {
     }
   };
 
-  const handleAssignTutor = async () => {
+  const handleAssignRemedialTutor = async () => {
     if (!selectedRemedialTutor) {
       toast.error('Please select a tutor');
       return;
