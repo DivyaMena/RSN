@@ -229,16 +229,6 @@ export default function Login() {
               </p>
             </div>
           )}
-
-          {/* Test Login Link */}
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => navigate('/test-login')}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Test Login Portal
-            </button>
-          </div>
         </div>
 
         {/* Back to Home */}
