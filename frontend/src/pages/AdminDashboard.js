@@ -657,21 +657,21 @@ export default function AdminDashboard({ user, logout }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1 sm:gap-2 bg-white p-2 rounded-lg shadow-sm overflow-x-auto">
-            <TabsTrigger value="overview" className="text-xs">
-              <BarChart3 className="h-4 w-4 mr-1" />
-              Overview
+            <TabsTrigger value="overview" className="text-xs flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="admins" className="text-xs">
-              <Shield className="h-4 w-4 mr-1" />
-              Admins
+            <TabsTrigger value="admins" className="text-xs flex items-center justify-center">
+              <Shield className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Admins</span>
             </TabsTrigger>
-            <TabsTrigger value="coordinators" className="text-xs">
-              <UserCog className="h-4 w-4 mr-1" />
-              Coordinators
+            <TabsTrigger value="coordinators" className="text-xs flex items-center justify-center">
+              <UserCog className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Coordinators</span>
             </TabsTrigger>
-            <TabsTrigger value="tutors" className="text-xs">
-              <GraduationCap className="h-4 w-4 mr-1" />
-              Tutors
+            <TabsTrigger value="tutors" className="text-xs flex items-center justify-center">
+              <GraduationCap className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Tutors</span>
             </TabsTrigger>
             <TabsTrigger value="students" className="text-xs">
               <Users className="h-4 w-4 mr-1" />
