@@ -30,6 +30,16 @@ db = client[os.environ['DB_NAME']]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI()
+origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+# print(":white_tick: CORS Origins:", origins)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 # ============= MODELS =============
@@ -3219,13 +3229,13 @@ async def get_batch_attendance(batch_id: str, request: Request, date: Optional[s
 
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_credentials=True,
+#     allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 logging.basicConfig(
     level=logging.INFO,
