@@ -338,6 +338,14 @@ class CreateRemedialRequestInput(BaseModel):
     topic: str
     description: Optional[str] = None
 
+class PoolRemedialStudentsInput(BaseModel):
+    request_ids: List[str]  # List of remedial request IDs to pool
+    topic: str
+    
+class AssignRemedialTutorInput(BaseModel):
+    remedial_class_id: str
+    tutor_id: str
+
 class JoinClassAttendanceInput(BaseModel):
     batch_id: str
     log_entry_id: str
