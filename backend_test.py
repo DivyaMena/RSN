@@ -138,7 +138,12 @@ class RisingStarsAPITester:
         """Test curriculum management endpoints"""
         self.log("\n📚 Testing Curriculum Endpoints...")
         
-        # Test public curriculum endpoint with filters
+        # Login as admin first to access curriculum
+        if not self.login_as_role("admin"):
+            self.log("❌ Cannot test curriculum without admin access")
+            return False
+        
+        # Test curriculum endpoint with filters
         success, curriculum = self.run_test(
             "Get Curriculum (TS, Class 6, MAT)",
             "GET",
@@ -156,10 +161,11 @@ class RisingStarsAPITester:
         
         # Test different class/subject combinations
         test_combinations = [
-            ("TS", 7, "PHY"),
-            ("TS", 8, "BIO"),
-            ("TS", 9, "ENG"),
-            ("TS", 10, "MAT")
+            ("TS", 7, "MAT"),
+            ("TS", 7, "SCI"),
+            ("TS", 7, "ENG"),
+            ("TS", 8, "MAT"),
+            ("TS", 8, "PHY")
         ]
         
         for board, class_level, subject in test_combinations:
