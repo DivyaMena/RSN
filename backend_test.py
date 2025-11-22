@@ -16,13 +16,10 @@ class RisingStarsAPITester:
         self.tests_passed = 0
         self.failed_tests = []
         
-        # Test credentials from review request
+        # Real test credentials from database
         self.test_credentials = {
-            "admin": {"email": "admin@risingstars.com", "password": "password"},
-            "coordinator": {"email": "test-coordinator@risingstarsnation.com", "password": "password123"},
-            "tutor": {"email": "milletmomentz@gmail.com", "password": "password"},
-            "student": {"email": "vignesh.student@example.com", "password": "password"},
-            "school": {"email": "zphs.school1@example.com", "password": "School@123"}
+            "admin": {"email": "risingstarsnation2025@gmail.com", "password": "Divya@1907"},
+            "student": {"email": "4krishnakumar@gmail.com", "password": "12-11-2013"}  # Parent email + student DOB
         }
         
     def log(self, message):
