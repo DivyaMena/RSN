@@ -526,31 +526,35 @@ class RisingStarsAPITester:
         return True
 
     def run_all_tests(self):
-        """Run comprehensive API test suite"""
-        self.log("🚀 Starting Rising Stars Nation API Test Suite")
+        """Run comprehensive API test suite for Rising Stars Nation Educational Platform"""
+        self.log("🚀 Starting Rising Stars Nation Educational Platform API Test Suite")
         self.log(f"🌐 Testing against: {self.base_url}")
+        self.log("📋 Testing critical flows from review request...")
         
         try:
-            # Test authentication
+            # Test basic authentication
             self.test_auth_flow()
             
-            # Test user registration
-            self.test_user_registration()
+            # Test curriculum endpoints (public access)
+            self.test_curriculum_endpoints()
             
-            # Test student management
-            self.test_student_management()
+            # Test admin dashboard functionality
+            self.test_admin_dashboard_endpoints()
             
-            # Test batch management
-            self.test_batch_management()
+            # Test coordinator dashboard functionality  
+            self.test_coordinator_dashboard_endpoints()
             
-            # Test curriculum
-            self.test_curriculum_access()
+            # Test tutor dashboard functionality
+            self.test_tutor_dashboard_endpoints()
             
-            # Test tutor endpoints
-            self.test_tutor_endpoints()
+            # Test student dashboard functionality
+            self.test_student_dashboard_endpoints()
             
-            # Test log board
-            self.test_logboard_endpoints()
+            # Test student data access
+            self.test_student_endpoints()
+            
+            # Test remedial system
+            self.test_remedial_endpoints()
             
         except Exception as e:
             self.log(f"❌ Test suite error: {str(e)}")
@@ -562,6 +566,8 @@ class RisingStarsAPITester:
             self.log("\n❌ Failed Tests:")
             for test in self.failed_tests:
                 self.log(f"   - {test}")
+        else:
+            self.log("\n🎉 All tests passed!")
                 
         return self.tests_passed == self.tests_run
 
