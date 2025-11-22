@@ -350,9 +350,7 @@ export default function CoordinatorDashboard({ user, logout }) {
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-white" />
-            </div>
+            <img src="/logo.jpg" alt="Rising Stars Nation" className="h-12 w-12 rounded-lg object-cover" />
             <span className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
