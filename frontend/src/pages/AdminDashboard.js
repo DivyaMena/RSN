@@ -1825,18 +1825,97 @@ export default function AdminDashboard({ user, logout }) {
               <CardContent className="pt-6">
                 <div className="space-y-2">
                   {curriculum.length > 0 && (
-                    <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
-                      <Checkbox
-                        checked={selectedCurriculum.length === curriculum.length}
-                        onCheckedChange={() => handleSelectAll('curriculum', curriculum, selectedCurriculum, setSelectedCurriculum)}
-                      />
-                      <span className="text-sm font-medium">Select All ({curriculum.length} lessons)</span>
-                    </div>
+                    <>
+                      {/* Filters Section */}
+                      <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 className="font-semibold text-gray-900 mb-3">Filters</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Class Filter */}
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Class</label>
+                            <Select value={curriculumFilterClass} onValueChange={setCurriculumFilterClass}>
+                              <SelectTrigger className="w-full bg-white">
+                                <SelectValue placeholder="All Classes" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Classes</SelectItem>
+                                {[...new Set(curriculum.map(item => item.class_level))].sort((a, b) => a - b).map(cls => (
+                                  <SelectItem key={cls} value={String(cls)}>Class {cls}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Subject Filter */}
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Subject</label>
+                            <Select value={curriculumFilterSubject} onValueChange={setCurriculumFilterSubject}>
+                              <SelectTrigger className="w-full bg-white">
+                                <SelectValue placeholder="All Subjects" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Subjects</SelectItem>
+                                {[...new Set(curriculum.map(item => item.subject))].sort().map(subj => (
+                                  <SelectItem key={subj} value={subj}>{subj}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Clear Filters Button */}
+                        {(curriculumFilterClass !== 'all' || curriculumFilterSubject !== 'all') && (
+                          <div className="mt-3">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setCurriculumFilterClass('all');
+                                setCurriculumFilterSubject('all');
+                              }}
+                            >
+                              Clear Filters
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Select All Checkbox */}
+                      <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg mb-4">
+                        <Checkbox
+                          checked={(() => {
+                            const filtered = curriculum.filter(item => 
+                              (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                              (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                            );
+                            return selectedCurriculum.length > 0 && filtered.every(item => selectedCurriculum.includes(item.id));
+                          })()}
+                          onCheckedChange={() => {
+                            const filtered = curriculum.filter(item => 
+                              (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                              (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                            );
+                            handleSelectAll('curriculum', filtered, selectedCurriculum, setSelectedCurriculum);
+                          }}
+                        />
+                        <span className="text-sm font-medium">
+                          Select All ({curriculum.filter(item => 
+                            (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                            (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                          ).length} lessons)
+                        </span>
+                      </div>
+                    </>
                   )}
                   {curriculum.length === 0 ? (
                     <p className="text-center text-gray-500 py-8">No curriculum items found. Upload a CSV to get started!</p>
                   ) : (
-                    curriculum.map((item) => (
+                    curriculum
+                      .filter(item => 
+                        (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
+                        (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
+                      )
+                      .map((item) => (
                       <div key={item.id}>
                         <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
                           <Checkbox
