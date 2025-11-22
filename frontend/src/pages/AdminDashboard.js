@@ -1943,6 +1943,7 @@ export default function AdminDashboard({ user, logout }) {
                     <p className="text-center text-gray-500 py-8">No curriculum items found. Upload a CSV to get started!</p>
                   ) : (() => {
                     const filteredCurriculum = curriculum.filter(item => 
+                      (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
                       (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
                       (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
                     );
