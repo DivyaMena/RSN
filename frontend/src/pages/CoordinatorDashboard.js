@@ -953,6 +953,67 @@ export default function CoordinatorDashboard({ user, logout }) {
               <p className="text-gray-600">Students haven't requested any remedial classes yet</p>
             </div>
           ) : (
+            <>
+              {/* Filters */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-3">Filter Requests</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Class</label>
+                    <Select value={remedialFilterClass} onValueChange={setRemedialFilterClass}>
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="All Classes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Classes</SelectItem>
+                        {[...new Set(remedialRequests.map(r => r.class_level))].sort((a, b) => a - b).map(cls => (
+                          <SelectItem key={cls} value={String(cls)}>Class {cls}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Subject</label>
+                    <Select value={remedialFilterSubject} onValueChange={setRemedialFilterSubject}>
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="All Subjects" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Subjects</SelectItem>
+                        {[...new Set(remedialRequests.map(r => r.subject))].sort().map(subj => (
+                          <SelectItem key={subj} value={subj}>{SUBJECTS[subj] || subj}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {(remedialFilterClass !== 'all' || remedialFilterSubject !== 'all') && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="mt-3"
+                    onClick={() => {
+                      setRemedialFilterClass('all');
+                      setRemedialFilterSubject('all');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+
+              {(() => {
+                const filteredRequests = remedialRequests.filter(r => 
+                  r.status === 'pending' &&
+                  (remedialFilterClass === 'all' || String(r.class_level) === remedialFilterClass) &&
+                  (remedialFilterSubject === 'all' || r.subject === remedialFilterSubject)
+                );
+
+                return filteredRequests.length === 0 ? (
+                  <div className="text-center py-10 bg-gray-50 rounded-lg">
+                    <p className="text-gray-600">No pending remedial requests match the selected filters.</p>
+                  </div>
+                ) : (
             <div className="space-y-6">
               {/* Group by Subject and Class */}
               {Object.entries(
