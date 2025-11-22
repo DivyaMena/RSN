@@ -1890,6 +1890,85 @@ export default function CoordinatorDashboard({ user, logout }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Pool Students Dialog */}
+      <Dialog open={poolDialogOpen} onOpenChange={setPoolDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pool Selected Students into Remedial Class</DialogTitle>
+            <DialogDescription>
+              Create a remedial class from {selectedRemedialRequests.length} selected student{selectedRemedialRequests.length > 1 ? 's' : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Topic/Lesson Name *</label>
+              <Input
+                value={poolTopic}
+                onChange={(e) => setPoolTopic(e.target.value)}
+                placeholder="Enter the topic for this remedial class"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handlePoolStudents} className="flex-1">
+                Create Remedial Class
+              </Button>
+              <Button onClick={() => setPoolDialogOpen(false)} variant="outline" className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Tutor to Remedial Class Dialog */}
+      <Dialog open={assignTutorDialogOpen} onOpenChange={setAssignTutorDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Tutor to Remedial Class</DialogTitle>
+          </DialogHeader>
+          {selectedRemedialClass && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <p className="font-bold text-gray-900">{selectedRemedialClass.class_code}</p>
+                <p className="text-sm text-gray-600">
+                  {selectedRemedialClass.board} | Class {selectedRemedialClass.class_level} | {SUBJECTS[selectedRemedialClass.subject]}
+                </p>
+                <p className="text-sm text-gray-600">Topic: {selectedRemedialClass.topic}</p>
+                <p className="text-sm text-gray-600">Students: {selectedRemedialClass.student_ids.length}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Tutor *</label>
+                <Select value={selectedRemedialTutor} onValueChange={setSelectedRemedialTutor}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a tutor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tutors
+                      .filter(t => 
+                        t.subjects_can_teach?.includes(selectedRemedialClass.subject) &&
+                        t.classes_can_teach?.includes(selectedRemedialClass.class_level)
+                      )
+                      .map(tutor => (
+                        <SelectItem key={tutor.id} value={tutor.id}>
+                          {tutor.name} - {tutor.tutor_code}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAssignTutor} className="flex-1">
+                  Assign Tutor
+                </Button>
+                <Button onClick={() => setAssignTutorDialogOpen(false)} variant="outline" className="flex-1">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
