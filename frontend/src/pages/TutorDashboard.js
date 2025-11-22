@@ -300,7 +300,12 @@ export default function TutorDashboard({ user, logout }) {
                         {SUBJECTS[batch.subject]} | Class {batch.class_level} | {batch.board} Board
                       </p>
                       <p className="text-sm text-gray-500 mt-1">
-                        Status: <span className="capitalize">{batch.status}</span> | Students: {batch.student_ids.length}/25
+                        Status: <span className="capitalize">{batch.status}</span> | Students: <button 
+                          onClick={() => handleViewStudents(batch.id, batch.student_ids)}
+                          className="text-blue-600 hover:text-blue-800 underline font-medium"
+                        >
+                          {batch.student_ids.length}/25
+                        </button>
                       </p>
                       
                       {/* Batch Schedule */}
