@@ -97,6 +97,18 @@ export default function CoordinatorDashboard({ user, logout }) {
       setPendingSchools(allSchoolsRes.data.filter(s => s.approval_status === 'pending'));
       setRemedialRequests(remedialReqRes.data);
       setRemedialClasses(remedialClassesRes.data);
+
+      // Fetch student details for all remedial requests
+      const studentDetailsMap = {};
+      for (const req of remedialReqRes.data) {
+        try {
+          const studentRes = await axios.get(`${API}/students/${req.student_id}`, { withCredentials: true });
+          studentDetailsMap[req.student_id] = studentRes.data;
+        } catch (error) {
+          console.error(`Failed to fetch student ${req.student_id}`);
+        }
+      }
+      setRemedialStudentDetails(studentDetailsMap);
       
       // Fetch assignments for each batch
       const assignments = {};
