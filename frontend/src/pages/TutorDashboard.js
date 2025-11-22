@@ -67,17 +67,23 @@ export default function TutorDashboard({ user, logout }) {
       }
       setBatchTutors(tutorsData);
 
-      // Fetch curriculum for tutor's teaching subjects
+      // Fetch curriculum for tutor's opted classes and subjects
       const curriculumData = {};
-      for (const batch of batchesRes.data) {
-        const key = `${batch.board}-${batch.class_level}-${batch.subject}`;
-        if (!curriculumData[key]) {
+      const tutorBoard = tutorRes.data.board_preference;
+      const tutorClasses = tutorRes.data.classes_can_teach || [];
+      const tutorSubjects = tutorRes.data.subjects_can_teach || [];
+      
+      for (const classLevel of tutorClasses) {
+        for (const subject of tutorSubjects) {
+          const key = `${tutorBoard}-${classLevel}-${subject}`;
           try {
             const res = await axios.get(
-              `${API}/curriculum?board=${batch.board}&class_level=${batch.class_level}&subject=${batch.subject}`,
+              `${API}/curriculum?board=${tutorBoard}&class_level=${classLevel}&subject=${subject}`,
               { withCredentials: true }
             );
-            curriculumData[key] = res.data;
+            if (res.data && res.data.length > 0) {
+              curriculumData[key] = res.data;
+            }
           } catch (error) {
             console.error(`Failed to fetch curriculum for ${key}`);
           }
