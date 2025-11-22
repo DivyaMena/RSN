@@ -18,15 +18,10 @@ export default function Landing() {
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="h-12 w-12 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="h-7 w-7 text-white" />
-            </div>
+            <img src="/logo.jpg" alt="Rising Stars Nation" className="h-12 w-12 object-cover rounded-xl" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
           <div className="flex items-center space-x-3">
-            <Button onClick={() => navigate('/test-login')} variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
-              Test Login
-            </Button>
             <Button onClick={() => navigate('/login')} className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl px-6">
               Login
             </Button>
