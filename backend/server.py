@@ -1707,9 +1707,18 @@ async def upload_curriculum_csv(request: Request):
         if not csv_file:
             raise HTTPException(status_code=400, detail="No file uploaded")
         
-        # Read CSV content
+        # Read CSV content with encoding detection
         content = await csv_file.read()
-        csv_content = content.decode('utf-8')
+        
+        # Try multiple encodings
+        for encoding in ['utf-8', 'utf-8-sig', 'latin-1', 'iso-8859-1', 'windows-1252']:
+            try:
+                csv_content = content.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            raise HTTPException(status_code=400, detail="Unable to decode CSV file. Please save it as UTF-8 encoding.")
         
         import csv
         import io
