@@ -2010,6 +2010,64 @@ async def register_school(input: RegisterSchoolInput):
     
     return {"success": True, "message": "School registration successful. Waiting for coordinator approval."}
 
+# ============= TEST EMAIL ENDPOINT =============
+
+@api_router.post("/test-email")
+async def send_test_email(request: Request):
+    """Send a test email to verify SMTP configuration"""
+    user = await get_current_user(request)
+    
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can send test emails")
+    
+    try:
+        # Email configuration
+        smtp_server = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+        smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+        smtp_user = os.environ.get("SMTP_USER")
+        smtp_password = os.environ.get("SMTP_PASSWORD")
+        
+        # Create message
+        message = MIMEMultipart()
+        message["From"] = f"Rising Stars Nation <{smtp_user}>"
+        message["To"] = "divyapoosala@gmail.com"
+        message["Subject"] = "Test Email - Rising Stars Nation System"
+        
+        body = """
+        <html>
+          <body>
+            <h2>Rising Stars Nation - Test Email</h2>
+            <p>This is a test email from the Rising Stars Nation application.</p>
+            <p>If you're receiving this, the email notification system is working correctly!</p>
+            <br>
+            <p><strong>System Details:</strong></p>
+            <ul>
+              <li>SMTP Server: {}</li>
+              <li>From Email: {}</li>
+              <li>Status: ✅ Working</li>
+            </ul>
+            <br>
+            <p>Best regards,<br>Rising Stars Nation Team</p>
+          </body>
+        </html>
+        """.format(smtp_server, smtp_user)
+        
+        message.attach(MIMEText(body, "html"))
+        
+        # Send email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(message)
+        
+        return {
+            "success": True,
+            "message": "Test email sent successfully to divyapoosala@gmail.com"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+
 # ============= USER ROUTES =============
 
 @api_router.post("/users/register/parent")
