@@ -125,7 +125,14 @@ export default function StudentDashboard({ user, logout }) {
             `${API}/curriculum?board=${studentData.board}&class_level=${studentData.class_level}&subject=${subject}`,
             { withCredentials: true }
           );
-          curriculumData[subject] = res.data;
+          curriculumData[subject] = (res.data || []).sort((a, b) => {
+            // First sort by lesson number
+            if (a.topic_number !== b.topic_number) {
+              return a.topic_number - b.topic_number;
+            }
+            // Then sort alphabetically by topic name (handles A, B, C)
+            return a.topic_name.localeCompare(b.topic_name);
+          });
         } catch (error) {
           console.error(`Failed to fetch curriculum for ${subject}`);
         }
