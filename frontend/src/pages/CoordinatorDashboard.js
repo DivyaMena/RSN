@@ -498,8 +498,8 @@ export default function CoordinatorDashboard({ user, logout }) {
             onClick={() => setActiveTab('pending')}
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
           >
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Pending Approvals</h3>
-            <p className="text-4xl font-bold text-yellow-600">
+            <h3 className="text-gray-600 text-xs sm:text-sm font-medium mb-2">Pending Approvals</h3>
+            <p className="text-3xl sm:text-4xl font-bold text-yellow-600">
               {pendingTutors.length + pendingSchools.length + remedialRequests.filter(r => r.status === 'pending').length}
             </p>
             <p className="text-xs text-gray-500 mt-2">Tutors, Schools & Remedial Requests</p>
