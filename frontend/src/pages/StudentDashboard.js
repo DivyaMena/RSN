@@ -234,9 +234,7 @@ export default function StudentDashboard({ user, logout }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
-                <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
+              <img src="/logo.jpg" alt="Rising Stars Nation" className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover" />
               <span className="text-base sm:text-xl font-bold hidden sm:block" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
               <span className="text-sm font-bold sm:hidden" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>RSN</span>
             </div>
