@@ -31,6 +31,9 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [tutors, setTutors] = useState([]);
   const [pendingTutors, setPendingTutors] = useState([]);
   const [allSchools, setAllSchools] = useState([]);
+  const [pendingSchools, setPendingSchools] = useState([]);
+  const [remedialRequests, setRemedialRequests] = useState([]);
+  const [remedialClasses, setRemedialClasses] = useState([]);
   const [expandedSchoolId, setExpandedSchoolId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
