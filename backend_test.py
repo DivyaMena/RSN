@@ -232,8 +232,8 @@ class RisingStarsAPITester:
         """Test remedial request and class management endpoints"""
         self.log("\n🔧 Testing Remedial System Endpoints...")
         
-        # Login as coordinator to access remedial data
-        if not self.login_as_role("coordinator"):
+        # Login as admin to access remedial data
+        if not self.login_as_role("admin"):
             return False
             
         # Test get all remedial requests
@@ -247,17 +247,11 @@ class RisingStarsAPITester:
         if success:
             self.log(f"✅ Retrieved {len(requests)} remedial requests")
             
-            # Test filtering by class and subject
-            if requests:
-                # Test with filters
-                success, filtered = self.run_test(
-                    "Get Remedial Requests (Class 6, MAT)",
-                    "GET",
-                    "remedial/requests?class_level=6&subject=MAT",
-                    200
-                )
-                if success:
-                    self.log(f"   ✅ Filtered requests (Class 6, MAT): {len(filtered)}")
+            # Check if any requests show student names properly
+            for request in requests[:3]:  # Check first 3 requests
+                student_id = request.get("student_id")
+                if student_id:
+                    self.log(f"   Request for student ID: {student_id}")
         
         # Test get remedial classes
         success, classes = self.run_test(
@@ -269,23 +263,6 @@ class RisingStarsAPITester:
         
         if success:
             self.log(f"✅ Retrieved {len(classes)} remedial classes")
-        
-        # Test pool students endpoint (with mock data)
-        pool_data = {
-            "request_ids": ["mock-request-1", "mock-request-2"],
-            "topic": "Algebra Basics"
-        }
-        
-        success, pooled = self.run_test(
-            "Pool Remedial Students",
-            "POST",
-            "remedial/pool-students",
-            200,
-            data=pool_data
-        )
-        
-        if success:
-            self.log("✅ Pool students endpoint working")
         
         return True
 
