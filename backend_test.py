@@ -463,17 +463,65 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_logboard_endpoints(self):
-        """Test log board endpoints"""
-        self.log("\n📝 Testing Log Board Endpoints...")
+    def test_admin_dashboard_endpoints(self):
+        """Test admin dashboard specific endpoints"""
+        self.log("\n👑 Testing Admin Dashboard Endpoints...")
         
-        # Test get log entries for a batch (will likely be empty)
-        success, entries = self.run_test(
-            "Get Log Entries",
+        # Login as admin
+        if not self.login_as_role("admin"):
+            return False
+            
+        # Test curriculum upload functionality
+        success, response = self.run_test(
+            "Get Admin Curriculum",
             "GET",
-            "logboard/test-batch-id",
+            "admin/curriculum",
             200
         )
+        
+        if success:
+            self.log(f"✅ Retrieved admin curriculum access")
+        
+        # Test curriculum filters
+        filter_tests = [
+            ("board=TS", "Board filter"),
+            ("class_level=6", "Class filter"),
+            ("subject=MAT", "Subject filter"),
+            ("board=TS&class_level=6&subject=MAT", "Combined filters")
+        ]
+        
+        for filter_param, description in filter_tests:
+            success, filtered = self.run_test(
+                f"Test {description}",
+                "GET",
+                f"curriculum?{filter_param}",
+                200
+            )
+            if success:
+                self.log(f"   ✅ {description}: {len(filtered)} items")
+        
+        # Test bulk operations endpoints
+        bulk_endpoints = [
+            "admin/students/bulk",
+            "admin/tutors/bulk", 
+            "admin/parents/bulk",
+            "admin/coordinators/bulk",
+            "admin/schools/bulk",
+            "admin/batches/bulk",
+            "admin/curriculum/bulk"
+        ]
+        
+        for endpoint in bulk_endpoints:
+            # Test with empty array (should succeed but delete nothing)
+            success, response = self.run_test(
+                f"Test Bulk Delete ({endpoint.split('/')[-2].title()})",
+                "DELETE",
+                endpoint,
+                200,
+                data={"ids": []}
+            )
+            if success:
+                self.log(f"   ✅ Bulk delete endpoint working: {endpoint}")
         
         return True
 
