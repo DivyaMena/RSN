@@ -470,35 +470,64 @@ export default function StudentDashboard({ user, logout }) {
         {/* Curriculum */}
         {ACADEMIC_SUBJECTS.some(subj => student.subjects.includes(subj)) && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Curriculum</h2>
-            <div className="space-y-6">
-              {student.subjects.filter(subj => ACADEMIC_SUBJECTS.includes(subj)).map(subject => (
-                <div key={subject} data-testid={`curriculum-${subject}`} className="bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-gray-900">{SUBJECTS[subject]}</h3>
-                    {curriculum[subject] && curriculum[subject].length > 0 && (
-                      <span className="text-sm text-gray-600">{curriculum[subject].length} lessons</span>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>📚 My Curriculum</h2>
+            <div className="space-y-4">
+              {student.subjects.filter(subj => ACADEMIC_SUBJECTS.includes(subj)).map(subject => {
+                const curriculumItems = curriculum[subject] || [];
+                const isExpanded = expandedCurriculum[subject];
+                
+                return (
+                  <div key={subject} data-testid={`curriculum-${subject}`} className="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCurriculum(subject)}
+                      className="w-full flex items-center justify-between p-6 bg-gradient-to-r from-blue-50 to-green-50 hover:from-blue-100 hover:to-green-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 bg-gradient-to-br from-blue-600 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                          {subject}
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-xl font-bold text-gray-900">{SUBJECTS[subject]}</h3>
+                          <p className="text-sm text-gray-600">
+                            {curriculumItems.length > 0 
+                              ? `${curriculumItems.length} ${curriculumItems.length === 1 ? 'lesson' : 'lessons'}`
+                              : 'No curriculum available yet'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-gray-500 text-2xl">{isExpanded ? '▼' : '▶'}</span>
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="p-6 bg-white">
+                        {curriculumItems.length > 0 ? (
+                          <div className="space-y-2 max-h-96 overflow-y-auto">
+                            {curriculumItems.map(item => (
+                              <div key={item.id} className="bg-blue-50 rounded-lg p-4 border border-blue-200 hover:border-blue-300 transition-colors">
+                                <div className="flex items-start">
+                                  <span className="font-semibold text-blue-700 mr-3 text-lg min-w-[40px]">{item.topic_number}.</span>
+                                  <div className="flex-1">
+                                    <p className="font-medium text-gray-900 text-base">{item.topic_name}</p>
+                                    {item.description && (
+                                      <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-8">
+                            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                            <p className="text-gray-600">Curriculum will be available once uploaded by admin</p>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {curriculum[subject] && curriculum[subject].length > 0 ? (
-                    <div className="space-y-2">
-                      {curriculum[subject].map(item => (
-                        <div key={item.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                          <span className="font-semibold text-blue-600 min-w-[30px]">{item.topic_number}.</span>
-                          <div>
-                            <p className="font-medium text-gray-900">{item.topic_name}</p>
-                            {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4">
-                      <p className="text-gray-600 mb-3">Curriculum will be available once uploaded by admin</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
