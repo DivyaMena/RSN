@@ -1014,16 +1014,100 @@ export default function CoordinatorDashboard({ user, logout }) {
                     <p className="text-gray-600">No pending remedial requests match the selected filters.</p>
                   </div>
                 ) : (
-            <div className="space-y-6">
-              {/* Group by Subject and Class */}
-              {Object.entries(
-                remedialRequests.reduce((acc, req) => {
-                  const key = `${req.board}-Class ${req.class_level}-${SUBJECTS[req.subject] || req.subject}`;
-                  if (!acc[key]) acc[key] = [];
-                  acc[key].push(req);
-                  return acc;
-                }, {})
-              ).map(([groupKey, requests]) => (
+                  <div className="space-y-4">
+                    {/* Select All and Pool Button */}
+                    <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          checked={selectedRemedialRequests.length === filteredRequests.length && filteredRequests.length > 0}
+                          onCheckedChange={() => handleSelectAllRemedialRequests(filteredRequests)}
+                        />
+                        <span className="text-sm font-medium">
+                          Select All ({selectedRemedialRequests.filter(id => filteredRequests.find(r => r.id === id)).length}/{filteredRequests.length})
+                        </span>
+                      </div>
+                      {selectedRemedialRequests.length > 0 && (
+                        <Button
+                          onClick={() => setPoolDialogOpen(true)}
+                          className="bg-gradient-to-r from-blue-600 to-green-600 text-white"
+                        >
+                          <Users className="h-4 w-4 mr-2" />
+                          Pool Selected ({selectedRemedialRequests.length})
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Requests List */}
+                    <div className="space-y-3">
+                      {filteredRequests.map(req => {
+                        const student = remedialStudentDetails[req.student_id];
+                        const isExpanded = expandedStudentId === req.student_id;
+                        
+                        return (
+                          <div key={req.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                checked={selectedRemedialRequests.includes(req.id)}
+                                onCheckedChange={() => handleSelectRemedialRequest(req.id)}
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => setExpandedStudentId(isExpanded ? null : req.student_id)}
+                                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                      {student ? `${student.name} (${student.student_code})` : req.student_id}
+                                    </button>
+                                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                      {req.board} | Class {req.class_level} | {SUBJECTS[req.subject]}
+                                    </span>
+                                  </div>
+                                  <span className="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">
+                                    {req.status.toUpperCase()}
+                                  </span>
+                                </div>
+                                
+                                <div className="space-y-1 text-sm">
+                                  <p><strong>Topic:</strong> {req.topic}</p>
+                                  <p><strong>Reason:</strong> {req.reason}</p>
+                                  {req.description && <p className="text-gray-600">{req.description}</p>}
+                                  <p className="text-xs text-gray-500">Requested: {new Date(req.requested_at).toLocaleDateString()}</p>
+                                </div>
+
+                                {/* Expanded Student Details */}
+                                {isExpanded && student && (
+                                  <div className="mt-3 p-3 bg-white rounded border border-blue-200">
+                                    <h5 className="font-semibold text-sm mb-2">Student Details</h5>
+                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                      <div><strong>Name:</strong> {student.name}</div>
+                                      <div><strong>Code:</strong> {student.student_code}</div>
+                                      <div><strong>Class:</strong> {student.class_level}</div>
+                                      <div><strong>School:</strong> {student.school_name}</div>
+                                      <div><strong>Board:</strong> {student.board}</div>
+                                      <div><strong>Location:</strong> {student.location}</div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+            </>
+          )}
+          
+          {/* Remedial Classes Section */}
+          {remedialClasses.length > 0 && (
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Remedial Classes Created ({remedialClasses.length})</h3>
+              <div className="space-y-3">
+                {remedialClasses.map(rc => (
                 <div key={groupKey} className="border rounded-lg p-4 bg-gray-50">
                   <h3 className="font-bold text-lg text-gray-900 mb-3">{groupKey}</h3>
                   
