@@ -160,7 +160,15 @@ export default function StudentDashboard({ user, logout }) {
         `${API}/curriculum?board=${batch.board}&class_level=${batch.class_level}&subject=${batch.subject}`,
         { withCredentials: true }
       );
-      setAvailableCurriculum(res.data || []);
+      const sortedCurriculum = (res.data || []).sort((a, b) => {
+        // First sort by lesson number
+        if (a.topic_number !== b.topic_number) {
+          return a.topic_number - b.topic_number;
+        }
+        // Then sort alphabetically by topic name (handles A, B, C)
+        return a.topic_name.localeCompare(b.topic_name);
+      });
+      setAvailableCurriculum(sortedCurriculum);
     } catch (error) {
       console.error('Failed to fetch curriculum');
       toast.error('Failed to load curriculum topics');
