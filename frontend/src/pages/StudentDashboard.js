@@ -42,6 +42,7 @@ export default function StudentDashboard({ user, logout }) {
   const [batches, setBatches] = useState([]);
   const [batchTutors, setBatchTutors] = useState({});
   const [curriculum, setCurriculum] = useState({});
+  const [expandedCurriculum, setExpandedCurriculum] = useState({});
   const [loading, setLoading] = useState(true);
   
   // Remedial request state
