@@ -1762,19 +1762,20 @@ export default function AdminDashboard({ user, logout }) {
                     <Trash2 className="h-4 w-4 mr-2" />Delete Selected ({selectedCurriculum.length})
                   </Button>
                 )}
-                <label htmlFor="csv-upload">
-                  <Button as="span" disabled={uploadingCsv}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    {uploadingCsv ? 'Uploading...' : 'Upload CSV'}
-                  </Button>
-                  <input
-                    id="csv-upload"
-                    type="file"
-                    accept=".csv"
-                    onChange={handleCsvUpload}
-                    style={{ display: 'none' }}
-                  />
-                </label>
+                <Button 
+                  onClick={() => document.getElementById('csv-upload').click()} 
+                  disabled={uploadingCsv}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploadingCsv ? 'Uploading...' : 'Upload CSV'}
+                </Button>
+                <input
+                  id="csv-upload"
+                  type="file"
+                  accept=".csv"
+                  onChange={handleCsvUpload}
+                  style={{ display: 'none' }}
+                />
                 <a href="/sample_curriculum.csv" download>
                   <Button variant="outline">
                     <Upload className="h-4 w-4 mr-2" />Download Sample CSV
