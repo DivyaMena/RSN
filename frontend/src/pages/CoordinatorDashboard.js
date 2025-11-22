@@ -411,18 +411,21 @@ export default function CoordinatorDashboard({ user, logout }) {
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
           >
             <h3 className="text-gray-600 text-sm font-medium mb-2">Pending Approvals</h3>
-            <p className="text-4xl font-bold text-yellow-600">{pendingTutors.length}</p>
-            <p className="text-xs text-gray-500 mt-2">Click to review</p>
+            <p className="text-4xl font-bold text-yellow-600">
+              {pendingTutors.length + pendingSchools.length + remedialRequests.filter(r => r.status === 'pending').length}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">Tutors, Schools & Remedial Requests</p>
           </button>
         </div>
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="batches">All Batches ({batches.length})</TabsTrigger>
             <TabsTrigger value="tutors">All Tutors ({tutors.length})</TabsTrigger>
             <TabsTrigger value="schools">Schools ({allSchools.length})</TabsTrigger>
-            <TabsTrigger value="pending">Pending ({pendingTutors.length})</TabsTrigger>
+            <TabsTrigger value="remedial">Remedial ({remedialRequests.length})</TabsTrigger>
+            <TabsTrigger value="pending">Pending ({pendingTutors.length + pendingSchools.length + remedialRequests.filter(r => r.status === 'pending').length})</TabsTrigger>
           </TabsList>
 
           {/* All Tutors Tab */}
