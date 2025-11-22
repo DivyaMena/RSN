@@ -1117,13 +1117,28 @@ export default function CoordinatorDashboard({ user, logout }) {
                         </p>
                         <p className="text-sm text-gray-600">Topic: {rc.topic}</p>
                         <p className="text-sm text-gray-600">Students: {rc.student_ids.length}</p>
-                        {rc.tutor_id && <p className="text-sm text-green-600 font-medium">Tutor Assigned</p>}
+                        {rc.tutor_id && <p className="text-sm text-green-600 font-medium">✓ Tutor Assigned</p>}
                       </div>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                        rc.status === 'assigned' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {rc.status?.toUpperCase()}
-                      </span>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                          rc.status === 'assigned' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {rc.status?.toUpperCase()}
+                        </span>
+                        {!rc.tutor_id && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRemedialClass(rc);
+                              setAssignTutorDialogOpen(true);
+                            }}
+                            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                          >
+                            <UserCheck className="h-4 w-4 mr-1" />
+                            Assign Tutor
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
