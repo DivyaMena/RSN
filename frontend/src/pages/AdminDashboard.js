@@ -100,6 +100,8 @@ export default function AdminDashboard({ user, logout }) {
   const [curriculumSummary, setCurriculumSummary] = useState([]);
   const [uploadingCsv, setUploadingCsv] = useState(false);
   const [selectedCurriculum, setSelectedCurriculum] = useState([]);
+  const [curriculumFilterClass, setCurriculumFilterClass] = useState('all');
+  const [curriculumFilterSubject, setCurriculumFilterSubject] = useState('all');
 
   // Selection state for bulk operations
   const [selectedCoordinators, setSelectedCoordinators] = useState([]);
