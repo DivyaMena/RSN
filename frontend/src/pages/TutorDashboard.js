@@ -66,6 +66,24 @@ export default function TutorDashboard({ user, logout }) {
         }
       }
       setBatchTutors(tutorsData);
+
+      // Fetch curriculum for tutor's teaching subjects
+      const curriculumData = {};
+      for (const batch of batchesRes.data) {
+        const key = `${batch.board}-${batch.class_level}-${batch.subject}`;
+        if (!curriculumData[key]) {
+          try {
+            const res = await axios.get(
+              `${API}/curriculum?board=${batch.board}&class_level=${batch.class_level}&subject=${batch.subject}`,
+              { withCredentials: true }
+            );
+            curriculumData[key] = res.data;
+          } catch (error) {
+            console.error(`Failed to fetch curriculum for ${key}`);
+          }
+        }
+      }
+      setCurriculum(curriculumData);
     } catch (error) {
       toast.error('Failed to fetch data');
     } finally {
