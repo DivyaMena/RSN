@@ -471,7 +471,14 @@ export default function StudentDashboard({ user, logout }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>📚 My Curriculum</h2>
             <div className="space-y-4">
               {student.subjects.filter(subj => ACADEMIC_SUBJECTS.includes(subj)).map(subject => {
-                const curriculumItems = curriculum[subject] || [];
+                const curriculumItems = (curriculum[subject] || []).sort((a, b) => {
+                  // First sort by lesson number
+                  if (a.topic_number !== b.topic_number) {
+                    return a.topic_number - b.topic_number;
+                  }
+                  // Then sort alphabetically by topic name (handles A, B, C)
+                  return a.topic_name.localeCompare(b.topic_name);
+                });
                 const isExpanded = expandedCurriculum[subject];
                 
                 return (
