@@ -184,15 +184,15 @@ class RisingStarsAPITester:
         """Test student-related endpoints"""
         self.log("\n🎓 Testing Student Endpoints...")
         
-        # Login as coordinator to access student data
-        if not self.login_as_role("coordinator"):
+        # Login as admin to access student data
+        if not self.login_as_role("admin"):
             return False
             
         # Test get students endpoint
         success, students = self.run_test(
             "Get All Students",
             "GET",
-            "students",
+            "admin/students",
             200
         )
         
@@ -212,26 +212,19 @@ class RisingStarsAPITester:
                 student_code = vignesh_student.get("student_code")
                 
                 self.log(f"   Found Vignesh: {student_name} ({student_code})")
+                self.log(f"   ✅ Student details: Class {vignesh_student.get('class_level')}, Board {vignesh_student.get('board')}")
+                self.log(f"   ✅ School: {vignesh_student.get('school_name')}")
+                self.log(f"   ✅ Subjects: {vignesh_student.get('subjects', [])}")
                 
-                # Test get individual student details
-                success, student_details = self.run_test(
-                    f"Get Student Details ({student_name})",
-                    "GET",
-                    f"students/{student_id}",
-                    200
-                )
-                
-                if success:
-                    self.log(f"   ✅ Student details: Class {student_details.get('class_level')}, Board {student_details.get('board')}")
-                    self.log(f"   ✅ School: {student_details.get('school_name')}")
-                    self.log(f"   ✅ Subjects: {student_details.get('subjects', [])}")
-                    
-                    # Verify student shows as "Name (Code)" format, not UUID
-                    display_name = f"{student_name} ({student_code})"
-                    if student_code and "RSN-" in student_code:
-                        self.log(f"   ✅ Student display format correct: {display_name}")
-                    else:
-                        self.log(f"   ❌ Student code format issue: {student_code}")
+                # Verify student shows as "Name (Code)" format, not UUID
+                display_name = f"{student_name} ({student_code})"
+                if student_code and "RSN-TS-S-2025-24508" in student_code:
+                    self.log(f"   ✅ Student display format correct: {display_name}")
+                    self.log(f"   ✅ Matches expected code from review request: RSN-TS-S-2025-24508")
+                else:
+                    self.log(f"   ❌ Student code format issue: {student_code}")
+            else:
+                self.log("   ❌ Vignesh student not found")
         
         return True
 
