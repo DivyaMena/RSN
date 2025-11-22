@@ -1823,24 +1823,51 @@ export default function AdminDashboard({ user, logout }) {
                       {/* Filters Section */}
                       <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <h4 className="font-semibold text-gray-900 mb-3">Filters</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Board Filter */}
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Board</label>
+                            <Select value={curriculumFilterBoard} onValueChange={(value) => {
+                              setCurriculumFilterBoard(value);
+                              setCurriculumFilterClass('all');
+                              setCurriculumFilterSubject('all');
+                            }}>
+                              <SelectTrigger className="w-full bg-white">
+                                <SelectValue placeholder="All Boards" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Boards</SelectItem>
+                                {[...new Set(curriculum.map(item => item.board))].sort().map(board => (
+                                  <SelectItem key={board} value={board}>{board} Board</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
                           {/* Class Filter */}
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Class</label>
-                            <Select value={curriculumFilterClass} onValueChange={setCurriculumFilterClass}>
+                            <Select value={curriculumFilterClass} onValueChange={(value) => {
+                              setCurriculumFilterClass(value);
+                              setCurriculumFilterSubject('all');
+                            }}>
                               <SelectTrigger className="w-full bg-white">
                                 <SelectValue placeholder="All Classes" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="all">All Classes</SelectItem>
-                                {[...new Set(curriculum.map(item => item.class_level))].sort((a, b) => a - b).map(cls => (
+                                {[...new Set(
+                                  curriculum
+                                    .filter(item => curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard)
+                                    .map(item => item.class_level)
+                                )].sort((a, b) => a - b).map(cls => (
                                   <SelectItem key={cls} value={String(cls)}>Class {cls}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </div>
 
-                          {/* Subject Filter */}
+                          {/* Subject Filter - Dynamic based on Class */}
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-2 block">Filter by Subject</label>
                             <Select value={curriculumFilterSubject} onValueChange={setCurriculumFilterSubject}>
@@ -1849,7 +1876,14 @@ export default function AdminDashboard({ user, logout }) {
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="all">All Subjects</SelectItem>
-                                {[...new Set(curriculum.map(item => item.subject))].sort().map(subj => (
+                                {[...new Set(
+                                  curriculum
+                                    .filter(item => 
+                                      (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
+                                      (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass)
+                                    )
+                                    .map(item => item.subject)
+                                )].sort().map(subj => (
                                   <SelectItem key={subj} value={subj}>{subj}</SelectItem>
                                 ))}
                               </SelectContent>
@@ -1858,17 +1892,18 @@ export default function AdminDashboard({ user, logout }) {
                         </div>
 
                         {/* Clear Filters Button */}
-                        {(curriculumFilterClass !== 'all' || curriculumFilterSubject !== 'all') && (
+                        {(curriculumFilterBoard !== 'all' || curriculumFilterClass !== 'all' || curriculumFilterSubject !== 'all') && (
                           <div className="mt-3">
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => {
+                                setCurriculumFilterBoard('all');
                                 setCurriculumFilterClass('all');
                                 setCurriculumFilterSubject('all');
                               }}
                             >
-                              Clear Filters
+                              Clear All Filters
                             </Button>
                           </div>
                         )}
