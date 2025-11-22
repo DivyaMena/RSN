@@ -1958,7 +1958,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                 </Select>
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleAssignTutor} className="flex-1">
+                <Button onClick={handleAssignRemedialTutor} className="flex-1">
                   Assign Tutor
                 </Button>
                 <Button onClick={() => setAssignTutorDialogOpen(false)} variant="outline" className="flex-1">
