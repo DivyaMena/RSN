@@ -539,11 +539,12 @@ export default function LogBoard({ user, logout }) {
           </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Topic Covered</label>
+              <label className="block text-sm font-medium mb-2">Lesson Teaching</label>
               <Input
                 data-testid="edit-topic-input"
                 value={editFormData.topic_covered}
                 onChange={(e) => setEditFormData({ ...editFormData, topic_covered: e.target.value })}
+                placeholder="Paste Lesson name from curriculum"
               />
             </div>
 
