@@ -1914,6 +1914,7 @@ export default function AdminDashboard({ user, logout }) {
                         <Checkbox
                           checked={(() => {
                             const filtered = curriculum.filter(item => 
+                              (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
                               (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
                               (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
                             );
@@ -1921,6 +1922,7 @@ export default function AdminDashboard({ user, logout }) {
                           })()}
                           onCheckedChange={() => {
                             const filtered = curriculum.filter(item => 
+                              (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
                               (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
                               (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
                             );
@@ -1929,6 +1931,7 @@ export default function AdminDashboard({ user, logout }) {
                         />
                         <span className="text-sm font-medium">
                           Select All ({curriculum.filter(item => 
+                            (curriculumFilterBoard === 'all' || item.board === curriculumFilterBoard) &&
                             (curriculumFilterClass === 'all' || String(item.class_level) === curriculumFilterClass) &&
                             (curriculumFilterSubject === 'all' || item.subject === curriculumFilterSubject)
                           ).length} lessons)
