@@ -138,6 +138,13 @@ export default function StudentDashboard({ user, logout }) {
     }
   };
 
+  const toggleCurriculum = (subject) => {
+    setExpandedCurriculum(prev => ({
+      ...prev,
+      [subject]: !prev[subject]
+    }));
+  };
+
   const handleBatchSelection = async (batchId) => {
     setRemedialBatch(batchId);
     setRemedialCurriculum('');
