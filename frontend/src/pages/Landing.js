@@ -31,17 +31,18 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6 text-sm font-medium">
-            <Heart className="h-4 w-4" />
-            <span>Free Education for Underprivileged Students</span>
-          </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 bg-clip-text text-transparent leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Free Online Tuition For Students Who Need Extra Support
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Helping students who struggle to understand subjects, can't speak up in crowded classrooms, or attend schools with teacher shortages. Free online tuition for classes 6-10 by volunteer tutors.
-          </p>
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6 text-sm font-medium">
+              <Heart className="h-4 w-4" />
+              <span>India's Platform for Aspiring Students</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 bg-clip-text text-transparent leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Free Online Tuition For Students Who Need Extra Support to Succeed
+            </h1>
+            <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+              Helping students who want clearer understanding, personal attention, and a safe space to ask questions — through free online tuition for Classes 6–10 by dedicated volunteer tutors.
+            </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button data-testid="get-started-btn" onClick={() => navigate('/login')} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
               Get Started
