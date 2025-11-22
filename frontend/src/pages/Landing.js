@@ -43,13 +43,21 @@ export default function Landing() {
             <p className="text-lg text-gray-600 mb-10 leading-relaxed">
               Helping students who want clearer understanding, personal attention, and a safe space to ask questions — through free online tuition for Classes 6–10 by dedicated volunteer tutors.
             </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button data-testid="get-started-btn" onClick={() => navigate('/login')} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
-              Get Started
-            </Button>
-            <Button data-testid="learn-more-btn" variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300 px-8 py-6 text-lg">
-              Learn More
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button data-testid="get-started-btn" onClick={() => navigate('/login')} size="lg" className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl px-8 py-6 text-lg">
+                Get Started
+              </Button>
+              <Button data-testid="learn-more-btn" variant="outline" size="lg" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300 px-8 py-6 text-lg">
+                Learn More
+              </Button>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="/hero.jpg" 
+              alt="Rising Stars Nation - Empowering Students" 
+              className="rounded-3xl shadow-2xl w-full h-auto object-cover"
+            />
           </div>
         </div>
       </section>
