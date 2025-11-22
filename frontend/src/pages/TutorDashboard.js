@@ -212,6 +212,30 @@ export default function TutorDashboard({ user, logout }) {
           );
         })()}
 
+        {/* Batch Statistics */}
+        {batches.length > 0 && (() => {
+          const ACADEMIC_SUBJECTS = ['MAT', 'PHY', 'SCI', 'BIO', 'ENG'];
+          const academicBatches = batches.filter(b => ACADEMIC_SUBJECTS.includes(b.subject));
+          const nonAcademicBatches = batches.filter(b => !ACADEMIC_SUBJECTS.includes(b.subject));
+          
+          return (
+            <div className="grid md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Total Batches</h3>
+                <p className="text-3xl font-bold text-blue-600">{batches.length}</p>
+              </div>
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Academic</h3>
+                <p className="text-3xl font-bold text-green-600">{academicBatches.length}</p>
+              </div>
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Non-Academic</h3>
+                <p className="text-3xl font-bold text-purple-600">{nonAcademicBatches.length}</p>
+              </div>
+            </div>
+          );
+        })()}
+
         {batches.length === 0 ? (
           <div data-testid="no-batches-message" className="text-center py-20">
             <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
