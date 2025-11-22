@@ -1,91 +1,170 @@
-<analysis>
-The trajectory documents an extensive and iterative development process for the Rising Stars Nation application, driven by a continuous stream of detailed feature requests from the user. The initial focus on verifying the Coordinator Dashboard was quickly superseded by major new requirements, including a super-admin (RSN) role, a new School role with a full registration and dashboard flow, and significant enhancements for all existing user dashboards (Parent, Student, Tutor, Coordinator).
+<analysis>**original_problem_statement:**
+The user has requested a series of features and bug fixes, primarily focused on the Admin, Coordinator, Student, and Tutor dashboards.
 
-The development process was characterized by the AI engineer creating detailed, phased plans, which the user would then amend with more requirements. A significant portion of the work focused on the , which became the most complex component. Key features tackled include a role-based login dropdown, new registration forms with extensive fields (KYC, T&C), and a highly specific, rule-based batch scheduling system.
+The latest request includes four main items:
+1.  Fix the non-working Upload Curriculum button on the Admin Dashboard.
+2.  On the Student Dashboard, display a View Curriculum button below enrolled academic batches.
+3.  On the Tutor Dashboard, display the curriculum for the academic classes the tutor teaches. Also, add stat blocks for Total batches, Academic, and Non-Academic batches.
+4.  Fix the student count display (e.g., 15/25) on the Tutor Dashboard to be clickable again, showing a list of student names in a popup or inline view.
 
-Several development loops were caused by bugs and user frustration. The Manage Availability feature for Coordinators went through multiple incorrect implementations, causing significant friction. The most recent and critical work has been on implementing the global batch scheduling rules (e.g., 3 or 4 slots per subject, no consecutive slots on the same day) and the associated UI on the Coordinator Dashboard. The user reported major issues with this implementation, including the logic violating its own rules, UI colors not updating correctly after an unassign action, and incorrect feedback messages. The final messages show the AI engineer attempting to fix these specific, critical bugs in the scheduling and assignment logic.
+The user has explicitly requested to implement these changes without running automated tests to save costs, and will perform testing themselves.
 
-The user's primary language is English. The next agent must respond in English only.
-</analysis>
+**User's preferred language**: English
 
-<product_requirements>
-The Rising Stars Nation application is a multi-role educational platform. The core goal is to build out comprehensive dashboards and registration flows for all user types, with a super-admin having ultimate control.
+**what currently exists?**
+A full-stack educational platform with role-based access for Admins, Coordinators, Tutors, Parents, and Students. Recent major additions include:
+- A comprehensive Admin Dashboard with bulk selection/deletion and inline detail views for all major entities (students, tutors, schools, etc.).
+- A full curriculum management system with CSV upload functionality on the Admin Dashboard.
+- A complete School registration, login, and approval workflow, integrated into the Coordinator and Admin dashboards.
+- A redesigned homepage and cleanup of old Test Login functionality.
+- A functional email notification system using a Gmail App Password.
 
-**Key Roles & Features:**
-*   **RSN (Admin):** A super-admin role () with a dedicated dashboard to view and manage all platform data (users, batches, subjects, etc.). This role handles coordinator assignments and manages site-wide settings like curriculum and holidays. There is no public signup for this role.
-*   **School:** Schools register with detailed information (board, address, classes taught, required subjects). After coordinator approval, they access a dashboard to specify their Tutors Unavailable timetable, indicating where they need volunteer teachers.
-*   **Coordinator:** Manages tutors and batches. The dashboard includes complex filters, tutor assignment capabilities, and a view of pending approvals. They can request changes to their own availability, which must be approved by an Admin.
-*   **Tutor:** Registers with detailed preferences (classes, subjects, preferred slots). The dashboard allows them to view assigned batches, manage their availability (with coordinator approval for preference changes), and post log board entries with strict Google Meet link validation.
-*   **Parent/Student:** Parents register students with DOB and T&C acceptance. Students log in with their parent's email and their DOB. They can view batches, request remedial classes, and have their attendance marked by confirming Join Class.
+**Last working item**:
+The agent was actively implementing a four-part user request related to curriculum visibility and Tutor Dashboard enhancements.
 
-A central, rule-based **Global Batch Schedule** must be implemented. For each batch, a schedule (e.g., 3-4 slots/week) is pre-generated based on class level and subject, respecting constraints like no consecutive slots on the same day. This schedule is visualized on the Coordinator dashboard with color-coded slots (Yellow for unassigned, Green for assigned).
-</product_requirements>
+-   **Last item agent was working**: The agent was working on **Issue #3** of the user's latest request: adding stat blocks (Total, Academic, Non-Academic) and curriculum visibility to the Tutor Dashboard (). It had successfully implemented fixes for Issue #1 (CSV upload button) and started work on Issue #2 (Student curriculum view) by adding the necessary backend endpoint.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?** Manual testing by user. The user has explicitly stated not to run automated tests. The next agent should complete the implementation and inform the user that it's ready for their review.
+-   **User Testing Done**: N
 
-<key_technical_concepts>
-- **Full-Stack Application:** Python (FastAPI) backend with a React.js (Vite) frontend.
-- **Database:** MongoDB for data persistence.
-- **API & Data Modeling:** Pydantic for data validation and schema definition in the backend. All API routes are prefixed with .
-- **Frontend State & UI:** State management is handled with  and . UI components are built using shadcn/ui on top of Tailwind CSS.
-- **Authentication:** A test/development JWT-based authentication system using  to switch between user roles.
-- **Asynchronous Operations:**  for frontend API calls.
-</key_technical_concepts>
+**All Pending/In progress Issue list**:
+-   **Issue 1**: Complete the 4-part feature request. (P0)
+-   **Issue 2**: User verification needed for the All Tutors filter fix on the Coordinator Dashboard. (P1)
+-   **Issue 3**: User verification needed for the WAITLIST button styling fix on the Coordinator Dashboard. (P1)
 
-<code_architecture>
-The project is a monorepo with a standard  and  directory structure.
+**Issues Detail**:
+-   **Issue 1: Complete the 4-part feature request**
+    -   **Attempted fixes**:
+        -   **Part 1 (CSV Button):** A fix was applied to the  file, changing the  component's structure to correctly trigger the hidden file input.
+        -   **Part 2 (Student Curriculum):** A backend endpoint () was added. Frontend work was started to add a collapsible curriculum view in .
+        -   **Part 3 (Tutor Dashboard UI):** Work is in progress. The agent was about to add stat blocks to .
+        -   **Part 4 (Clickable Student Count):** Not yet started.
+    -   **Next debug checklist**:
+        1.  Resume work in .
+        2.  Implement the UI for the three stat blocks (Total, Academic, Non-Academic).
+        3.  Implement the curriculum viewing feature for tutors within their batch listings.
+        4.  Implement the clickable student count, fetching the student list and displaying it in a dialog or inline collapsible section.
+    -   **Why fix this issue and what will be achieved with the fix?** This will complete the user's current feature request, providing essential curriculum information to students and tutors and restoring previously working functionality on the Tutor Dashboard.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on other issue**: None
+
+-   **Issue 2: User verification for All Tutors filter**
+    -   **Attempted fixes**: The agent modified the filter logic in  to correctly match the tutor ID from the batch data.
+    -   **Why fix this issue and what will be achieved with the fix?** This addresses a user-reported bug where filtering batches by a specific tutor was not working.
+    -   **Status**: USER VERIFICATION PENDING
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend
+
+-   **Issue 3: User verification for WAITLIST button styling**
+    -   **Attempted fixes**: The agent added explicit Tailwind CSS classes (, ) to the buttons in  when a batch status is WAITLIST.
+    -   **Why fix this issue and what will be achieved with the fix?** This provides a clear visual cue to coordinators that certain actions are unavailable for waitlisted batches.
+    -   **Status**: USER VERIFICATION PENDING
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend
+
+**In progress Task List**:
+-   **Task 1: Complete Curriculum and Tutor Dashboard Enhancements**
+    -   **Where to resume**: Continue editing . The next step is to add the batch statistic cards, followed by the curriculum view and the clickable student count feature.
+    -   **What will be achieved with this?** The Tutor Dashboard will be significantly more informative, and students will have access to their curriculum, fulfilling the user's request.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on something**: None
+
+**Upcoming and Future Tasks**
+-   There are no other pending tasks. The agent should solicit the next set of requirements from the user after completing and getting verification for the current tasks.
+
+**Completed work in this session**
+-   **Admin Dashboard Overhaul**: Implemented bulk delete, inline details, and new tabs for State Boards and Curriculum. (DONE)
+-   **Curriculum CSV Upload**: Backend endpoint and frontend UI for uploading curriculum data. (DONE)
+-   **School Management System**: Full registration, login, and approval workflow for schools. (DONE)
+-   **Coordinator Dashboard Refactor**: Added school management and cleaned up UI. (DONE)
+-   **Homepage Redesign**: Updated homepage text, logo, and hero image. (DONE)
+-   **Email Configuration**: Successfully configured and tested email sending with a user-provided app password. (DONE)
+-   **Bug Fixes**: Resolved a critical  error and fixed missing school data by adding a necessary backend endpoint. (DONE)
+-   **Code Cleanup**: Removed all legacy Test Login functionality. (DONE)
+
+**Earlier issues found/mentioned but not fixed**
+-   None. All previously mentioned issues were either resolved or are currently in progress.
+
+**Known issue recurrence from previous fork**
+-   Not applicable.
+
+**Code Architecture**
 
 
+**Key Technical Concepts**
+-   **Full-Stack**: React.js frontend, Python (FastAPI) backend.
+-   **Database**: MongoDB.
+-   **UI**:  and Tailwind CSS.
+-   **API**: Pydantic models for validation, all routes prefixed with .
+-   **File Handling**: Backend CSV parsing for curriculum uploads.
 
--   ****
-    -   **Importance:** This is the core of the application, defining all data models (Pydantic), API endpoints, and business logic for every user role and feature.
-    -   **Summary of Changes:** This file has been massively extended to support all new roles and features. Key additions include:
-        -   New Pydantic models for , , , , and new fields across existing models (, , , ).
-        -   New registration endpoints for Coordinators and Schools.
-        -   An endpoint for Coordinators to request availability changes ().
-        -   A complex  endpoint that now handles both 'assign' and 'unassign' modes.
-        -   A schedule generation function () that creates a fixed weekly schedule for each batch based on global rules.
-        -   Endpoints to support student attendance tracking ().
+**key DB schema**
+-   : Stores all user types (admin, coordinator, parent, tutor, student, school) and roles.
+-   : New collection for school registrations, including approval status and detailed information.
+-   : Stores structured curriculum data (Board → Class → Subject → Lesson).
+-   : New collection for state board names.
 
--   ****
-    -   **Importance:** This is the most complex and most frequently modified component, serving as the central hub for coordinators. It is the primary focus of the most recent user feedback.
-    -   **Summary of Changes:**
-        -   Filters were added to the All Batches tab for class, subject, day, tutor, and a placeholder for slot.
-        -   The Active Batches card was removed.
-        -   The logic for displaying a batch's schedule was completely reworked to show pre-generated slots as color-coded chips (Yellow for unassigned, Green for assigned). The chips are now sorted by day of the week.
-        -   The Assign Tutor dialog's tutor list is now strictly filtered by class, subject, and availability status.
-        -   The Assign Tutor dialog was updated to include two buttons, Assign and Unassign, which pass a  to the backend.
-        -   A Manage Availability feature was implemented (and debugged extensively) as a dialog that submits an availability change request to the Admin.
+**changes in tech stack**
+-   None.
 
--   ****
-    -   **Importance:** A new page created to handle the detailed registration process for the Coordinator role.
-    -   **Summary of Changes:** Created from scratch to include fields for state, address, mobile numbers, pincode, KYC file uploads (selfie, Aadhaar), a multi-select for languages known, and a mandatory, clickable T&C checkbox.
+**All files**
+-   **Created:**
+    -   : A new dashboard for the school role.
+    -   : A downloadable sample file for admins.
+    -   : A manual testing guide for the school features.
+-   **Updated Heavily:**
+    -   : Added numerous models and endpoints for schools, curriculum, bulk deletes, and email testing.
+    -   : Overhauled to add bulk actions, inline details, and new tabs.
+    -   : Refactored to add school management and fix bugs.
+    -   : Rewritten with a new detailed form.
+    -   : Redesigned with new content and images.
 
--   ****
-    -   **Importance:** The entry point for new tutors.
-    -   **Summary of Changes:** The form was updated to include a mandatory Preferred Slot radio button selection (5pm-6pm, 6pm-7pm, Any), which is required for the batch slot filter to function. The Tell me about yourself label was also updated.
+**key api endpoints**
+-   : Endpoints for bulk deleting records.
+-   : Endpoint for uploading curriculum CSV.
+-   : Endpoint to fetch all school records.
+-   : Endpoint for the new school registration form.
+-   : Endpoints for school approval.
+-   : Endpoint to fetch curriculum data for a given subject.
 
--   ****
-    -   **Importance:** A shared component used by multiple roles to view class logs.
-    -   **Summary of Changes:** Updated to include a clickable tutor name that opens a dialog with the tutor's bio. It also contains the Join Class button with special logic for students to confirm attendance.
-</code_architecture>
+**Critical Info for New Agent**
+-   **NO TESTING**: The user has explicitly forbidden the use of automated testing agents to save costs. Implement the features and ask the user to verify them manually.
+-   **Follow Instructions Precisely**: The user is very specific in their requests and will notice if any part of the instructions is missed. Ensure all four parts of the current task are fully completed.
+-   **Large Components**: Be aware that  and  are very large files. Make targeted edits to avoid introducing regressions.
+-   **Data-Not-Showing Bug Pattern**: A previous bug where data failed to appear was caused by a missing backend GET endpoint. If you encounter a similar issue, verify the entire data flow from the backend API call to the frontend rendering logic.
 
-<pending_tasks>
-- **Full Admin Dashboard:** Implement the UI for Admins to view and act upon Coordinator availability requests. Build out the other sections for managing all platform data.
-- **School Dashboard:** Complete the Tutors Unavailable grid functionality.
-- **Tutor Dashboard:** Fix the issue where assigned batches are not appearing. Implement the My Teaching Preferences change request flow.
-- **Notification System:** Implement the planned in-app and email notification system.
-- **Final Verification:** Verify the View Students in a batch feature and the smart Assign Tutor dialog's final state.
-</pending_tasks>
+**documents created in this job**
+-   
+-    (and a copy in )
 
-<current_work>
-The immediate work is a critical bug-fixing and refinement cycle on the **Coordinator Dashboard's batch scheduling and assignment feature**, directly responding to user frustration. The user reported three major flaws with the last implementation:
+**Last 5 User Messages and any pending user messages**
+1.  **Latest Request**: User reported 4 issues: broken curriculum upload, missing curriculum view on Student/Tutor dashboards, and broken clickable student count on Tutor dashboard. **Status: IN PROGRESS**.
+2.  **School Data Missing (Admin)**: User reported approved schools were not showing on the Admin dashboard. **Status: Agent fixed by adding a missing API endpoint, but user verification is pending.**
+3.  **pendingSchools is not defined Error**: User provided a console error. **Status: RESOLVED.**
+4.  **u are messing with me**: User expressed frustration that the app was broken after the agent claimed success. **Status: RESOLVED (by fixing the error from the next message).**
+5.  **School Data Missing (Follow-up)**: User specified that the school data issue also affected the Admin dashboard. **Status: Part of the same fix for the missing API endpoint.**
 
-1.  **Global Rule Violation:** The schedule generator created two slots on the same day for a batch (), violating the no two slots on the same day rule.
-2.  **Incorrect UI Feedback:** After a tutor was unassigned from a day, the corresponding slot chip on the batch card did not revert its color from green back to yellow.
-3.  **Incorrect Toast Message & Button Style:** The Unassign button was not visually distinct, and upon a successful unassignment, it triggered the Tutor assigned successfully toast instead of a Tutor removed successfully message.
+**Project Health Check:**
+-   **Broken**: The curriculum and tutor dashboard features from the latest request are incomplete. A regression where the student count is no longer clickable is part of this fix.
+-   **Mocked**: None.
 
-The AI engineer has already implemented frontend fixes for the toast message and button styling and has updated the backend  endpoint to differentiate between 'assign' and 'unassign' modes. The primary focus now is correcting the schedule generation logic in  to strictly enforce the one-slot-per-day-per-batch rule and ensuring the frontend  correctly reflects the assignment status changes in the UI (green to yellow). The work is happening in  and .
-</current_work>
+**Testing status**
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: The clickable student count on the Tutor Dashboard, which the user mentioned was previously working, is now broken and needs to be fixed.
 
-<optional_next_step>
-Verify the fixes for the global schedule generation and the assign/unassign UI feedback. Specifically, check batch  to confirm it no longer has two slots on the same day, and test the unassign functionality to ensure the slot color reverts to yellow.
-</optional_next_step>
+**Credentials to test flow:**
+-   **Admin**:  / 
+-   **Approved Schools**:  / ,  / 
+-   **Email**:  (password is set in )
+
+**What agent forgot to execute**
+-   The agent is in the middle of executing the user's latest 4-part request. It has not yet completed:
+    -   Adding stat blocks to the Tutor Dashboard.
+    -   Adding the curriculum view to the Tutor Dashboard.
+    -   Fixing the clickable student count on the Tutor Dashboard.</analysis>
