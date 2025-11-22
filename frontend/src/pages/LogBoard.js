@@ -377,12 +377,12 @@ export default function LogBoard({ user, logout }) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Topic Covered *</label>
+                      <label className="block text-sm font-medium mb-2">Lesson Teaching *</label>
                       <Input
                         data-testid="log-topic-input"
                         value={formData.topic_covered}
                         onChange={(e) => setFormData({ ...formData, topic_covered: e.target.value })}
-                        placeholder="Enter topic covered"
+                        placeholder="Paste Lesson name from curriculum"
                       />
                     </div>
 
