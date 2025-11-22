@@ -70,16 +70,21 @@ export default function CoordinatorDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
-      const [batchesRes, tutorsRes, pendingRes, allSchoolsRes] = await Promise.all([
+      const [batchesRes, tutorsRes, pendingRes, allSchoolsRes, remedialReqRes, remedialClassesRes] = await Promise.all([
         axios.get(`${API}/batches`, { withCredentials: true }),
         axios.get(`${API}/tutors`, { withCredentials: true }),
         axios.get(`${API}/tutors/pending`, { withCredentials: true }).catch(() => ({ data: [] })),
-        axios.get(`${API}/admin/schools`, { withCredentials: true }).catch(() => ({ data: [] }))
+        axios.get(`${API}/admin/schools`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/remedial/requests`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/remedial/classes`, { withCredentials: true }).catch(() => ({ data: [] }))
       ]);
       setBatches(batchesRes.data);
       setTutors(tutorsRes.data);
       setPendingTutors(pendingRes.data);
       setAllSchools(allSchoolsRes.data); // Store all schools
+      setPendingSchools(allSchoolsRes.data.filter(s => s.approval_status === 'pending'));
+      setRemedialRequests(remedialReqRes.data);
+      setRemedialClasses(remedialClassesRes.data);
       
       // Fetch assignments for each batch
       const assignments = {};
