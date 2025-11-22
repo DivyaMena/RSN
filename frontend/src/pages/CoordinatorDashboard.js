@@ -490,8 +490,8 @@ export default function CoordinatorDashboard({ user, logout }) {
             onClick={() => setActiveTab('schools')}
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-left cursor-pointer"
           >
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Schools</h3>
-            <p className="text-4xl font-bold text-orange-600">{allSchools.length}</p>
+            <h3 className="text-gray-600 text-xs sm:text-sm font-medium mb-2">Schools</h3>
+            <p className="text-3xl sm:text-4xl font-bold text-orange-600">{allSchools.length}</p>
             <p className="text-xs text-gray-500 mt-2">Click to view all</p>
           </button>
           <button 
