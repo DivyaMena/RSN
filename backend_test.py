@@ -18,7 +18,7 @@ class RisingStarsAPITester:
         
         # Real test credentials from database
         self.test_credentials = {
-            "admin": {"email": "risingstarsnation2025@gmail.com", "password": "Divya@1907"},
+            "admin": {"email": "idonateforneedy@gmail.com", "password": "RisingStars@2025"},
             "student": {"email": "4krishnakumar@gmail.com", "password": "12-11-2013"}  # Parent email + student DOB
         }
         
