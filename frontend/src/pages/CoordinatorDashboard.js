@@ -853,6 +853,117 @@ export default function CoordinatorDashboard({ user, logout }) {
         </div>
       </TabsContent>
 
+      {/* Remedial Requests Tab */}
+      <TabsContent value="remedial">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Remedial Requests Management</h2>
+          
+          {remedialRequests.length === 0 ? (
+            <div className="text-center py-20">
+              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No remedial requests</h3>
+              <p className="text-gray-600">Students haven't requested any remedial classes yet</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Group by Subject and Class */}
+              {Object.entries(
+                remedialRequests.reduce((acc, req) => {
+                  const key = `${req.board}-Class ${req.class_level}-${SUBJECTS[req.subject] || req.subject}`;
+                  if (!acc[key]) acc[key] = [];
+                  acc[key].push(req);
+                  return acc;
+                }, {})
+              ).map(([groupKey, requests]) => (
+                <div key={groupKey} className="border rounded-lg p-4 bg-gray-50">
+                  <h3 className="font-bold text-lg text-gray-900 mb-3">{groupKey}</h3>
+                  
+                  {/* Pending Requests */}
+                  {requests.filter(r => r.status === 'pending').length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-sm text-yellow-800 bg-yellow-100 px-3 py-1 rounded inline-block mb-2">
+                        Pending Requests ({requests.filter(r => r.status === 'pending').length})
+                      </h4>
+                      <div className="space-y-2 mt-2">
+                        {requests.filter(r => r.status === 'pending').map(req => (
+                          <div key={req.id} className="bg-white p-3 rounded border">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">Student ID: {req.student_id}</p>
+                                <p className="text-sm text-gray-600">Topic: {req.topic}</p>
+                                <p className="text-sm text-gray-600">Reason: {req.reason}</p>
+                                {req.description && <p className="text-sm text-gray-500 mt-1">{req.description}</p>}
+                                <p className="text-xs text-gray-400 mt-1">Requested: {new Date(req.requested_at).toLocaleDateString()}</p>
+                              </div>
+                              <span className="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">
+                                {req.status.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Pooled/Assigned Requests */}
+                  {requests.filter(r => r.status !== 'pending').length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-sm text-blue-800 bg-blue-100 px-3 py-1 rounded inline-block mb-2">
+                        Processed Requests ({requests.filter(r => r.status !== 'pending').length})
+                      </h4>
+                      <div className="space-y-2 mt-2">
+                        {requests.filter(r => r.status !== 'pending').map(req => (
+                          <div key={req.id} className="bg-white p-3 rounded border opacity-60">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">Student ID: {req.student_id}</p>
+                                <p className="text-sm text-gray-600">Topic: {req.topic}</p>
+                              </div>
+                              <span className="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">
+                                {req.status.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Remedial Classes Section */}
+          {remedialClasses.length > 0 && (
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Remedial Classes Created ({remedialClasses.length})</h3>
+              <div className="space-y-3">
+                {remedialClasses.map(rc => (
+                  <div key={rc.id} className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900">{rc.class_code}</h4>
+                        <p className="text-sm text-gray-600">
+                          {rc.board} | Class {rc.class_level} | {SUBJECTS[rc.subject] || rc.subject}
+                        </p>
+                        <p className="text-sm text-gray-600">Topic: {rc.topic}</p>
+                        <p className="text-sm text-gray-600">Students: {rc.student_ids.length}</p>
+                        {rc.tutor_id && <p className="text-sm text-green-600 font-medium">Tutor Assigned</p>}
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                        rc.status === 'assigned' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {rc.status?.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+
       {/* Pending Tutors Tab */}
       <TabsContent value="pending">
         <div className="bg-white rounded-xl shadow-lg p-6">
