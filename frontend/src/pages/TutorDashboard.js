@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
-import { BookOpen, LogOut, Settings, Calendar } from 'lucide-react';
+import { BookOpen, LogOut, Settings, Calendar, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDateIST, getCurrentDateIST } from '../utils/dateUtils';
 
