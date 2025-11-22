@@ -82,7 +82,14 @@ export default function TutorDashboard({ user, logout }) {
               { withCredentials: true }
             );
             if (res.data && res.data.length > 0) {
-              curriculumData[key] = res.data;
+              curriculumData[key] = res.data.sort((a, b) => {
+                // First sort by lesson number
+                if (a.topic_number !== b.topic_number) {
+                  return a.topic_number - b.topic_number;
+                }
+                // Then sort alphabetically by topic name (handles A, B, C)
+                return a.topic_name.localeCompare(b.topic_name);
+              });
             }
           } catch (error) {
             console.error(`Failed to fetch curriculum for ${key}`);
