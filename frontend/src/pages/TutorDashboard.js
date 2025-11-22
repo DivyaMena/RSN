@@ -419,6 +419,78 @@ export default function TutorDashboard({ user, logout }) {
             })}
           </div>
         )}
+
+        {/* Curriculum Section - Showing all opted subjects and classes */}
+        {tutorProfile && tutorProfile.classes_can_teach && tutorProfile.subjects_can_teach && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">📚 My Teaching Curriculum</h2>
+            <p className="text-gray-600 mb-6">
+              Curriculum for Classes {tutorProfile.classes_can_teach.join(', ')} - {tutorProfile.board_preference} Board
+            </p>
+            
+            <div className="grid gap-6">
+              {tutorProfile.classes_can_teach.map(classLevel => (
+                <div key={classLevel} className="bg-white rounded-2xl shadow-lg p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Class {classLevel}</h3>
+                  
+                  <div className="space-y-4">
+                    {tutorProfile.subjects_can_teach.map(subject => {
+                      const curriculumKey = `${tutorProfile.board_preference}-${classLevel}-${subject}`;
+                      const curriculumItems = curriculum[curriculumKey] || [];
+                      const isExpanded = expandedCurriculum[curriculumKey];
+                      
+                      return (
+                        <div key={subject} className="border border-gray-200 rounded-lg overflow-hidden">
+                          <button
+                            onClick={() => toggleCurriculum(curriculumKey)}
+                            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 hover:from-blue-100 hover:to-green-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-lg flex items-center justify-center text-white font-bold">
+                                {subject}
+                              </div>
+                              <div className="text-left">
+                                <h4 className="font-semibold text-gray-900">{SUBJECTS[subject]}</h4>
+                                <p className="text-sm text-gray-600">
+                                  {curriculumItems.length} {curriculumItems.length === 1 ? 'topic' : 'topics'}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-gray-500 text-xl">{isExpanded ? '▼' : '▶'}</span>
+                          </button>
+                          
+                          {isExpanded && (
+                            <div className="p-4 bg-white">
+                              {curriculumItems.length === 0 ? (
+                                <p className="text-center text-gray-500 py-4">No curriculum available for this subject yet.</p>
+                              ) : (
+                                <div className="space-y-2 max-h-96 overflow-y-auto">
+                                  {curriculumItems.map((item, idx) => (
+                                    <div key={idx} className="bg-blue-50 rounded-lg p-3 border border-blue-200 hover:border-blue-300 transition-colors">
+                                      <div className="flex items-start">
+                                        <span className="font-semibold text-blue-700 mr-3 text-lg">{item.topic_number}.</span>
+                                        <div className="flex-1">
+                                          <p className="font-medium text-gray-900">{item.topic_name}</p>
+                                          {item.description && (
+                                            <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Status Management Dialog */}
