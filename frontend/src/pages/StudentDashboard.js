@@ -460,31 +460,40 @@ export default function StudentDashboard({ user, logout }) {
         )}
 
         {/* Curriculum */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Curriculum</h2>
-          <div className="space-y-6">
-            {student.subjects.map(subject => (
-              <div key={subject} data-testid={`curriculum-${subject}`} className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{SUBJECTS[subject]}</h3>
-                {curriculum[subject] && curriculum[subject].length > 0 ? (
-                  <div className="space-y-2">
-                    {curriculum[subject].map(item => (
-                      <div key={item.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                        <span className="font-semibold text-blue-600 min-w-[30px]">{item.topic_number}.</span>
-                        <div>
-                          <p className="font-medium text-gray-900">{item.topic_name}</p>
-                          {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
-                        </div>
-                      </div>
-                    ))}
+        {ACADEMIC_SUBJECTS.some(subj => student.subjects.includes(subj)) && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Curriculum</h2>
+            <div className="space-y-6">
+              {student.subjects.filter(subj => ACADEMIC_SUBJECTS.includes(subj)).map(subject => (
+                <div key={subject} data-testid={`curriculum-${subject}`} className="bg-white rounded-xl shadow-lg p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-gray-900">{SUBJECTS[subject]}</h3>
+                    {curriculum[subject] && curriculum[subject].length > 0 && (
+                      <span className="text-sm text-gray-600">{curriculum[subject].length} lessons</span>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-gray-600">Curriculum not available</p>
-                )}
-              </div>
-            ))}
+                  {curriculum[subject] && curriculum[subject].length > 0 ? (
+                    <div className="space-y-2">
+                      {curriculum[subject].map(item => (
+                        <div key={item.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <span className="font-semibold text-blue-600 min-w-[30px]">{item.topic_number}.</span>
+                          <div>
+                            <p className="font-medium text-gray-900">{item.topic_name}</p>
+                            {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-gray-600 mb-3">Curriculum will be available once uploaded by admin</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* Remedial Request Dialog */}
