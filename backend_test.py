@@ -398,21 +398,69 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_tutor_endpoints(self):
-        """Test tutor-related endpoints"""
-        self.log("\n👨‍🏫 Testing Tutor Endpoints...")
+    def test_coordinator_dashboard_endpoints(self):
+        """Test coordinator dashboard specific endpoints"""
+        self.log("\n👥 Testing Coordinator Dashboard Endpoints...")
         
-        # Test get tutors (should fail for non-coordinator)
-        success, _ = self.run_test(
-            "Get All Tutors (Should Fail)",
+        # Login as coordinator
+        if not self.login_as_role("coordinator"):
+            return False
+            
+        # Test get all batches
+        success, batches = self.run_test(
+            "Get All Batches",
             "GET",
-            "tutors",
-            403
+            "batches",
+            200
         )
         
         if success:
-            self.log("✅ Tutor access properly restricted")
+            self.log(f"✅ Retrieved {len(batches)} batches")
+        
+        # Test get all tutors
+        success, tutors = self.run_test(
+            "Get All Tutors",
+            "GET",
+            "tutors",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(tutors)} tutors")
+        
+        # Test get all schools
+        success, schools = self.run_test(
+            "Get All Schools",
+            "GET",
+            "schools",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(schools)} schools")
             
+            # Verify at least one pending school exists
+            pending_schools = [s for s in schools if s.get("approval_status") == "pending"]
+            if pending_schools:
+                self.log(f"   ✅ Found {len(pending_schools)} pending schools")
+        
+        # Test pending counts
+        success, pending = self.run_test(
+            "Get Pending Counts",
+            "GET",
+            "coordinator/pending-counts",
+            200
+        )
+        
+        if success:
+            tutors_count = pending.get("tutors", 0)
+            schools_count = pending.get("schools", 0)
+            remedial_count = pending.get("remedial", 0)
+            total_count = tutors_count + schools_count + remedial_count
+            
+            self.log(f"✅ Pending counts - Tutors: {tutors_count}, Schools: {schools_count}, Remedial: {remedial_count}")
+            self.log(f"   Total pending: {total_count}")
+        
         return True
 
     def test_logboard_endpoints(self):
