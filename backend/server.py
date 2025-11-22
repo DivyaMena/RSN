@@ -1677,6 +1677,16 @@ async def bulk_delete_curriculum(input: BulkDeleteInput, request: Request):
 
 # ============= CURRICULUM ENDPOINTS =============
 
+@api_router.get("/curriculum")
+async def get_curriculum(board: str, class_level: int, subject: str):
+    """Get curriculum for specific board, class, and subject - Public endpoint"""
+    items = await db.curriculum_items.find({
+        "board": board,
+        "class_level": class_level,
+        "subject": subject
+    }, {"_id": 0}).sort("topic_number", 1).to_list(length=None)
+    return items
+
 @api_router.get("/admin/curriculum")
 async def get_all_curriculum(request: Request):
     """Get all curriculum items"""
