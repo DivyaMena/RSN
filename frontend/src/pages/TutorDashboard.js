@@ -121,6 +121,30 @@ export default function TutorDashboard({ user, logout }) {
     }
   };
 
+  const handleViewStudents = async (batchId, studentIds) => {
+    try {
+      const studentsData = [];
+      for (const studentId of studentIds) {
+        try {
+          const res = await axios.get(`${API}/students/${studentId}`, { withCredentials: true });
+          studentsData.push(res.data);
+        } catch (error) {
+          console.error(`Failed to fetch student ${studentId}`);
+        }
+      }
+      setStudentListDialog({ open: true, batchId, students: studentsData });
+    } catch (error) {
+      toast.error('Failed to fetch student list');
+    }
+  };
+
+  const toggleCurriculum = (key) => {
+    setExpandedCurriculum(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
