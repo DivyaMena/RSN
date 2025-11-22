@@ -372,48 +372,6 @@ export default function TutorDashboard({ user, logout }) {
                       </div>
                     </div>
                   )}
-
-                  {/* Curriculum Section */}
-                  {(() => {
-                    const curriculumKey = `${batch.board}-${batch.class_level}-${batch.subject}`;
-                    const curriculumItems = curriculum[curriculumKey] || [];
-                    const isExpanded = expandedCurriculum[curriculumKey];
-                    
-                    if (curriculumItems.length > 0) {
-                      return (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <button
-                            onClick={() => toggleCurriculum(curriculumKey)}
-                            className="w-full flex items-center justify-between text-left"
-                          >
-                            <h4 className="font-semibold text-gray-900">
-                              📚 Curriculum - {SUBJECTS[batch.subject]} (Class {batch.class_level})
-                            </h4>
-                            <span className="text-gray-500">{isExpanded ? '▼' : '▶'}</span>
-                          </button>
-                          
-                          {isExpanded && (
-                            <div className="mt-3 space-y-2 max-h-96 overflow-y-auto">
-                              {curriculumItems.map((item, idx) => (
-                                <div key={idx} className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                                  <div className="flex items-start">
-                                    <span className="font-semibold text-blue-700 mr-2">{item.topic_number}.</span>
-                                    <div className="flex-1">
-                                      <p className="font-medium text-gray-900">{item.topic_name}</p>
-                                      {item.description && (
-                                        <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
                 </div>
               );
             })}
