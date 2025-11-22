@@ -64,6 +64,18 @@ export default function CoordinatorDashboard({ user, logout }) {
   const [availabilityRequestTo, setAvailabilityRequestTo] = useState('');
   const [availabilityRequestLoading, setAvailabilityRequestLoading] = useState(false);
 
+  // Remedial management states
+  const [remedialFilterClass, setRemedialFilterClass] = useState('all');
+  const [remedialFilterSubject, setRemedialFilterSubject] = useState('all');
+  const [selectedRemedialRequests, setSelectedRemedialRequests] = useState([]);
+  const [remedialStudentDetails, setRemedialStudentDetails] = useState({});
+  const [expandedStudentId, setExpandedStudentId] = useState(null);
+  const [poolDialogOpen, setPoolDialogOpen] = useState(false);
+  const [poolTopic, setPoolTopic] = useState('');
+  const [assignTutorDialogOpen, setAssignTutorDialogOpen] = useState(false);
+  const [selectedRemedialClass, setSelectedRemedialClass] = useState(null);
+  const [selectedRemedialTutor, setSelectedRemedialTutor] = useState('');
+
   useEffect(() => {
     fetchData();
   }, []);
