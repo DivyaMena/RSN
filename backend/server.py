@@ -3244,6 +3244,106 @@ async def get_my_remedial_requests(request: Request):
     requests_list = await db.remedial_requests.find({"student_id": student["id"]}, {"_id": 0}).to_list(None)
     return requests_list
 
+@api_router.post("/remedial/pool-students")
+async def pool_remedial_students(input: PoolRemedialStudentsInput, request: Request):
+    """Pool multiple remedial requests into a single remedial class (coordinator only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can pool remedial students")
+    
+    # Fetch all the remedial requests
+    requests = await db.remedial_requests.find({"id": {"$in": input.request_ids}}, {"_id": 0}).to_list(None)
+    
+    if not requests:
+        raise HTTPException(status_code=404, detail="No remedial requests found")
+    
+    # Get common details from first request
+    first_req = requests[0]
+    subject = first_req["subject"]
+    class_level = first_req["class_level"]
+    board = first_req["board"]
+    
+    # Validate all requests are for same subject, class, board
+    for req in requests:
+        if req["subject"] != subject or req["class_level"] != class_level or req["board"] != board:
+            raise HTTPException(status_code=400, detail="All requests must be for the same subject, class, and board")
+    
+    # Generate remedial class code
+    class_count = await db.remedial_classes.count_documents({
+        "subject": subject,
+        "class_level": class_level,
+        "board": board
+    })
+    class_code = f"RSN-{board}-REMEDIAL-C{class_level}-{subject}-{str(class_count + 1).zfill(3)}"
+    
+    # Create remedial class
+    remedial_class = RemedialClass(
+        class_code=class_code,
+        subject=subject,
+        class_level=class_level,
+        board=board,
+        topic=input.topic,
+        student_ids=[req["student_id"] for req in requests],
+        request_ids=input.request_ids,
+        status="pending_tutor"
+    )
+    
+    doc = remedial_class.model_dump()
+    doc["created_at"] = doc.get("created_at", datetime.now(timezone.utc)).isoformat() if isinstance(doc.get("created_at"), datetime) else doc.get("created_at")
+    await db.remedial_classes.insert_one(doc)
+    
+    # Update all requests to "pooled" status
+    await db.remedial_requests.update_many(
+        {"id": {"$in": input.request_ids}},
+        {"$set": {"status": "pooled"}}
+    )
+    
+    return remedial_class
+
+@api_router.post("/remedial/assign-tutor")
+async def assign_tutor_to_remedial(input: AssignRemedialTutorInput, request: Request):
+    """Assign a tutor to a remedial class (coordinator only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can assign tutors")
+    
+    # Check if remedial class exists
+    remedial_class = await db.remedial_classes.find_one({"id": input.remedial_class_id})
+    if not remedial_class:
+        raise HTTPException(status_code=404, detail="Remedial class not found")
+    
+    # Check if tutor exists
+    tutor = await db.tutors.find_one({"id": input.tutor_id})
+    if not tutor:
+        raise HTTPException(status_code=404, detail="Tutor not found")
+    
+    # Update remedial class with tutor assignment
+    await db.remedial_classes.update_one(
+        {"id": input.remedial_class_id},
+        {"$set": {"tutor_id": input.tutor_id, "status": "assigned"}}
+    )
+    
+    # Update all related requests to "assigned" status
+    await db.remedial_requests.update_many(
+        {"id": {"$in": remedial_class["request_ids"]}},
+        {"$set": {"status": "assigned"}}
+    )
+    
+    return {"success": True, "message": "Tutor assigned successfully"}
+
+@api_router.get("/remedial/classes")
+async def get_remedial_classes(request: Request):
+    """Get all remedial classes (coordinator only)"""
+    user = await require_auth(request)
+    
+    if user.role not in ["coordinator", "admin"]:
+        raise HTTPException(status_code=403, detail="Only coordinators can view remedial classes")
+    
+    classes = await db.remedial_classes.find({}, {"_id": 0}).to_list(None)
+    return classes
+
 # ============= ATTENDANCE ROUTES =============
 
 @api_router.post("/attendance/mark")
