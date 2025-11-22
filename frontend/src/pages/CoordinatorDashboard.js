@@ -1055,10 +1055,14 @@ export default function CoordinatorDashboard({ user, logout }) {
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => setExpandedStudentId(isExpanded ? null : req.student_id)}
-                                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+                                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-left"
                                     >
-                                      <Eye className="h-4 w-4" />
-                                      {student ? `${student.name} (${student.student_code})` : req.student_id}
+                                      <Eye className="h-4 w-4 flex-shrink-0" />
+                                      {student ? (
+                                        <span>{student.name} ({student.student_code})</span>
+                                      ) : (
+                                        <span className="text-xs text-gray-500">Loading student data...</span>
+                                      )}
                                     </button>
                                     <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
                                       {req.board} | Class {req.class_level} | {SUBJECTS[req.subject]}
