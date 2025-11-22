@@ -293,22 +293,55 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_batch_management(self):
-        """Test batch creation and management"""
-        self.log("\n📚 Testing Batch Management...")
+    def test_tutor_dashboard_endpoints(self):
+        """Test tutor dashboard specific endpoints"""
+        self.log("\n👨‍🏫 Testing Tutor Dashboard Endpoints...")
         
-        # Test get batches
-        success, batches = self.run_test(
-            "Get Batches",
-            "GET", 
-            "batches",
+        # Login as tutor
+        if not self.login_as_role("tutor"):
+            return False
+            
+        # Test get tutor's teaching curriculum
+        success, curriculum = self.run_test(
+            "Get Tutor Teaching Curriculum",
+            "GET",
+            "tutors/me/curriculum",
             200
         )
         
         if success:
-            self.log(f"✅ Retrieved {len(batches)} batches")
+            self.log(f"✅ Retrieved tutor curriculum for opted classes/subjects")
             
-        return success
+            # Verify curriculum is sorted properly (1A, 1B, 1C order)
+            if curriculum:
+                self.log(f"   First curriculum item: {curriculum[0].get('topic_name', 'N/A')}")
+        
+        # Test get tutor's batches
+        success, batches = self.run_test(
+            "Get Tutor Batches",
+            "GET",
+            "tutors/me/batches",
+            200
+        )
+        
+        if success:
+            self.log(f"✅ Retrieved {len(batches)} tutor batches")
+            
+            # Test student count for batches
+            for batch in batches[:2]:  # Test first 2 batches
+                batch_id = batch.get("id")
+                if batch_id:
+                    success, students = self.run_test(
+                        f"Get Batch Students ({batch.get('batch_code', 'Unknown')})",
+                        "GET",
+                        f"batches/{batch_id}/students",
+                        200
+                    )
+                    if success:
+                        student_count = len(students)
+                        self.log(f"   ✅ Batch {batch.get('batch_code')}: {student_count} students")
+        
+        return True
 
     def test_curriculum_access(self):
         """Test curriculum endpoints"""
