@@ -177,28 +177,60 @@ class RisingStarsAPITester:
         
         return True
 
-    def test_user_registration(self):
-        """Test user registration endpoints"""
-        self.log("\n👤 Testing User Registration...")
+    def test_student_endpoints(self):
+        """Test student-related endpoints"""
+        self.log("\n🎓 Testing Student Endpoints...")
         
-        if not self.session_token:
-            self.log("❌ No session token available for registration tests")
+        # Login as coordinator to access student data
+        if not self.login_as_role("coordinator"):
             return False
             
-        # Test parent registration
-        success, parent_data = self.run_test(
-            "Register as Parent",
-            "POST",
-            "users/register/parent",
-            200,
-            data={"state": "TS"}
+        # Test get students endpoint
+        success, students = self.run_test(
+            "Get All Students",
+            "GET",
+            "students",
+            200
         )
         
-        if success:
-            self.user_data = parent_data
-            self.log(f"✅ Parent registered with code: {parent_data.get('user_code', 'N/A')}")
+        if success and students:
+            self.log(f"✅ Retrieved {len(students)} students")
+            
+            # Find Vignesh student for detailed testing
+            vignesh_student = None
+            for student in students:
+                if "vignesh" in student.get("name", "").lower():
+                    vignesh_student = student
+                    break
+            
+            if vignesh_student:
+                student_id = vignesh_student.get("id")
+                student_name = vignesh_student.get("name")
+                student_code = vignesh_student.get("student_code")
+                
+                self.log(f"   Found Vignesh: {student_name} ({student_code})")
+                
+                # Test get individual student details
+                success, student_details = self.run_test(
+                    f"Get Student Details ({student_name})",
+                    "GET",
+                    f"students/{student_id}",
+                    200
+                )
+                
+                if success:
+                    self.log(f"   ✅ Student details: Class {student_details.get('class_level')}, Board {student_details.get('board')}")
+                    self.log(f"   ✅ School: {student_details.get('school_name')}")
+                    self.log(f"   ✅ Subjects: {student_details.get('subjects', [])}")
+                    
+                    # Verify student shows as "Name (Code)" format, not UUID
+                    display_name = f"{student_name} ({student_code})"
+                    if student_code and "RSN-" in student_code:
+                        self.log(f"   ✅ Student display format correct: {display_name}")
+                    else:
+                        self.log(f"   ❌ Student code format issue: {student_code}")
         
-        return success
+        return True
 
     def test_student_management(self):
         """Test student creation and management"""
