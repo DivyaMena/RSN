@@ -84,6 +84,36 @@ class RisingStarsAPITester:
             })
             return False, {}
 
+    def login_as_role(self, role):
+        """Login as specific role using test credentials"""
+        if role not in self.test_credentials:
+            self.log(f"❌ No credentials for role: {role}")
+            return False
+            
+        creds = self.test_credentials[role]
+        login_data = {
+            "email": creds["email"],
+            "password": creds["password"],
+            "role": role
+        }
+        
+        success, response = self.run_test(
+            f"Login as {role.title()}",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success and response.get("session_token"):
+            self.session_token = response["session_token"]
+            self.user_data = response.get("user", {})
+            self.log(f"✅ Logged in as {role}: {self.user_data.get('name', 'Unknown')}")
+            return True
+        else:
+            self.log(f"❌ Failed to login as {role}")
+            return False
+
     def test_auth_flow(self):
         """Test authentication endpoints"""
         self.log("\n🔐 Testing Authentication Flow...")
@@ -96,17 +126,14 @@ class RisingStarsAPITester:
             401
         )
         
-        # Test session endpoint without session ID (should fail)
+        # Test login with invalid credentials
         success, _ = self.run_test(
-            "Auth Session (No Session ID)",
-            "GET",
-            "auth/session", 
-            400
+            "Login Invalid Credentials",
+            "POST",
+            "auth/login",
+            401,
+            data={"email": "invalid@test.com", "password": "wrong", "role": "student"}
         )
-        
-        # Create a test session manually for testing
-        self.log("📝 Creating test session for API testing...")
-        self.create_test_session()
         
         return True
 
