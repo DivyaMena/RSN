@@ -558,10 +558,10 @@ export default function StudentDashboard({ user, logout }) {
             
             {remedialBatch && (
               <div>
-                <Label>Select Curriculum Topic *</Label>
+                <Label>Select Lesson Name *</Label>
                 <Select value={remedialCurriculum} onValueChange={setRemedialCurriculum}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select topic from curriculum" />
+                    <SelectValue placeholder="Select lesson from curriculum" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[200px] overflow-y-auto">
                     {availableCurriculum.length > 0 ? (
