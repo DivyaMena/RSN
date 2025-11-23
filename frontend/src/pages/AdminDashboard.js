@@ -1490,18 +1490,66 @@ export default function AdminDashboard({ user, logout }) {
                                 <p><span className="font-medium">Enrollment Year:</span> {student.enrollment_year}</p>
                               </div>
                               <div className="space-y-3">
-                                {student.photo_url && (
+                                {student.photo_url ? (
                                   <div>
                                     <p className="text-xs font-medium text-gray-700 mb-1">Student Photo:</p>
                                     <img src={student.photo_url} alt="Student Photo" className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300" />
                                   </div>
+                                ) : (
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-700 mb-1">Student Photo:</p>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="text-xs"
+                                      onChange={async (e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                          const formData = new FormData();
+                                          formData.append('file', file);
+                                          try {
+                                            const res = await axios.post(`${API}/upload-file`, formData, { withCredentials: true, headers: { 'Content-Type': 'multipart/form-data' } });
+                                            await axios.put(`${API}/students/${student.id}`, { photo_url: res.data.url }, { withCredentials: true });
+                                            toast.success('Photo uploaded!');
+                                            window.location.reload();
+                                          } catch (error) {
+                                            toast.error('Upload failed');
+                                          }
+                                        }
+                                      }}
+                                    />
+                                  </div>
                                 )}
-                                {student.aadhaar_page1_url && (
+                                {student.aadhaar_page1_url ? (
                                   <div>
                                     <p className="text-xs font-medium text-gray-700 mb-1">Aadhaar Document:</p>
                                     <a href={student.aadhaar_page1_url} target="_blank" rel="noopener noreferrer">
                                       <img src={student.aadhaar_page1_url} alt="Aadhaar" className="w-40 h-auto rounded border hover:shadow-md transition-shadow cursor-pointer" />
                                     </a>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-700 mb-1">Aadhaar Document:</p>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="text-xs"
+                                      onChange={async (e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                          const formData = new FormData();
+                                          formData.append('file', file);
+                                          try {
+                                            const res = await axios.post(`${API}/upload-file`, formData, { withCredentials: true, headers: { 'Content-Type': 'multipart/form-data' } });
+                                            await axios.put(`${API}/students/${student.id}`, { aadhaar_page1_url: res.data.url }, { withCredentials: true });
+                                            toast.success('Aadhaar uploaded!');
+                                            window.location.reload();
+                                          } catch (error) {
+                                            toast.error('Upload failed');
+                                          }
+                                        }
+                                      }}
+                                    />
                                   </div>
                                 )}
                               </div>
