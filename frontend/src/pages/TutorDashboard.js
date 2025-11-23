@@ -178,6 +178,7 @@ export default function TutorDashboard({ user, logout }) {
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-gray-700">Welcome, {user.name}</span>
+            <DonateButton />
             <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
               My Profile
             </Button>
