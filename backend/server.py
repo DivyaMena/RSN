@@ -412,7 +412,10 @@ class ReportInput(BaseModel):
     from_date: str  # ISO date string
     to_date: str  # ISO date string
     report_type: str  # "enrollments", "students", "tutors", "coordinators", "parents"
-    filter_value: Optional[str] = None  # "all" or specific ID for filtering
+    filter_value: Optional[str] = None  # "all" or specific value for filtering
+    filter_subject: Optional[str] = None  # For enrollment reports
+    filter_class_level: Optional[int] = None  # For enrollment reports
+    filter_board: Optional[str] = None  # For enrollment and student reports
 
 class RegisterSchoolInput(BaseModel):
     school_name: str
