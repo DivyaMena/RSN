@@ -101,7 +101,10 @@ export default function Login() {
           >
             Rising Stars Nation
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">Free online tuition for students who need extra support</p>
+          <p className="text-sm sm:text-base text-gray-600 mb-3">Free online tuition for students who need extra support</p>
+          <div className="flex justify-center">
+            <DonateButton />
+          </div>
         </div>
 
         {/* Login Card */}
