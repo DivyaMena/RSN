@@ -3527,14 +3527,19 @@ async def delete_student(student_id: str, request: Request):
 
 @api_router.get("/students/me/batches")
 async def get_my_batches(request: Request):
-    """Get batches for logged-in student"""
+    """Get batches for logged-in student - only current academic year"""
     user = await require_auth(request)
     
     if user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can access this endpoint")
     
     # For student login, user.id IS the student ID
-    batches = await db.batches.find({"student_ids": user.id}, {"_id": 0}).to_list(None)
+    # Filter by current academic year only
+    current_year = get_current_academic_year()
+    batches = await db.batches.find({
+        "student_ids": user.id,
+        "academic_year": current_year
+    }, {"_id": 0}).to_list(None)
     return [Batch(**b) for b in batches]
 
 # ============= REMEDIAL CLASS ROUTES =============
