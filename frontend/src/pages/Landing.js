@@ -23,6 +23,7 @@ export default function Landing() {
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
           </div>
           <div className="flex items-center space-x-3">
+            <DonateButton />
             <Button onClick={() => navigate('/login')} className="bg-gradient-to-r from-blue-600 to-green-600 text-white hover:from-blue-700 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl px-6">
               Login
             </Button>
