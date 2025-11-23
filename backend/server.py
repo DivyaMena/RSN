@@ -2003,8 +2003,8 @@ async def generate_report(input: ReportInput, request: Request):
     elif input.report_type == "students":
         # Get students
         students_query = date_query.copy()
-        if input.filter_value and input.filter_value != "all":
-            students_query["board"] = input.filter_value
+        if input.filter_board and input.filter_board != "all":
+            students_query["board"] = input.filter_board
         
         students = await db.students.find(students_query, {"_id": 0}).to_list(None)
         
