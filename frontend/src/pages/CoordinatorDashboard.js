@@ -84,13 +84,14 @@ export default function CoordinatorDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
-      const [batchesRes, tutorsRes, pendingRes, allSchoolsRes, remedialReqRes, remedialClassesRes] = await Promise.all([
+      const [batchesRes, tutorsRes, pendingRes, allSchoolsRes, remedialReqRes, remedialClassesRes, studentsRes] = await Promise.all([
         axios.get(`${API}/batches`, { withCredentials: true }),
         axios.get(`${API}/tutors`, { withCredentials: true }),
         axios.get(`${API}/tutors/pending`, { withCredentials: true }).catch(() => ({ data: [] })),
         axios.get(`${API}/admin/schools`, { withCredentials: true }).catch(() => ({ data: [] })),
         axios.get(`${API}/remedial/requests`, { withCredentials: true }).catch(() => ({ data: [] })),
-        axios.get(`${API}/remedial/classes`, { withCredentials: true }).catch(() => ({ data: [] }))
+        axios.get(`${API}/remedial/classes`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/admin/students`, { withCredentials: true }).catch(() => ({ data: [] }))
       ]);
       setBatches(batchesRes.data);
       setTutors(tutorsRes.data);
@@ -99,6 +100,7 @@ export default function CoordinatorDashboard({ user, logout }) {
       setPendingSchools(allSchoolsRes.data.filter(s => s.approval_status === 'pending'));
       setRemedialRequests(remedialReqRes.data);
       setRemedialClasses(remedialClassesRes.data);
+      setAllStudents(studentsRes.data);
 
       // Fetch student details for all remedial requests
       const studentDetailsMap = {};
