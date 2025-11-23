@@ -2001,6 +2001,9 @@ async def generate_report(input: ReportInput, request: Request):
         # Get batch enrollments with enhanced filters
         batches_query = date_query.copy()
         
+        # FIRST FILTER: Academic Year (required)
+        batches_query["academic_year"] = input.academic_year
+        
         # Apply subject filter
         if input.filter_subject and input.filter_subject != "all":
             batches_query["subject"] = input.filter_subject
