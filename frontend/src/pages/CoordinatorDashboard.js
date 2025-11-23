@@ -1525,15 +1525,15 @@ export default function CoordinatorDashboard({ user, logout }) {
                 )}
 
                 {/* Aadhaar */}
-                {currentTutor.tutor?.aadhaar_number && (
-                  <p className="text-sm text-gray-700 mb-2">
-                    <strong>Aadhaar Number:</strong> {currentTutor.tutor.aadhaar_number}
-                  </p>
-                )}
-                
-                {currentTutor.tutor?.aadhaar_page1_url && (
-                  <div className="mb-2">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar Document:</p>
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar Information:</p>
+                  {currentTutor.tutor?.aadhaar_number && currentTutor.tutor.aadhaar_number !== '000000000000' && (
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Number:</strong> {currentTutor.tutor.aadhaar_number}
+                    </p>
+                  )}
+                  
+                  {currentTutor.tutor?.aadhaar_page1_url ? (
                     <a 
                       href={currentTutor.tutor.aadhaar_page1_url} 
                       target="_blank" 
@@ -1543,16 +1543,14 @@ export default function CoordinatorDashboard({ user, logout }) {
                       <img 
                         src={currentTutor.tutor.aadhaar_page1_url} 
                         alt="Aadhaar Document" 
-                        className="max-w-xs w-full h-auto rounded-lg border-2 border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                        className="max-w-xs w-full h-auto rounded-lg border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                       />
                       <p className="text-xs text-blue-600 mt-1 hover:underline">Click to view full size</p>
                     </a>
-                  </div>
-                )}
-                
-                {!currentTutor.tutor?.aadhaar_number && !currentTutor.tutor?.aadhaar_page1_url && (
-                  <p className="text-sm text-gray-600">📝 Aadhaar: Not provided</p>
-                )}
+                  ) : (
+                    <p className="text-sm text-red-600">⚠️ Aadhaar document not uploaded</p>
+                  )}
+                </div>
               </div>
 
               <div className="flex space-x-3">
