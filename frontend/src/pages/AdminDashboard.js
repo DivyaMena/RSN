@@ -145,7 +145,9 @@ export default function AdminDashboard({ user, logout }) {
   const [reportFromDate, setReportFromDate] = useState('');
   const [reportToDate, setReportToDate] = useState('');
   const [reportType, setReportType] = useState('enrollments');
-  const [reportFilter, setReportFilter] = useState('all');
+  const [reportFilterSubject, setReportFilterSubject] = useState('all');
+  const [reportFilterClass, setReportFilterClass] = useState('all');
+  const [reportFilterBoard, setReportFilterBoard] = useState('all');
   const [reportData, setReportData] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
 
