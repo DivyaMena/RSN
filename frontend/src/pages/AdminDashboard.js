@@ -2176,6 +2176,22 @@ export default function AdminDashboard({ user, logout }) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
+                  <label className="text-sm font-medium mb-2 block">Academic Year <span className="text-red-500">*</span></label>
+                  <Select value={reportAcademicYear} onValueChange={setReportAcademicYear}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select academic year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableAcademicYears.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <label className="text-sm font-medium mb-2 block">Report Type</label>
                   <Select value={reportType} onValueChange={(value) => {
                     setReportType(value);
