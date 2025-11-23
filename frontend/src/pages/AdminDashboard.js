@@ -2591,6 +2591,62 @@ export default function AdminDashboard({ user, logout }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Academic Year Rollover Dialog */}
+      <Dialog open={showRolloverDialog} onOpenChange={setShowRolloverDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>⚠️ Confirm Academic Year Rollover</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-700">
+              This action will:
+            </p>
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-2">
+              <li>Promote all students to the next class (6→7, 7→8, 8→9, 9→10)</li>
+              <li>Mark Class 10 students as "graduated"</li>
+              <li>Clear all student subjects (they must re-register)</li>
+              <li>Update academic year for all students</li>
+              <li className="text-red-600 font-semibold">This action cannot be undone!</li>
+            </ul>
+            <div className="bg-yellow-50 border border-yellow-200 p-3 rounded">
+              <p className="text-sm font-medium text-yellow-800">
+                ⚠️ Make sure all end-of-year tasks are complete before proceeding.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRolloverDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                setRolloverLoading(true);
+                try {
+                  const response = await axios.post(
+                    `${API}/admin/academic-year/rollover`,
+                    {},
+                    { withCredentials: true }
+                  );
+                  toast.success(response.data.message);
+                  toast.info(`${response.data.promoted_students} students promoted, ${response.data.graduated_students} graduated`);
+                  setShowRolloverDialog(false);
+                  fetchAcademicYearInfo();
+                  fetchDashboardStats();
+                } catch (error) {
+                  toast.error(error.response?.data?.detail || 'Rollover failed');
+                } finally {
+                  setRolloverLoading(false);
+                }
+              }}
+              disabled={rolloverLoading}
+            >
+              {rolloverLoading ? 'Processing...' : 'Yes, Start Rollover'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
