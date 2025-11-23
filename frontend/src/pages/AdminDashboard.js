@@ -2280,14 +2280,24 @@ export default function AdminDashboard({ user, logout }) {
 
                       setReportLoading(true);
                       try {
+                        const payload = {
+                          from_date: reportFromDate,
+                          to_date: reportToDate,
+                          report_type: reportType
+                        };
+
+                        // Add filters based on report type
+                        if (reportType === 'enrollments') {
+                          if (reportFilterSubject !== 'all') payload.filter_subject = reportFilterSubject;
+                          if (reportFilterClass !== 'all') payload.filter_class_level = parseInt(reportFilterClass);
+                          if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                        } else if (reportType === 'students') {
+                          if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                        }
+
                         const response = await axios.post(
                           `${API}/admin/reports/generate`,
-                          {
-                            from_date: reportFromDate,
-                            to_date: reportToDate,
-                            report_type: reportType,
-                            filter_value: reportFilter
-                          },
+                          payload,
                           { withCredentials: true }
                         );
                         setReportData(response.data);
