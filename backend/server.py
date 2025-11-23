@@ -31,6 +31,9 @@ db = client[os.environ['DB_NAME']]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI()
+
+# Serve uploaded files
+app.mount("/uploads", StaticFiles(directory="/app/backend/uploaded_files"), name="uploads")
 origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
 # print(":white_tick: CORS Origins:", origins)
 app.add_middleware(
