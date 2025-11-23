@@ -819,6 +819,69 @@ export default function CoordinatorDashboard({ user, logout }) {
         </div>
       </TabsContent>
 
+      {/* Students Tab */}
+      <TabsContent value="students">
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">All Students ({allStudents.length})</h2>
+            <div className="space-y-2">
+              {allStudents.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">No students found</p>
+              ) : (
+                allStudents.map((student) => (
+                  <div key={student.id}>
+                    <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                      <button onClick={() => setExpandedStudentId(expandedStudentId === student.id ? null : student.id)} className="p-1 hover:bg-gray-200 rounded">
+                        {expandedStudentId === student.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </button>
+                      <div className="flex-1">
+                        <p className="font-semibold">{student.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {student.student_code} | Class {student.class_level} | {student.school_name}
+                        </p>
+                      </div>
+                    </div>
+                    {expandedStudentId === student.id && (
+                      <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <h4 className="font-semibold text-sm mb-2">Student Details</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1 text-sm">
+                            <p><span className="font-medium">Code:</span> {student.student_code}</p>
+                            <p><span className="font-medium">School:</span> {student.school_name}</p>
+                            <p><span className="font-medium">Class:</span> {student.class_level}</p>
+                            <p><span className="font-medium">Board:</span> {student.board}</p>
+                            <p><span className="font-medium">Roll No:</span> {student.roll_no}</p>
+                            <p><span className="font-medium">Subjects:</span> {student.subjects?.join(', ')}</p>
+                            <p><span className="font-medium">Location:</span> {student.location}</p>
+                            <p><span className="font-medium">Enrollment Year:</span> {student.enrollment_year}</p>
+                          </div>
+                          <div className="space-y-3">
+                            {student.photo_url && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-700 mb-1">Student Photo:</p>
+                                <img src={student.photo_url} alt="Student Photo" className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300" />
+                              </div>
+                            )}
+                            {student.aadhaar_page1_url && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-700 mb-1">Aadhaar Document:</p>
+                                <a href={student.aadhaar_page1_url} target="_blank" rel="noopener noreferrer">
+                                  <img src={student.aadhaar_page1_url} alt="Aadhaar" className="w-40 h-auto rounded border hover:shadow-md transition-shadow cursor-pointer" />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
       {/* Schools Tab */}
       <TabsContent value="schools">
         <div className="bg-white rounded-xl shadow-lg p-6">
