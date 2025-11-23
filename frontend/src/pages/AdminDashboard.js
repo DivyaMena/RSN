@@ -2453,6 +2453,7 @@ export default function AdminDashboard({ user, logout }) {
                         onClick={async () => {
                           try {
                             const payload = {
+                              academic_year: reportAcademicYear,
                               from_date: reportFromDate,
                               to_date: reportToDate,
                               report_type: reportType
