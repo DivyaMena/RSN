@@ -2119,6 +2119,37 @@ async def register_parent(input: RegisterParentInput, request: Request):
     
     return user
 
+@api_router.post("/upload-file")
+async def upload_file(request: Request):
+    """Upload a file and return its URL"""
+    await require_auth(request)
+    
+    try:
+        form = await request.form()
+        uploaded_file = form.get("file")
+        
+        if not uploaded_file:
+            raise HTTPException(status_code=400, detail="No file uploaded")
+        
+        # Generate unique filename
+        import uuid
+        import os
+        file_extension = os.path.splitext(uploaded_file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = f"/app/backend/uploaded_files/{unique_filename}"
+        
+        # Save file
+        content = await uploaded_file.read()
+        with open(file_path, "wb") as f:
+            f.write(content)
+        
+        # Return URL (assuming files are served from /uploads/)
+        file_url = f"/uploads/{unique_filename}"
+        
+        return {"url": file_url, "filename": unique_filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+
 @api_router.post("/users/register/tutor")
 async def register_tutor(input: RegisterTutorInput, request: Request):
     """Register as tutor"""
