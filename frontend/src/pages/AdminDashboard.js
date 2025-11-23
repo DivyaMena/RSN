@@ -1368,13 +1368,31 @@ export default function AdminDashboard({ user, logout }) {
                         {expandedId === item.tutor?.id && (
                           <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                             <h4 className="font-semibold text-sm mb-2">Tutor Details</h4>
-                            <div className="space-y-1 text-sm">
-                              <p><span className="font-medium">Code:</span> {item.tutor?.tutor_code}</p>
-                              <p><span className="font-medium">Board:</span> {item.tutor?.board_preference}</p>
-                              <p><span className="font-medium">Classes:</span> {item.tutor?.classes_can_teach?.join(', ')}</p>
-                              <p><span className="font-medium">Subjects:</span> {item.tutor?.subjects_can_teach?.join(', ')}</p>
-                              <p><span className="font-medium">Days:</span> {item.tutor?.available_days?.join(', ')}</p>
-                              <p><span className="font-medium">About:</span> {item.tutor?.about_yourself || 'N/A'}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-1 text-sm">
+                                <p><span className="font-medium">Code:</span> {item.tutor?.tutor_code}</p>
+                                <p><span className="font-medium">Board:</span> {item.tutor?.board_preference}</p>
+                                <p><span className="font-medium">Classes:</span> {item.tutor?.classes_can_teach?.join(', ')}</p>
+                                <p><span className="font-medium">Subjects:</span> {item.tutor?.subjects_can_teach?.join(', ')}</p>
+                                <p><span className="font-medium">Days:</span> {item.tutor?.available_days?.join(', ')}</p>
+                                <p><span className="font-medium">About:</span> {item.tutor?.about_yourself || 'N/A'}</p>
+                              </div>
+                              <div className="space-y-3">
+                                {item.tutor?.photo_url && (
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-700 mb-1">Selfie Photo:</p>
+                                    <img src={item.tutor.photo_url} alt="Tutor Selfie" className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300" />
+                                  </div>
+                                )}
+                                {item.tutor?.aadhaar_page1_url && (
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-700 mb-1">Aadhaar Document:</p>
+                                    <a href={item.tutor.aadhaar_page1_url} target="_blank" rel="noopener noreferrer">
+                                      <img src={item.tutor.aadhaar_page1_url} alt="Aadhaar" className="w-40 h-auto rounded border hover:shadow-md transition-shadow cursor-pointer" />
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
