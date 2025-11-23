@@ -1510,14 +1510,14 @@ export default function CoordinatorDashboard({ user, logout }) {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-bold text-gray-900 mb-3">KYC Documents</h4>
                 
-                {/* Tutor Photo */}
-                {currentTutor.tutor?.photo_url ? (
+                {/* Photo */}
+                {(currentTutor.tutor?.photo_url || currentTutor.user?.photo_url) ? (
                   <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Tutor Photo:</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Selfie Photo:</p>
                     <img 
-                      src={currentTutor.tutor.photo_url} 
-                      alt="Tutor" 
-                      className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                      src={currentTutor.tutor?.photo_url || currentTutor.user?.photo_url} 
+                      alt="Tutor Selfie" 
+                      className="w-32 h-32 object-cover rounded-lg border-2 border-blue-300 shadow-md"
                     />
                   </div>
                 ) : (
