@@ -313,6 +313,9 @@ class RegisterTutorInput(BaseModel):
     subjects_can_teach: List[str]
     available_days: List[str]
     available_slots: List[str]
+    photo_url: Optional[str] = None
+    aadhaar_page1_url: Optional[str] = None
+    aadhaar_page2_url: Optional[str] = None
 
 class RegisterStudentInput(BaseModel):
     name: str
