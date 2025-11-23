@@ -133,6 +133,8 @@ class Student(BaseModel):
     roll_no: str
     subjects: List[str]  # ["MAT", "PHY", "SCI", "BIO", "ENG"]
     enrollment_year: int
+    academic_year: str = Field(default_factory=get_current_academic_year)  # e.g., "2025-26"
+    original_class: Optional[int] = None  # Original class at registration
     user_id: Optional[str] = None  # Linked user account for student login
     last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
