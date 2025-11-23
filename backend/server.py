@@ -47,6 +47,37 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 
+# ============= ACADEMIC YEAR UTILITIES =============
+
+def get_current_academic_year() -> str:
+    """
+    Returns current academic year in format '2025-26'
+    Academic year runs from April 1 to March 31
+    """
+    today = datetime.now(timezone.utc)
+    current_year = today.year
+    
+    # If before April 1, we're in previous academic year
+    if today.month < 4:
+        start_year = current_year - 1
+        end_year = current_year
+    else:
+        start_year = current_year
+        end_year = current_year + 1
+    
+    return f"{start_year}-{str(end_year)[-2:]}"
+
+def get_all_academic_years() -> List[str]:
+    """Returns list of academic years from 2024-25 to current + 2 years"""
+    current = get_current_academic_year()
+    start_year = int(current.split('-')[0])
+    
+    years = []
+    for year in range(2024, start_year + 3):
+        years.append(f"{year}-{str(year + 1)[-2:]}")
+    
+    return years
+
 # ============= MODELS =============
 
 class User(BaseModel):
