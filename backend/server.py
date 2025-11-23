@@ -1964,10 +1964,20 @@ async def generate_report(input: ReportInput, request: Request):
     }
     
     if input.report_type == "enrollments":
-        # Get batch enrollments
+        # Get batch enrollments with enhanced filters
         batches_query = date_query.copy()
-        if input.filter_value and input.filter_value != "all":
-            batches_query["id"] = input.filter_value
+        
+        # Apply subject filter
+        if input.filter_subject and input.filter_subject != "all":
+            batches_query["subject"] = input.filter_subject
+        
+        # Apply class level filter
+        if input.filter_class_level:
+            batches_query["class_level"] = input.filter_class_level
+        
+        # Apply board filter
+        if input.filter_board and input.filter_board != "all":
+            batches_query["board"] = input.filter_board
         
         batches = await db.batches.find(batches_query, {"_id": 0}).to_list(None)
         
