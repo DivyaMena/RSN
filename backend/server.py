@@ -2705,23 +2705,36 @@ async def get_students(request: Request):
 
 @api_router.get("/batches", response_model=List[Batch])
 async def get_batches(request: Request):
-    """Get batches (filtered by role)"""
+    """Get batches (filtered by role and academic year)"""
     user = await require_auth(request)
     
+    # Non-admin users see only current academic year
+    current_year = get_current_academic_year()
+    
     if user.role == "parent":
-        # Get batches for parent's students
+        # Get batches for parent's students - current year only
         students = await db.students.find({"parent_id": user.id}).to_list(None)
         student_ids = [s["id"] for s in students]
-        batches = await db.batches.find({"student_ids": {"$in": student_ids}}, {"_id": 0}).to_list(None)
+        batches = await db.batches.find({
+            "student_ids": {"$in": student_ids},
+            "academic_year": current_year
+        }, {"_id": 0}).to_list(None)
     elif user.role == "tutor":
-        # Get batches assigned to this tutor
+        # Get batches assigned to this tutor - current year only
         tutor = await db.tutors.find_one({"user_id": user.id})
         if not tutor:
             return []
         assignments = await db.batch_tutor_assignments.find({"tutor_id": tutor["id"]}).to_list(None)
         batch_ids = [a["batch_id"] for a in assignments]
-        batches = await db.batches.find({"id": {"$in": batch_ids}}, {"_id": 0}).to_list(None)
-    elif user.role in ["coordinator", "admin"]:
+        batches = await db.batches.find({
+            "id": {"$in": batch_ids},
+            "academic_year": current_year
+        }, {"_id": 0}).to_list(None)
+    elif user.role == "coordinator":
+        # Coordinators see current year only
+        batches = await db.batches.find({"academic_year": current_year}, {"_id": 0}).to_list(None)
+    elif user.role == "admin":
+        # Admins see all years (no filter)
         batches = await db.batches.find({}, {"_id": 0}).to_list(None)
     else:
         return []
