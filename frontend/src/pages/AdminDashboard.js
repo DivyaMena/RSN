@@ -142,6 +142,8 @@ export default function AdminDashboard({ user, logout }) {
   });
 
   // Reports State
+  const [reportAcademicYear, setReportAcademicYear] = useState('');
+  const [availableAcademicYears, setAvailableAcademicYears] = useState([]);
   const [reportFromDate, setReportFromDate] = useState('');
   const [reportToDate, setReportToDate] = useState('');
   const [reportType, setReportType] = useState('enrollments');
@@ -150,6 +152,10 @@ export default function AdminDashboard({ user, logout }) {
   const [reportFilterBoard, setReportFilterBoard] = useState('all');
   const [reportData, setReportData] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
+
+  // Academic Year Rollover State
+  const [showRolloverDialog, setShowRolloverDialog] = useState(false);
+  const [rolloverLoading, setRolloverLoading] = useState(false);
 
   // Helper function to get subjects based on class level
   const getSubjectsForClass = (classLevel) => {
