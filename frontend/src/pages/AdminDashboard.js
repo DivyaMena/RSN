@@ -2312,6 +2312,10 @@ export default function AdminDashboard({ user, logout }) {
                 <div className="flex gap-3">
                   <Button
                     onClick={async () => {
+                      if (!reportAcademicYear) {
+                        toast.error('Please select Academic Year');
+                        return;
+                      }
                       if (!reportFromDate || !reportToDate) {
                         toast.error('Please select both From Date and To Date');
                         return;
@@ -2320,6 +2324,7 @@ export default function AdminDashboard({ user, logout }) {
                       setReportLoading(true);
                       try {
                         const payload = {
+                          academic_year: reportAcademicYear,
                           from_date: reportFromDate,
                           to_date: reportToDate,
                           report_type: reportType
