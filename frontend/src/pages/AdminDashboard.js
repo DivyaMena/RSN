@@ -196,6 +196,7 @@ export default function AdminDashboard({ user, logout }) {
     if (activeTab === 'reports') {
       fetchStateBoards();
       fetchBatches();
+      fetchAcademicYearInfo();
     }
   }, [activeTab]);
 
