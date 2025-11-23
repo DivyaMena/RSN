@@ -408,6 +408,11 @@ class UpdateStateBoardInput(BaseModel):
     code: Optional[str] = None
     description: Optional[str] = None
 
+class EnrollmentReportInput(BaseModel):
+    from_date: str  # ISO date string
+    to_date: str  # ISO date string
+    course_id: Optional[str] = None  # "all" or specific batch ID
+
 class RegisterSchoolInput(BaseModel):
     school_name: str
     principal_name: str
