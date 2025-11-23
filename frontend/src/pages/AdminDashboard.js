@@ -1394,6 +1394,45 @@ export default function AdminDashboard({ user, logout }) {
                                 )}
                               </div>
                             </div>
+                            {/* Approve/Reject Buttons for Pending Tutors */}
+                            {item.tutor?.approval_status === 'pending' && (
+                              <div className="mt-4 pt-4 border-t flex gap-3">
+                                <Button
+                                  onClick={async () => {
+                                    try {
+                                      await axios.put(`${API}/tutors/${item.tutor.id}/approve`, {}, { withCredentials: true });
+                                      toast.success('Tutor approved successfully');
+                                      window.location.reload();
+                                    } catch (error) {
+                                      toast.error('Failed to approve tutor');
+                                    }
+                                  }}
+                                  className="flex-1 bg-green-600 hover:bg-green-700"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Approve Tutor
+                                </Button>
+                                <Button
+                                  onClick={async () => {
+                                    const reason = prompt('Enter rejection reason:');
+                                    if (reason) {
+                                      try {
+                                        await axios.put(`${API}/tutors/${item.tutor.id}/reject`, { reason }, { withCredentials: true });
+                                        toast.success('Tutor rejected');
+                                        window.location.reload();
+                                      } catch (error) {
+                                        toast.error('Failed to reject tutor');
+                                      }
+                                    }
+                                  }}
+                                  variant="destructive"
+                                  className="flex-1"
+                                >
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Reject Tutor
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
