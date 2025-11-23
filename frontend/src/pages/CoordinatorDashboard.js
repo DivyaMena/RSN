@@ -1510,6 +1510,19 @@ export default function CoordinatorDashboard({ user, logout }) {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-bold text-gray-900 mb-3">KYC Documents</h4>
                 
+                {/* Debug Info - Remove after testing */}
+                <details className="mb-3 text-xs bg-yellow-50 p-2 rounded">
+                  <summary className="cursor-pointer font-medium">Debug: View Raw Data</summary>
+                  <pre className="mt-2 overflow-auto max-h-40 text-xs">
+                    {JSON.stringify({
+                      tutor_photo: currentTutor.tutor?.photo_url,
+                      user_photo: currentTutor.user?.photo_url,
+                      aadhaar_url: currentTutor.tutor?.aadhaar_page1_url,
+                      aadhaar_num: currentTutor.tutor?.aadhaar_number
+                    }, null, 2)}
+                  </pre>
+                </details>
+                
                 {/* Photo */}
                 {(currentTutor.tutor?.photo_url || currentTutor.user?.photo_url) ? (
                   <div className="mb-4">
