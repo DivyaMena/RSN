@@ -2312,11 +2312,12 @@ export default function AdminDashboard({ user, logout }) {
                         onClick={async () => {
                           try {
                             const response = await axios.post(
-                              `${API}/admin/reports/enrollment/download?format=csv`,
+                              `${API}/admin/reports/download?format=csv`,
                               {
                                 from_date: reportFromDate,
                                 to_date: reportToDate,
-                                course_id: reportCourse
+                                report_type: reportType,
+                                filter_value: reportFilter
                               },
                               { 
                                 withCredentials: true,
@@ -2327,7 +2328,7 @@ export default function AdminDashboard({ user, logout }) {
                             const url = window.URL.createObjectURL(new Blob([response.data]));
                             const link = document.createElement('a');
                             link.href = url;
-                            link.setAttribute('download', `enrollment_report_${reportFromDate}_${reportToDate}.csv`);
+                            link.setAttribute('download', `${reportType}_report_${reportFromDate}_${reportToDate}.csv`);
                             document.body.appendChild(link);
                             link.click();
                             link.remove();
@@ -2346,11 +2347,12 @@ export default function AdminDashboard({ user, logout }) {
                         onClick={async () => {
                           try {
                             const response = await axios.post(
-                              `${API}/admin/reports/enrollment/download?format=excel`,
+                              `${API}/admin/reports/download?format=excel`,
                               {
                                 from_date: reportFromDate,
                                 to_date: reportToDate,
-                                course_id: reportCourse
+                                report_type: reportType,
+                                filter_value: reportFilter
                               },
                               { 
                                 withCredentials: true,
@@ -2361,7 +2363,7 @@ export default function AdminDashboard({ user, logout }) {
                             const url = window.URL.createObjectURL(new Blob([response.data]));
                             const link = document.createElement('a');
                             link.href = url;
-                            link.setAttribute('download', `enrollment_report_${reportFromDate}_${reportToDate}.xlsx`);
+                            link.setAttribute('download', `${reportType}_report_${reportFromDate}_${reportToDate}.xlsx`);
                             document.body.appendChild(link);
                             link.click();
                             link.remove();
