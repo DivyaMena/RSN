@@ -2156,7 +2156,9 @@ export default function AdminDashboard({ user, logout }) {
                   <label className="text-sm font-medium mb-2 block">Report Type</label>
                   <Select value={reportType} onValueChange={(value) => {
                     setReportType(value);
-                    setReportFilter('all');
+                    setReportFilterSubject('all');
+                    setReportFilterClass('all');
+                    setReportFilterBoard('all');
                     setReportData(null);
                   }}>
                     <SelectTrigger className="w-full">
@@ -2194,28 +2196,65 @@ export default function AdminDashboard({ user, logout }) {
                 </div>
 
                 {reportType === 'enrollments' && (
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Filter by Course (Batch)</label>
-                    <Select value={reportFilter} onValueChange={setReportFilter}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select course" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Courses</SelectItem>
-                        {batches.map((batch) => (
-                          <SelectItem key={batch.id} value={batch.id}>
-                            {batch.batch_code} - Class {batch.class_level} {batch.subject}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-gray-700">Filter Options (Optional)</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Subject</label>
+                        <Select value={reportFilterSubject} onValueChange={setReportFilterSubject}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="All Subjects" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Subjects</SelectItem>
+                            <SelectItem value="MAT">Mathematics</SelectItem>
+                            <SelectItem value="PHY">Physics</SelectItem>
+                            <SelectItem value="BIO">Biology</SelectItem>
+                            <SelectItem value="SCI">Science</SelectItem>
+                            <SelectItem value="ENG">English</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Class Level</label>
+                        <Select value={reportFilterClass} onValueChange={setReportFilterClass}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="All Classes" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Classes</SelectItem>
+                            <SelectItem value="6">Class 6</SelectItem>
+                            <SelectItem value="7">Class 7</SelectItem>
+                            <SelectItem value="8">Class 8</SelectItem>
+                            <SelectItem value="9">Class 9</SelectItem>
+                            <SelectItem value="10">Class 10</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Board</label>
+                        <Select value={reportFilterBoard} onValueChange={setReportFilterBoard}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="All Boards" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Boards</SelectItem>
+                            {stateBoards.map((board) => (
+                              <SelectItem key={board.code} value={board.code}>
+                                {board.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {reportType === 'students' && (
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Filter by Board</label>
-                    <Select value={reportFilter} onValueChange={setReportFilter}>
+                    <label className="text-sm font-medium mb-2 block">Filter by Board (Optional)</label>
+                    <Select value={reportFilterBoard} onValueChange={setReportFilterBoard}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select board" />
                       </SelectTrigger>
