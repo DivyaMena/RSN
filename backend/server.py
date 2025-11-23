@@ -2186,6 +2186,15 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
     tutor_doc = tutor.model_dump()
     tutor_doc["created_at"] = tutor_doc["created_at"].isoformat()
     tutor_doc["registration_timestamp"] = tutor_doc["registration_timestamp"].isoformat()
+    
+    # Add uploaded file URLs
+    if input.photo_url:
+        tutor_doc["photo_url"] = input.photo_url
+    if input.aadhaar_page1_url:
+        tutor_doc["aadhaar_page1_url"] = input.aadhaar_page1_url
+    if input.aadhaar_page2_url:
+        tutor_doc["aadhaar_page2_url"] = input.aadhaar_page2_url
+    
     await db.tutors.insert_one(tutor_doc)
     
     await db.users.update_one(
