@@ -326,6 +326,9 @@ class RegisterStudentInput(BaseModel):
     subjects: List[str]
     enrollment_year: int
     create_login: bool = False  # Whether to create separate login for student
+    photo_url: Optional[str] = None
+    aadhaar_page1_url: Optional[str] = None
+    aadhaar_page2_url: Optional[str] = None
 
 class CreateLogEntryInput(BaseModel):
     batch_id: str
