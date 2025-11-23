@@ -2150,8 +2150,8 @@ async def upload_file(request: Request):
         with open(file_path, "wb") as f:
             f.write(content)
         
-        # Return URL (assuming files are served from /uploads/)
-        file_url = f"/uploads/{unique_filename}"
+        # Return full URL with /api prefix
+        file_url = f"/api/uploads/{unique_filename}"
         
         return {"url": file_url, "filename": unique_filename}
     except Exception as e:
