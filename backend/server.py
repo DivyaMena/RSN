@@ -442,6 +442,7 @@ class UpdateStateBoardInput(BaseModel):
     description: Optional[str] = None
 
 class ReportInput(BaseModel):
+    academic_year: str  # "2025-26" - FIRST FILTER for admin
     from_date: str  # ISO date string
     to_date: str  # ISO date string
     report_type: str  # "enrollments", "students", "tutors", "coordinators", "parents"
