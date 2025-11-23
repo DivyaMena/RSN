@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../components/ui/checkbox';
 import { BookOpen, LogOut, Plus, Users, User } from 'lucide-react';
 import { toast } from 'sonner';
+import DonateButton from '../components/DonateButton';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -235,6 +236,7 @@ export default function ParentDashboard({ user, logout }) {
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-gray-700">Welcome, {user.name}</span>
+            <DonateButton />
             <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
               <User className="h-4 w-4 mr-2" />
               My Profile
