@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { BookOpen, Users, Heart } from 'lucide-react';
+import DonateButton from '../components/DonateButton';
 
 const REDIRECT_URL = window.location.origin + '/dashboard';
 const AUTH_URL = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(REDIRECT_URL)}`;
