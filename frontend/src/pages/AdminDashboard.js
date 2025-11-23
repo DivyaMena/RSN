@@ -741,6 +741,30 @@ export default function AdminDashboard({ user, logout }) {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Academic Year Rollover Card */}
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Academic Year Management</span>
+                  <Button
+                    onClick={() => setShowRolloverDialog(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Trigger Year Rollover
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-700">
+                  Current Academic Year: <span className="font-bold text-blue-600">{reportAcademicYear || 'Loading...'}</span>
+                </p>
+                <p className="text-xs text-gray-600 mt-2">
+                  Use rollover to promote all students to the next class and start a new academic year.
+                </p>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="pb-3">
