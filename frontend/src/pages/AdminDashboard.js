@@ -2200,6 +2200,22 @@ export default function AdminDashboard({ user, logout }) {
                     <p className="text-sm font-medium text-gray-700">Filter Options (Optional)</p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
+                        <label className="text-sm font-medium mb-2 block">Board</label>
+                        <Select value={reportFilterBoard} onValueChange={setReportFilterBoard}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="All Boards" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Boards</SelectItem>
+                            {stateBoards.map((board) => (
+                              <SelectItem key={board.code} value={board.code}>
+                                {board.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
                         <label className="text-sm font-medium mb-2 block">Subject</label>
                         <Select value={reportFilterSubject} onValueChange={setReportFilterSubject}>
                           <SelectTrigger className="w-full">
@@ -2228,24 +2244,6 @@ export default function AdminDashboard({ user, logout }) {
                             <SelectItem value="8">Class 8</SelectItem>
                             <SelectItem value="9">Class 9</SelectItem>
                             <SelectItem value="10">Class 10</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Board</label>
-                        <Select value={reportFilterBoard} onValueChange={setReportFilterBoard}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="All Boards" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">
-                              All Boards ({stateBoards.map(b => b.code).join(', ')})
-                            </SelectItem>
-                            {stateBoards.map((board) => (
-                              <SelectItem key={board.code} value={board.code}>
-                                {board.name}
-                              </SelectItem>
-                            ))}
                           </SelectContent>
                         </Select>
                       </div>
