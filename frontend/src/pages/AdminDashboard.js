@@ -2381,85 +2381,32 @@ export default function AdminDashboard({ user, logout }) {
                   </CardContent>
                 </Card>
 
-                {/* Batch Enrollments Table */}
-                {reportData.batch_enrollments.length > 0 && (
+                {/* Data Table */}
+                {reportData.details && reportData.details.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Batch Enrollments</CardTitle>
+                      <CardTitle className="capitalize">{reportType} Details</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead className="bg-gray-100">
                             <tr>
-                              <th className="p-2 text-left">Batch Code</th>
-                              <th className="p-2 text-left">Class</th>
-                              <th className="p-2 text-left">Subject</th>
-                              <th className="p-2 text-left">Board</th>
-                              <th className="p-2 text-left">Status</th>
-                              <th className="p-2 text-left">Enrollments</th>
-                              <th className="p-2 text-left">Created On</th>
+                              {Object.keys(reportData.details[0]).map((key) => (
+                                <th key={key} className="p-2 text-left capitalize">{key.replace('_', ' ')}</th>
+                              ))}
                             </tr>
                           </thead>
                           <tbody>
-                            {reportData.batch_enrollments.map((batch, idx) => (
+                            {reportData.details.map((row, idx) => (
                               <tr key={idx} className="border-b hover:bg-gray-50">
-                                <td className="p-2 font-medium">{batch.batch_code}</td>
-                                <td className="p-2">{batch.class_level}</td>
-                                <td className="p-2">{batch.subject}</td>
-                                <td className="p-2">{batch.board}</td>
-                                <td className="p-2">
-                                  <span className={`px-2 py-1 text-xs rounded ${
-                                    batch.status === 'active' ? 'bg-green-100 text-green-800' :
-                                    batch.status === 'waitlist' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-gray-100 text-gray-800'
-                                  }`}>
-                                    {batch.status}
-                                  </span>
-                                </td>
-                                <td className="p-2 font-semibold">{batch.enrollment_count}</td>
-                                <td className="p-2">{new Date(batch.created_at).toLocaleDateString()}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Student Details Table */}
-                {reportData.student_details.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>New Student Registrations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead className="bg-gray-100">
-                            <tr>
-                              <th className="p-2 text-left">Student Code</th>
-                              <th className="p-2 text-left">Name</th>
-                              <th className="p-2 text-left">Class</th>
-                              <th className="p-2 text-left">Board</th>
-                              <th className="p-2 text-left">School</th>
-                              <th className="p-2 text-left">Subjects</th>
-                              <th className="p-2 text-left">Parent</th>
-                              <th className="p-2 text-left">Registered On</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {reportData.student_details.map((student, idx) => (
-                              <tr key={idx} className="border-b hover:bg-gray-50">
-                                <td className="p-2 font-medium">{student.student_code}</td>
-                                <td className="p-2">{student.student_name}</td>
-                                <td className="p-2">{student.class_level}</td>
-                                <td className="p-2">{student.board}</td>
-                                <td className="p-2">{student.school_name}</td>
-                                <td className="p-2">{student.subjects}</td>
-                                <td className="p-2">{student.parent_name}</td>
-                                <td className="p-2">{new Date(student.registered_on).toLocaleDateString()}</td>
+                                {Object.values(row).map((value, colIdx) => (
+                                  <td key={colIdx} className="p-2">
+                                    {typeof value === 'string' && value.includes('T') && value.includes('Z') 
+                                      ? new Date(value).toLocaleDateString()
+                                      : String(value)}
+                                  </td>
+                                ))}
                               </tr>
                             ))}
                           </tbody>
