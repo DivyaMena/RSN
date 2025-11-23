@@ -1538,9 +1538,14 @@ export default function CoordinatorDashboard({ user, logout }) {
                       href={currentTutor.tutor.aadhaar_page1_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-sm"
+                      className="block"
                     >
-                      📄 View Aadhaar Document
+                      <img 
+                        src={currentTutor.tutor.aadhaar_page1_url} 
+                        alt="Aadhaar Document" 
+                        className="max-w-xs w-full h-auto rounded-lg border-2 border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                      />
+                      <p className="text-xs text-blue-600 mt-1 hover:underline">Click to view full size</p>
                     </a>
                   </div>
                 )}
