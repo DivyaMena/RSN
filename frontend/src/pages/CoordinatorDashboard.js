@@ -512,9 +512,10 @@ export default function CoordinatorDashboard({ user, logout }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
             <TabsTrigger value="batches" className="text-xs sm:text-sm">Batches ({batches.length})</TabsTrigger>
             <TabsTrigger value="tutors" className="text-xs sm:text-sm">Tutors ({tutors.length})</TabsTrigger>
+            <TabsTrigger value="students" className="text-xs sm:text-sm">Students ({allStudents.length})</TabsTrigger>
             <TabsTrigger value="schools" className="text-xs sm:text-sm">Schools ({allSchools.length})</TabsTrigger>
             <TabsTrigger value="remedial" className="text-xs sm:text-sm">Remedial ({remedialRequests.length})</TabsTrigger>
             <TabsTrigger value="pending" className="text-xs sm:text-sm">Pending ({pendingTutors.length + pendingSchools.length + remedialRequests.filter(r => r.status === 'pending').length})</TabsTrigger>
