@@ -2275,7 +2275,7 @@ export default function AdminDashboard({ user, logout }) {
                     <CardTitle>Report Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <p className="text-sm text-gray-600">Date Range</p>
                         <p className="text-lg font-bold text-blue-600">
@@ -2283,17 +2283,19 @@ export default function AdminDashboard({ user, logout }) {
                         </p>
                       </div>
                       <div className="p-4 bg-green-50 rounded-lg">
-                        <p className="text-sm text-gray-600">New Registrations</p>
-                        <p className="text-2xl font-bold text-green-600">{reportData.summary.total_students_registered}</p>
+                        <p className="text-sm text-gray-600">Report Type</p>
+                        <p className="text-lg font-bold text-green-600 capitalize">{reportData.summary.report_type}</p>
                       </div>
                       <div className="p-4 bg-purple-50 rounded-lg">
-                        <p className="text-sm text-gray-600">Batch Enrollments</p>
-                        <p className="text-2xl font-bold text-purple-600">{reportData.summary.total_batch_enrollments}</p>
+                        <p className="text-sm text-gray-600">Total Records</p>
+                        <p className="text-2xl font-bold text-purple-600">{reportData.summary.total_count}</p>
                       </div>
-                      <div className="p-4 bg-orange-50 rounded-lg">
-                        <p className="text-sm text-gray-600">Total Batches</p>
-                        <p className="text-2xl font-bold text-orange-600">{reportData.summary.total_batches}</p>
-                      </div>
+                      {reportData.summary.total_enrollments !== undefined && (
+                        <div className="p-4 bg-orange-50 rounded-lg">
+                          <p className="text-sm text-gray-600">Total Enrollments</p>
+                          <p className="text-2xl font-bold text-orange-600">{reportData.summary.total_enrollments}</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
