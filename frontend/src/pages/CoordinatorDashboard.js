@@ -1655,11 +1655,11 @@ export default function CoordinatorDashboard({ user, logout }) {
                   {/* Selfie Photo Thumbnail */}
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Selfie Photo:</p>
-                    {selectedTutorDetails.tutor?.photo_url ? (
+                    {selectedTutorDetails.tutor?.photo_url || selectedTutorDetails.user?.photo_url ? (
                       <img 
-                        src={selectedTutorDetails.tutor.photo_url} 
+                        src={selectedTutorDetails.tutor?.photo_url || selectedTutorDetails.user?.photo_url} 
                         alt="Tutor Selfie" 
-                        className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300 shadow-sm"
+                        className="w-32 h-32 object-cover rounded-lg border-2 border-blue-300 shadow-md"
                       />
                     ) : (
                       <p className="text-sm text-gray-500">Not uploaded</p>
@@ -1668,23 +1668,26 @@ export default function CoordinatorDashboard({ user, logout }) {
                   
                   {/* Aadhaar */}
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar:</p>
-                    {selectedTutorDetails.tutor?.aadhaar_number ? (
-                      <>
-                        <p className="text-sm text-gray-700 mb-2">{selectedTutorDetails.tutor.aadhaar_number}</p>
-                        {selectedTutorDetails.tutor?.aadhaar_page1_url && (
-                          <a 
-                            href={selectedTutorDetails.tutor.aadhaar_page1_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline text-sm inline-flex items-center"
-                          >
-                            📄 View Aadhaar Document →
-                          </a>
-                        )}
-                      </>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Aadhaar Document:</p>
+                    {selectedTutorDetails.tutor?.aadhaar_number && (
+                      <p className="text-sm text-gray-700 mb-2">Number: {selectedTutorDetails.tutor.aadhaar_number}</p>
+                    )}
+                    {selectedTutorDetails.tutor?.aadhaar_page1_url ? (
+                      <a 
+                        href={selectedTutorDetails.tutor.aadhaar_page1_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <img 
+                          src={selectedTutorDetails.tutor.aadhaar_page1_url} 
+                          alt="Aadhaar Document" 
+                          className="max-w-xs w-full h-auto rounded-lg border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                        />
+                        <p className="text-xs text-blue-600 mt-1">Click to view full size</p>
+                      </a>
                     ) : (
-                      <p className="text-sm text-gray-500">Not provided</p>
+                      <p className="text-sm text-gray-500">Not uploaded</p>
                     )}
                   </div>
                   
