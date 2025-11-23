@@ -2189,6 +2189,88 @@ async def download_report(input: ReportInput, request: Request, format: str = "c
     
     else:
         raise HTTPException(status_code=400, detail="Invalid format. Use 'csv' or 'excel'")
+# ============= ACADEMIC YEAR MANAGEMENT =============
+
+@api_router.get("/admin/academic-year/current")
+async def get_current_academic_year_info(request: Request):
+    """Get current academic year and available years"""
+    await require_admin(request)
+    
+    current_year = get_current_academic_year()
+    all_years = get_all_academic_years()
+    
+    return {
+        "current_academic_year": current_year,
+        "available_years": all_years
+    }
+
+@api_router.post("/admin/academic-year/rollover")
+async def trigger_academic_year_rollover(request: Request):
+    """
+    Manually trigger academic year rollover
+    - Promotes all students to next class (6→7, 7→8, etc.)
+    - Class 10 students are marked as graduated
+    - Updates academic year for all students
+    - Does NOT move students to new batches (they re-register)
+    """
+    await require_admin(request)
+    
+    new_academic_year = get_current_academic_year()
+    
+    # Get all active students
+    students = await db.students.find({}, {"_id": 0}).to_list(None)
+    
+    promoted_count = 0
+    graduated_count = 0
+    
+    for student in students:
+        student_obj = Student(**student)
+        
+        # Store original class if not already stored
+        if not student_obj.original_class:
+            original_class = student_obj.class_level
+        else:
+            original_class = student_obj.original_class
+        
+        # Promote to next class
+        if student_obj.class_level < 10:
+            new_class = student_obj.class_level + 1
+            
+            await db.students.update_one(
+                {"id": student_obj.id},
+                {
+                    "$set": {
+                        "class_level": new_class,
+                        "academic_year": new_academic_year,
+                        "original_class": original_class,
+                        "subjects": []  # Clear subjects - they need to re-register
+                    }
+                }
+            )
+            promoted_count += 1
+        
+        elif student_obj.class_level == 10:
+            # Mark Class 10 students as graduated
+            await db.students.update_one(
+                {"id": student_obj.id},
+                {
+                    "$set": {
+                        "academic_year": new_academic_year,
+                        "original_class": original_class,
+                        "status": "graduated"
+                    }
+                }
+            )
+            graduated_count += 1
+    
+    return {
+        "success": True,
+        "new_academic_year": new_academic_year,
+        "promoted_students": promoted_count,
+        "graduated_students": graduated_count,
+        "message": f"Successfully rolled over to academic year {new_academic_year}"
+    }
+
 # ============= SCHOOLS ENDPOINTS =============
 
 @api_router.put("/coordinator/schools/{school_id}/approve")
