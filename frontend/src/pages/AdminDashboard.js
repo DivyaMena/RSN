@@ -2142,14 +2142,34 @@ export default function AdminDashboard({ user, logout }) {
           {/* Reports Tab */}
           <TabsContent value="reports" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Enrollment Reports</h2>
+              <h2 className="text-2xl font-bold">System Reports</h2>
             </div>
 
             <Card>
               <CardHeader>
-                <CardTitle>Generate Enrollment Report</CardTitle>
+                <CardTitle>Generate Report</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Report Type</label>
+                  <Select value={reportType} onValueChange={(value) => {
+                    setReportType(value);
+                    setReportFilter('all');
+                    setReportData(null);
+                  }}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select report type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="enrollments">Course Enrollments</SelectItem>
+                      <SelectItem value="students">Students</SelectItem>
+                      <SelectItem value="tutors">Tutors</SelectItem>
+                      <SelectItem value="coordinators">Coordinators</SelectItem>
+                      <SelectItem value="parents">Parents</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">From Date</label>
@@ -2171,22 +2191,43 @@ export default function AdminDashboard({ user, logout }) {
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Filter by Course (Batch)</label>
-                  <Select value={reportCourse} onValueChange={setReportCourse}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select course" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Courses</SelectItem>
-                      {batches.map((batch) => (
-                        <SelectItem key={batch.id} value={batch.id}>
-                          {batch.batch_code} - Class {batch.class_level} {batch.subject}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {reportType === 'enrollments' && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Filter by Course (Batch)</label>
+                    <Select value={reportFilter} onValueChange={setReportFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select course" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Courses</SelectItem>
+                        {batches.map((batch) => (
+                          <SelectItem key={batch.id} value={batch.id}>
+                            {batch.batch_code} - Class {batch.class_level} {batch.subject}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {reportType === 'students' && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Filter by Board</label>
+                    <Select value={reportFilter} onValueChange={setReportFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select board" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Boards</SelectItem>
+                        {stateBoards.map((board) => (
+                          <SelectItem key={board.code} value={board.code}>
+                            {board.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   <Button
@@ -2199,11 +2240,12 @@ export default function AdminDashboard({ user, logout }) {
                       setReportLoading(true);
                       try {
                         const response = await axios.post(
-                          `${API}/admin/reports/enrollment`,
+                          `${API}/admin/reports/generate`,
                           {
                             from_date: reportFromDate,
                             to_date: reportToDate,
-                            course_id: reportCourse
+                            report_type: reportType,
+                            filter_value: reportFilter
                           },
                           { withCredentials: true }
                         );
