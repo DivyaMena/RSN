@@ -3460,6 +3460,9 @@ async def get_batch_attendance(batch_id: str, request: Request, date: Optional[s
 
 app.include_router(api_router)
 
+# Serve uploaded files at /api/uploads/
+app.mount("/api/uploads", StaticFiles(directory="/app/backend/uploaded_files"), name="uploads")
+
 # app.add_middleware(
 #     CORSMiddleware,
 #     allow_credentials=True,
