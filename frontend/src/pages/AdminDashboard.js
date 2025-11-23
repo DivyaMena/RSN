@@ -224,6 +224,18 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  const fetchAcademicYearInfo = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/academic-year/current`, {
+        withCredentials: true
+      });
+      setAvailableAcademicYears(response.data.available_years);
+      setReportAcademicYear(response.data.current_academic_year);
+    } catch (error) {
+      console.error('Error fetching academic year info:', error);
+    }
+  };
+
   const fetchAdmins = async () => {
     try {
       const response = await axios.get(`${API}/admin/admins`, {
