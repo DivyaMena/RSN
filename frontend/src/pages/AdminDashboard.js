@@ -141,6 +141,13 @@ export default function AdminDashboard({ user, logout }) {
     batch_end: ''
   });
 
+  // Reports State
+  const [reportFromDate, setReportFromDate] = useState('');
+  const [reportToDate, setReportToDate] = useState('');
+  const [reportCourse, setReportCourse] = useState('all');
+  const [reportData, setReportData] = useState(null);
+  const [reportLoading, setReportLoading] = useState(false);
+
   // Helper function to get subjects based on class level
   const getSubjectsForClass = (classLevel) => {
     if (classLevel >= 6 && classLevel <= 7) {
