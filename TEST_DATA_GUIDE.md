@@ -2,7 +2,7 @@
 
 ## 🎉 Your Free Online Tuition App is Ready!
 
-**Website**: https://edu-dashboard-fix.preview.emergentagent.com
+**Website**: https://data-insights-171.preview.emergentagent.com
 **Your Domain**: www.risingstarsnation.com (point to the app when ready)
 
 ---
@@ -10,7 +10,7 @@
 ## 🔐 How to Access the App
 
 ### Method 1: Test Login Portal (RECOMMENDED)
-1. Go to: https://edu-dashboard-fix.preview.emergentagent.com/test-login
+1. Go to: https://data-insights-171.preview.emergentagent.com/test-login
 2. Click on any user role to instantly login
 3. Explore the complete app!
 
