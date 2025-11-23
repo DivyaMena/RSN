@@ -2040,6 +2040,10 @@ async def generate_report(input: ReportInput, request: Request):
     elif input.report_type == "students":
         # Get students
         students_query = date_query.copy()
+        
+        # FIRST FILTER: Academic Year (required)
+        students_query["academic_year"] = input.academic_year
+        
         if input.filter_board and input.filter_board != "all":
             students_query["board"] = input.filter_board
         
