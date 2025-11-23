@@ -2259,9 +2259,7 @@ export default function AdminDashboard({ user, logout }) {
                         <SelectValue placeholder="Select board" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">
-                          All Boards ({stateBoards.map(b => b.code).join(', ')})
-                        </SelectItem>
+                        <SelectItem value="all">All Boards</SelectItem>
                         {stateBoards.map((board) => (
                           <SelectItem key={board.code} value={board.code}>
                             {board.name}
