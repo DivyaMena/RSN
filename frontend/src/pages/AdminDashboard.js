@@ -2137,6 +2137,293 @@ export default function AdminDashboard({ user, logout }) {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Reports Tab */}
+          <TabsContent value="reports" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Enrollment Reports</h2>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Generate Enrollment Report</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">From Date</label>
+                    <Input
+                      type="date"
+                      value={reportFromDate}
+                      onChange={(e) => setReportFromDate(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">To Date</label>
+                    <Input
+                      type="date"
+                      value={reportToDate}
+                      onChange={(e) => setReportToDate(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Filter by Course (Batch)</label>
+                  <Select value={reportCourse} onValueChange={setReportCourse}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select course" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Courses</SelectItem>
+                      {batches.map((batch) => (
+                        <SelectItem key={batch.id} value={batch.id}>
+                          {batch.batch_code} - Class {batch.class_level} {batch.subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={async () => {
+                      if (!reportFromDate || !reportToDate) {
+                        toast.error('Please select both From Date and To Date');
+                        return;
+                      }
+
+                      setReportLoading(true);
+                      try {
+                        const response = await axios.post(
+                          `${API}/admin/reports/enrollment`,
+                          {
+                            from_date: reportFromDate,
+                            to_date: reportToDate,
+                            course_id: reportCourse
+                          },
+                          { withCredentials: true }
+                        );
+                        setReportData(response.data);
+                        toast.success('Report generated successfully');
+                      } catch (error) {
+                        toast.error(error.response?.data?.detail || 'Failed to generate report');
+                      } finally {
+                        setReportLoading(false);
+                      }
+                    }}
+                    disabled={reportLoading}
+                    className="flex-1"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    {reportLoading ? 'Generating...' : 'Generate Report'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {reportData && (
+              <>
+                {/* Summary Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Report Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-gray-600">Date Range</p>
+                        <p className="text-lg font-bold text-blue-600">
+                          {new Date(reportData.summary.from_date).toLocaleDateString()} - {new Date(reportData.summary.to_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <p className="text-sm text-gray-600">New Registrations</p>
+                        <p className="text-2xl font-bold text-green-600">{reportData.summary.total_students_registered}</p>
+                      </div>
+                      <div className="p-4 bg-purple-50 rounded-lg">
+                        <p className="text-sm text-gray-600">Batch Enrollments</p>
+                        <p className="text-2xl font-bold text-purple-600">{reportData.summary.total_batch_enrollments}</p>
+                      </div>
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <p className="text-sm text-gray-600">Total Batches</p>
+                        <p className="text-2xl font-bold text-orange-600">{reportData.summary.total_batches}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Download Buttons */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Download Report</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            const response = await axios.post(
+                              `${API}/admin/reports/enrollment/download?format=csv`,
+                              {
+                                from_date: reportFromDate,
+                                to_date: reportToDate,
+                                course_id: reportCourse
+                              },
+                              { 
+                                withCredentials: true,
+                                responseType: 'blob'
+                              }
+                            );
+                            
+                            const url = window.URL.createObjectURL(new Blob([response.data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', `enrollment_report_${reportFromDate}_${reportToDate}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            link.remove();
+                            toast.success('CSV downloaded successfully');
+                          } catch (error) {
+                            toast.error('Failed to download CSV');
+                          }
+                        }}
+                        className="flex-1"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download CSV
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            const response = await axios.post(
+                              `${API}/admin/reports/enrollment/download?format=excel`,
+                              {
+                                from_date: reportFromDate,
+                                to_date: reportToDate,
+                                course_id: reportCourse
+                              },
+                              { 
+                                withCredentials: true,
+                                responseType: 'blob'
+                              }
+                            );
+                            
+                            const url = window.URL.createObjectURL(new Blob([response.data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', `enrollment_report_${reportFromDate}_${reportToDate}.xlsx`);
+                            document.body.appendChild(link);
+                            link.click();
+                            link.remove();
+                            toast.success('Excel downloaded successfully');
+                          } catch (error) {
+                            toast.error('Failed to download Excel');
+                          }
+                        }}
+                        className="flex-1"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Excel
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Batch Enrollments Table */}
+                {reportData.batch_enrollments.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Batch Enrollments</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="p-2 text-left">Batch Code</th>
+                              <th className="p-2 text-left">Class</th>
+                              <th className="p-2 text-left">Subject</th>
+                              <th className="p-2 text-left">Board</th>
+                              <th className="p-2 text-left">Status</th>
+                              <th className="p-2 text-left">Enrollments</th>
+                              <th className="p-2 text-left">Created On</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {reportData.batch_enrollments.map((batch, idx) => (
+                              <tr key={idx} className="border-b hover:bg-gray-50">
+                                <td className="p-2 font-medium">{batch.batch_code}</td>
+                                <td className="p-2">{batch.class_level}</td>
+                                <td className="p-2">{batch.subject}</td>
+                                <td className="p-2">{batch.board}</td>
+                                <td className="p-2">
+                                  <span className={`px-2 py-1 text-xs rounded ${
+                                    batch.status === 'active' ? 'bg-green-100 text-green-800' :
+                                    batch.status === 'waitlist' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {batch.status}
+                                  </span>
+                                </td>
+                                <td className="p-2 font-semibold">{batch.enrollment_count}</td>
+                                <td className="p-2">{new Date(batch.created_at).toLocaleDateString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Student Details Table */}
+                {reportData.student_details.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>New Student Registrations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="p-2 text-left">Student Code</th>
+                              <th className="p-2 text-left">Name</th>
+                              <th className="p-2 text-left">Class</th>
+                              <th className="p-2 text-left">Board</th>
+                              <th className="p-2 text-left">School</th>
+                              <th className="p-2 text-left">Subjects</th>
+                              <th className="p-2 text-left">Parent</th>
+                              <th className="p-2 text-left">Registered On</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {reportData.student_details.map((student, idx) => (
+                              <tr key={idx} className="border-b hover:bg-gray-50">
+                                <td className="p-2 font-medium">{student.student_code}</td>
+                                <td className="p-2">{student.student_name}</td>
+                                <td className="p-2">{student.class_level}</td>
+                                <td className="p-2">{student.board}</td>
+                                <td className="p-2">{student.school_name}</td>
+                                <td className="p-2">{student.subjects}</td>
+                                <td className="p-2">{student.parent_name}</td>
+                                <td className="p-2">{new Date(student.registered_on).toLocaleDateString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
 
