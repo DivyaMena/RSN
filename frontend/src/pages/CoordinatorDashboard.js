@@ -11,6 +11,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { BookOpen, LogOut, Plus, Users, CheckCircle, XCircle, Eye, UserCheck, Shield, Ban, UserX, User, School, ChevronDown, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import DonateButton from '../components/DonateButton';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
