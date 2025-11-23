@@ -87,8 +87,44 @@ export default function ParentDashboard({ user, logout }) {
     }
 
     try {
-      // For now, we'll just send the data without files (file upload needs separate handling)
-      // In production, you'd upload files to storage and get URLs
+      // Upload files first
+      let photoUrl = null;
+      let aadhaarPage1Url = null;
+      let aadhaarPage2Url = null;
+
+      // Upload student photo
+      if (formData.student_photo) {
+        const photoFormData = new FormData();
+        photoFormData.append('file', formData.student_photo);
+        const photoResponse = await axios.post(`${API}/upload-file`, photoFormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        photoUrl = photoResponse.data.url;
+      }
+
+      // Upload Aadhaar page 1
+      if (formData.aadhaar_page1) {
+        const aadhaarFormData = new FormData();
+        aadhaarFormData.append('file', formData.aadhaar_page1);
+        const aadhaarResponse = await axios.post(`${API}/upload-file`, aadhaarFormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        aadhaarPage1Url = aadhaarResponse.data.url;
+      }
+
+      // Upload Aadhaar page 2 (optional)
+      if (formData.aadhaar_page2) {
+        const aadhaar2FormData = new FormData();
+        aadhaar2FormData.append('file', formData.aadhaar_page2);
+        const aadhaar2Response = await axios.post(`${API}/upload-file`, aadhaar2FormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        aadhaarPage2Url = aadhaar2Response.data.url;
+      }
+
       const dobFormatted = `${formData.dob_year}-${formData.dob_month}-${formData.dob_day}`;
 
       // Combine academic subjects and non-academic courses
@@ -98,7 +134,10 @@ export default function ParentDashboard({ user, logout }) {
         ...formData,
         dob: dobFormatted,
         subjects: allSubjects,
-        aadhaar_number: '000000000000' // Placeholder
+        aadhaar_number: '000000000000', // Placeholder
+        photo_url: photoUrl,
+        aadhaar_page1_url: aadhaarPage1Url,
+        aadhaar_page2_url: aadhaarPage2Url
       };
       delete dataToSend.dob_day;
       delete dataToSend.dob_month;
@@ -106,6 +145,7 @@ export default function ParentDashboard({ user, logout }) {
       delete dataToSend.accept_terms;
       delete dataToSend.aadhaar_page1;
       delete dataToSend.aadhaar_page2;
+      delete dataToSend.student_photo;
       delete dataToSend.non_academic_courses;
       
       await axios.post(`${API}/students`, dataToSend, { withCredentials: true });
