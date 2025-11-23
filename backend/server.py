@@ -1932,6 +1932,216 @@ async def bulk_delete_state_boards(input: BulkDeleteInput, request: Request):
         "deleted_count": deleted_count
     }
 
+# ============= REPORTS ENDPOINTS =============
+
+@api_router.post("/admin/reports/enrollment")
+async def generate_enrollment_report(input: EnrollmentReportInput, request: Request):
+    """Generate enrollment report with date range and course filter"""
+    await require_admin(request)
+    
+    from_date = datetime.fromisoformat(input.from_date.replace('Z', '+00:00'))
+    to_date = datetime.fromisoformat(input.to_date.replace('Z', '+00:00'))
+    
+    # Query for students registered within date range
+    students_query = {
+        "created_at": {
+            "$gte": from_date.isoformat(),
+            "$lte": to_date.isoformat()
+        }
+    }
+    
+    # Query for batch enrollments within date range
+    batches_query = {
+        "created_at": {
+            "$gte": from_date.isoformat(),
+            "$lte": to_date.isoformat()
+        }
+    }
+    
+    # Apply course filter if specified
+    if input.course_id and input.course_id != "all":
+        batches_query["id"] = input.course_id
+    
+    # Fetch students and batches
+    students = await db.students.find(students_query, {"_id": 0}).to_list(None)
+    batches = await db.batches.find(batches_query, {"_id": 0}).to_list(None)
+    
+    # Calculate enrollment data
+    total_students_registered = len(students)
+    
+    # Get batch enrollment counts
+    batch_enrollments = []
+    total_batch_enrollments = 0
+    
+    for batch in batches:
+        batch_obj = Batch(**batch)
+        enrollment_count = len(batch_obj.student_ids)
+        total_batch_enrollments += enrollment_count
+        
+        batch_enrollments.append({
+            "batch_code": batch_obj.batch_code,
+            "batch_id": batch_obj.id,
+            "class_level": batch_obj.class_level,
+            "subject": batch_obj.subject,
+            "board": batch_obj.board,
+            "status": batch_obj.status,
+            "enrollment_count": enrollment_count,
+            "created_at": batch_obj.created_at.isoformat() if isinstance(batch_obj.created_at, datetime) else batch_obj.created_at
+        })
+    
+    # Get student details for the report
+    student_details = []
+    for student in students:
+        student_obj = Student(**student)
+        
+        # Get parent info
+        parent_doc = await db.users.find_one({"id": student_obj.parent_id}, {"_id": 0, "name": 1, "email": 1})
+        parent_name = parent_doc.get("name", "N/A") if parent_doc else "N/A"
+        parent_email = parent_doc.get("email", "N/A") if parent_doc else "N/A"
+        
+        student_details.append({
+            "student_code": student_obj.student_code,
+            "student_name": student_obj.name,
+            "class_level": student_obj.class_level,
+            "board": student_obj.board,
+            "school_name": student_obj.school_name,
+            "subjects": ", ".join(student_obj.subjects),
+            "parent_name": parent_name,
+            "parent_email": parent_email,
+            "registered_on": student_obj.created_at.isoformat() if isinstance(student_obj.created_at, datetime) else student_obj.created_at
+        })
+    
+    return {
+        "summary": {
+            "from_date": input.from_date,
+            "to_date": input.to_date,
+            "total_students_registered": total_students_registered,
+            "total_batch_enrollments": total_batch_enrollments,
+            "total_batches": len(batches)
+        },
+        "batch_enrollments": batch_enrollments,
+        "student_details": student_details
+    }
+
+@api_router.post("/admin/reports/enrollment/download")
+async def download_enrollment_report(input: EnrollmentReportInput, request: Request, format: str = "csv"):
+    """Download enrollment report as CSV or Excel"""
+    await require_admin(request)
+    
+    # Get report data (reusing the report generation logic)
+    from_date = datetime.fromisoformat(input.from_date.replace('Z', '+00:00'))
+    to_date = datetime.fromisoformat(input.to_date.replace('Z', '+00:00'))
+    
+    students_query = {
+        "created_at": {
+            "$gte": from_date.isoformat(),
+            "$lte": to_date.isoformat()
+        }
+    }
+    
+    batches_query = {
+        "created_at": {
+            "$gte": from_date.isoformat(),
+            "$lte": to_date.isoformat()
+        }
+    }
+    
+    if input.course_id and input.course_id != "all":
+        batches_query["id"] = input.course_id
+    
+    students = await db.students.find(students_query, {"_id": 0}).to_list(None)
+    batches = await db.batches.find(batches_query, {"_id": 0}).to_list(None)
+    
+    # Prepare data for export
+    report_data = []
+    
+    # Add batch enrollments
+    for batch in batches:
+        batch_obj = Batch(**batch)
+        for student_id in batch_obj.student_ids:
+            student_doc = await db.students.find_one({"id": student_id}, {"_id": 0})
+            if student_doc:
+                student_obj = Student(**student_doc)
+                parent_doc = await db.users.find_one({"id": student_obj.parent_id}, {"_id": 0, "name": 1, "email": 1})
+                parent_name = parent_doc.get("name", "N/A") if parent_doc else "N/A"
+                
+                report_data.append({
+                    "Type": "Batch Enrollment",
+                    "Batch Code": batch_obj.batch_code,
+                    "Student Code": student_obj.student_code,
+                    "Student Name": student_obj.name,
+                    "Class": student_obj.class_level,
+                    "Subject": batch_obj.subject,
+                    "Board": student_obj.board,
+                    "School": student_obj.school_name,
+                    "Parent Name": parent_name,
+                    "Enrolled On": batch_obj.created_at.isoformat() if isinstance(batch_obj.created_at, datetime) else batch_obj.created_at
+                })
+    
+    # Add new student registrations
+    for student in students:
+        student_obj = Student(**student)
+        parent_doc = await db.users.find_one({"id": student_obj.parent_id}, {"_id": 0, "name": 1, "email": 1})
+        parent_name = parent_doc.get("name", "N/A") if parent_doc else "N/A"
+        
+        report_data.append({
+            "Type": "New Registration",
+            "Batch Code": "N/A",
+            "Student Code": student_obj.student_code,
+            "Student Name": student_obj.name,
+            "Class": student_obj.class_level,
+            "Subject": ", ".join(student_obj.subjects),
+            "Board": student_obj.board,
+            "School": student_obj.school_name,
+            "Parent Name": parent_name,
+            "Enrolled On": student_obj.created_at.isoformat() if isinstance(student_obj.created_at, datetime) else student_obj.created_at
+        })
+    
+    # Generate CSV
+    if format.lower() == "csv":
+        output = io.StringIO()
+        if report_data:
+            fieldnames = report_data[0].keys()
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(report_data)
+        
+        response = Response(content=output.getvalue(), media_type="text/csv")
+        response.headers["Content-Disposition"] = f"attachment; filename=enrollment_report_{input.from_date}_{input.to_date}.csv"
+        return response
+    
+    # Generate Excel
+    elif format.lower() == "excel":
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Enrollment Report"
+        
+        # Add header with styling
+        if report_data:
+            headers = list(report_data[0].keys())
+            for col_num, header in enumerate(headers, 1):
+                cell = ws.cell(row=1, column=col_num, value=header)
+                cell.font = Font(bold=True, color="FFFFFF")
+                cell.fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            
+            # Add data rows
+            for row_num, data_row in enumerate(report_data, 2):
+                for col_num, header in enumerate(headers, 1):
+                    ws.cell(row=row_num, column=col_num, value=data_row[header])
+        
+        # Save to bytes
+        output = io.BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
+        response = Response(content=output.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response.headers["Content-Disposition"] = f"attachment; filename=enrollment_report_{input.from_date}_{input.to_date}.xlsx"
+        return response
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid format. Use 'csv' or 'excel'")
+
 # ============= SCHOOLS ENDPOINTS =============
 
 @api_router.put("/coordinator/schools/{school_id}/approve")
