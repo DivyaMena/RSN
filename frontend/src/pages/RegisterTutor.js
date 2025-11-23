@@ -85,7 +85,44 @@ export default function RegisterTutor({ setUser }) {
 
     setLoading(true);
     try {
-      // For now, send data without actual file upload (would need file storage in production)
+      // Upload files first
+      let photoUrl = null;
+      let aadhaarPage1Url = null;
+      let aadhaarPage2Url = null;
+
+      // Upload tutor photo
+      if (formData.tutor_photo) {
+        const photoFormData = new FormData();
+        photoFormData.append('file', formData.tutor_photo);
+        const photoResponse = await axios.post(`${API}/upload-file`, photoFormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        photoUrl = photoResponse.data.url;
+      }
+
+      // Upload Aadhaar page 1
+      if (formData.aadhaar_page1) {
+        const aadhaarFormData = new FormData();
+        aadhaarFormData.append('file', formData.aadhaar_page1);
+        const aadhaarResponse = await axios.post(`${API}/upload-file`, aadhaarFormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        aadhaarPage1Url = aadhaarResponse.data.url;
+      }
+
+      // Upload Aadhaar page 2 (optional)
+      if (formData.aadhaar_page2) {
+        const aadhaar2FormData = new FormData();
+        aadhaar2FormData.append('file', formData.aadhaar_page2);
+        const aadhaar2Response = await axios.post(`${API}/upload-file`, aadhaar2FormData, {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        aadhaarPage2Url = aadhaar2Response.data.url;
+      }
+
       let slots = [];
       if (formData.preferred_slot === '5pm-6pm') {
         slots = ['17:00-18:00'];
@@ -107,7 +144,10 @@ export default function RegisterTutor({ setUser }) {
         classes_can_teach: formData.classes_can_teach,
         subjects_can_teach: allSubjects,
         available_days: formData.available_days,
-        available_slots: slots
+        available_slots: slots,
+        photo_url: photoUrl,
+        aadhaar_page1_url: aadhaarPage1Url,
+        aadhaar_page2_url: aadhaarPage2Url
       };
       
       const response = await axios.post(
