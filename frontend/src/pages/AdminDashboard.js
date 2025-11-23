@@ -2362,14 +2362,24 @@ export default function AdminDashboard({ user, logout }) {
                         variant="outline"
                         onClick={async () => {
                           try {
+                            const payload = {
+                              from_date: reportFromDate,
+                              to_date: reportToDate,
+                              report_type: reportType
+                            };
+
+                            // Add filters based on report type
+                            if (reportType === 'enrollments') {
+                              if (reportFilterSubject !== 'all') payload.filter_subject = reportFilterSubject;
+                              if (reportFilterClass !== 'all') payload.filter_class_level = parseInt(reportFilterClass);
+                              if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                            } else if (reportType === 'students') {
+                              if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                            }
+
                             const response = await axios.post(
                               `${API}/admin/reports/download?format=csv`,
-                              {
-                                from_date: reportFromDate,
-                                to_date: reportToDate,
-                                report_type: reportType,
-                                filter_value: reportFilter
-                              },
+                              payload,
                               { 
                                 withCredentials: true,
                                 responseType: 'blob'
@@ -2397,14 +2407,24 @@ export default function AdminDashboard({ user, logout }) {
                         variant="outline"
                         onClick={async () => {
                           try {
+                            const payload = {
+                              from_date: reportFromDate,
+                              to_date: reportToDate,
+                              report_type: reportType
+                            };
+
+                            // Add filters based on report type
+                            if (reportType === 'enrollments') {
+                              if (reportFilterSubject !== 'all') payload.filter_subject = reportFilterSubject;
+                              if (reportFilterClass !== 'all') payload.filter_class_level = parseInt(reportFilterClass);
+                              if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                            } else if (reportType === 'students') {
+                              if (reportFilterBoard !== 'all') payload.filter_board = reportFilterBoard;
+                            }
+
                             const response = await axios.post(
                               `${API}/admin/reports/download?format=excel`,
-                              {
-                                from_date: reportFromDate,
-                                to_date: reportToDate,
-                                report_type: reportType,
-                                filter_value: reportFilter
-                              },
+                              payload,
                               { 
                                 withCredentials: true,
                                 responseType: 'blob'
