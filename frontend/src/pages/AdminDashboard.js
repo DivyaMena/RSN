@@ -752,62 +752,62 @@ export default function AdminDashboard({ user, logout }) {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Coordinators</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">Total Coordinators</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-blue-600">{stats.totalCoordinators}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-blue-600">{stats.totalCoordinators}</div>
                   {stats.pendingCoordinators > 0 && (
-                    <p className="text-xs text-orange-600 mt-1">{stats.pendingCoordinators} pending approval</p>
+                    <p className="text-xs text-orange-600 mt-1">{stats.pendingCoordinators} pending</p>
                   )}
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Tutors</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">Total Tutors</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-green-600">{stats.totalTutors}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-green-600">{stats.totalTutors}</div>
                   {stats.pendingTutors > 0 && (
-                    <p className="text-xs text-orange-600 mt-1">{stats.pendingTutors} pending approval</p>
+                    <p className="text-xs text-orange-600 mt-1">{stats.pendingTutors} pending</p>
                   )}
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Students</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">Total Students</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-purple-600">{stats.totalStudents}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-purple-600">{stats.totalStudents}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Batches</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">Total Batches</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-indigo-600">{stats.totalBatches}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-indigo-600">{stats.totalBatches}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Schools</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">Total Schools</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-orange-600">{stats.totalSchools}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-orange-600">{stats.totalSchools}</div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">State Boards</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-medium text-gray-600">State Boards</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-teal-600">{stats.totalStateBoards}</div>
+                <CardContent className="pb-4 pt-0">
+                  <div className="text-2xl font-bold text-teal-600">{stats.totalStateBoards}</div>
                 </CardContent>
               </Card>
             </div>
