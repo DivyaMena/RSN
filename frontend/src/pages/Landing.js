@@ -121,15 +121,42 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* Logo and Description */}
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <img src="/logo.jpg" alt="Rising Stars Nation" className="h-10 w-10 object-cover rounded-xl" />
+                <span className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
+              </div>
+              <p className="text-gray-400 text-sm">Free online tuition for students who need extra support to succeed in Classes 6-10.</p>
             </div>
-            <span className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Quick Links</h3>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
+                <li><a href="/login" className="hover:text-white transition-colors">Login</a></li>
+                <li><button onClick={() => navigate('/login')} className="hover:text-white transition-colors text-left">Get Started</button></li>
+              </ul>
+            </div>
+
+            {/* Contact Us */}
+            <div>
+              <h3 className="text-lg font-bold mb-4">Contact Us</h3>
+              <div className="space-y-2 text-gray-400 text-sm">
+                <p><strong className="text-white">Email:</strong> risingstarsnation2025@gmail.com</p>
+                <p><strong className="text-white">Organization:</strong> SHARANYA DEVELOPMENT FOUNDATION</p>
+                <p className="pt-2 text-xs text-gray-500">For donations and support, use the "Donate Now" button above.</p>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-400 mb-4">Free online tuition for students who need extra support</p>
-          <p className="text-sm text-gray-500">© 2025 Rising Stars Nation. All rights reserved.</p>
+          
+          {/* Copyright */}
+          <div className="border-t border-gray-800 pt-6 text-center">
+            <p className="text-sm text-gray-500">© 2025 Rising Stars Nation. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>
