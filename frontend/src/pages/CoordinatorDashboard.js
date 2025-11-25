@@ -1530,7 +1530,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-700 mb-2">Selfie Photo:</p>
                     <img 
-                      src={currentTutor.tutor?.photo_url || currentTutor.user?.photo_url} 
+                      src={`${BACKEND_URL}${currentTutor.tutor?.photo_url || currentTutor.user?.photo_url}`} 
                       alt="Tutor Selfie" 
                       className="w-32 h-32 object-cover rounded-lg border-2 border-blue-300 shadow-md"
                     />
@@ -1550,13 +1550,13 @@ export default function CoordinatorDashboard({ user, logout }) {
                   
                   {currentTutor.tutor?.aadhaar_page1_url ? (
                     <a 
-                      href={currentTutor.tutor.aadhaar_page1_url} 
+                      href={`${BACKEND_URL}${currentTutor.tutor.aadhaar_page1_url}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="block"
                     >
                       <img 
-                        src={currentTutor.tutor.aadhaar_page1_url} 
+                        src={`${BACKEND_URL}${currentTutor.tutor.aadhaar_page1_url}`} 
                         alt="Aadhaar Document" 
                         className="max-w-xs w-full h-auto rounded-lg border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                       />
