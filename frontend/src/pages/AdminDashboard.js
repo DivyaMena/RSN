@@ -696,54 +696,55 @@ export default function AdminDashboard({ user, logout }) {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-11 gap-1 sm:gap-2 bg-white p-2 rounded-lg shadow-sm overflow-x-auto">
-            <TabsTrigger value="overview" className="text-xs flex items-center justify-center">
-              <BarChart3 className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Overview</span>
+          {/* Mobile: Vertical Sidebar / Desktop: Two-line Grid */}
+          <TabsList className="flex flex-col sm:grid sm:grid-cols-6 gap-1 sm:gap-2 bg-white p-2 rounded-lg shadow-sm max-h-[60vh] sm:max-h-none overflow-y-auto sm:overflow-visible">
+            <TabsTrigger value="overview" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              <span>Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="admins" className="text-xs flex items-center justify-center">
-              <Shield className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Admins</span>
+            <TabsTrigger value="admins" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <Shield className="h-4 w-4 mr-2" />
+              <span>Admins</span>
             </TabsTrigger>
-            <TabsTrigger value="coordinators" className="text-xs flex items-center justify-center">
-              <UserCog className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Coordinators</span>
+            <TabsTrigger value="coordinators" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <UserCog className="h-4 w-4 mr-2" />
+              <span>Coordinators</span>
             </TabsTrigger>
-            <TabsTrigger value="tutors" className="text-xs flex items-center justify-center">
-              <GraduationCap className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Tutors</span>
+            <TabsTrigger value="tutors" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <GraduationCap className="h-4 w-4 mr-2" />
+              <span>Tutors</span>
             </TabsTrigger>
-            <TabsTrigger value="students" className="text-xs">
-              <Users className="h-4 w-4 mr-1" />
-              Students
+            <TabsTrigger value="students" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <Users className="h-4 w-4 mr-2" />
+              <span>Students</span>
             </TabsTrigger>
-            <TabsTrigger value="parents" className="text-xs">
-              <Users className="h-4 w-4 mr-1" />
-              Parents
+            <TabsTrigger value="parents" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <Users className="h-4 w-4 mr-2" />
+              <span>Parents</span>
             </TabsTrigger>
-            <TabsTrigger value="schools" className="text-xs">
-              <School className="h-4 w-4 mr-1" />
-              Schools
+            <TabsTrigger value="schools" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <School className="h-4 w-4 mr-2" />
+              <span>Schools</span>
             </TabsTrigger>
-            <TabsTrigger value="batches" className="text-xs">
-              <BookOpen className="h-4 w-4 mr-1" />
-              Batches
+            <TabsTrigger value="batches" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <BookOpen className="h-4 w-4 mr-2" />
+              <span>Batches</span>
             </TabsTrigger>
-            <TabsTrigger value="state-boards" className="text-xs">
-              <Flag className="h-4 w-4 mr-1" />
-              State Boards
+            <TabsTrigger value="state-boards" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <Flag className="h-4 w-4 mr-2" />
+              <span>State Boards</span>
             </TabsTrigger>
-            <TabsTrigger value="curriculum" className="text-xs">
-              <Upload className="h-4 w-4 mr-1" />
-              Curriculum
+            <TabsTrigger value="curriculum" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <Upload className="h-4 w-4 mr-2" />
+              <span>Curriculum</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="text-xs">
-              <FileText className="h-4 w-4 mr-1" />
-              Reports
+            <TabsTrigger value="reports" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <FileText className="h-4 w-4 mr-2" />
+              <span>Reports</span>
             </TabsTrigger>
-            <TabsTrigger value="role-requests" className="text-xs flex items-center justify-center">
-              <UserPlus className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Role Requests</span>
+            <TabsTrigger value="role-requests" className="text-xs flex items-center justify-start sm:justify-center w-full">
+              <UserPlus className="h-4 w-4 mr-2" />
+              <span>Role Requests</span>
             </TabsTrigger>
           </TabsList>
 
