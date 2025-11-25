@@ -1254,6 +1254,7 @@ async def get_admin_stats(request: Request):
     })
     
     pending_tutors = await db.tutors.count_documents({"approval_status": "pending"})
+    pending_role_requests = await db.role_requests.count_documents({"status": "pending"})
     
     return {
         "totalCoordinators": total_coordinators,
@@ -1263,8 +1264,95 @@ async def get_admin_stats(request: Request):
         "totalBatches": total_batches,
         "totalSchools": 0,
         "pendingCoordinators": pending_coordinators,
-        "pendingTutors": pending_tutors
+        "pendingTutors": pending_tutors,
+        "pendingRoleRequests": pending_role_requests
     }
+
+@api_router.get("/admin/role-requests")
+async def get_role_requests(request: Request):
+    """Get all pending role requests"""
+    await require_admin(request)
+    
+    requests = await db.role_requests.find({"status": "pending"}, {"_id": 0}).to_list(1000)
+    
+    # Enrich with user data
+    for req in requests:
+        user = await db.users.find_one({"id": req["user_id"]}, {"_id": 0, "name": 1, "email": 1, "role": 1, "roles": 1})
+        if user:
+            req["user"] = user
+    
+    return {"requests": requests}
+
+@api_router.post("/admin/role-requests/approve")
+async def approve_reject_role_request(input: ApproveRoleInput, request: Request):
+    """Approve or reject a role request"""
+    admin_user = await require_admin(request)
+    
+    # Get the role request
+    role_request = await db.role_requests.find_one({"id": input.request_id}, {"_id": 0})
+    if not role_request:
+        raise HTTPException(status_code=404, detail="Role request not found")
+    
+    if role_request["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Request already processed")
+    
+    user_id = role_request["user_id"]
+    requested_role = role_request["requested_role"]
+    
+    if input.action == "approve":
+        # Add role to user
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        current_roles = user.get("roles", [user.get("role")])
+        
+        if requested_role not in current_roles:
+            current_roles.append(requested_role)
+        
+        # Remove from pending_roles
+        await db.users.update_one(
+            {"id": user_id},
+            {
+                "$set": {
+                    "roles": current_roles,
+                    "primary_role": user.get("primary_role") or user.get("role")
+                },
+                "$pull": {"pending_roles": requested_role}
+            }
+        )
+        
+        # Update request status
+        await db.role_requests.update_one(
+            {"id": input.request_id},
+            {"$set": {
+                "status": "approved",
+                "reviewed_at": datetime.now(timezone.utc),
+                "reviewed_by": admin_user.id
+            }}
+        )
+        
+        return {"success": True, "message": f"Role '{requested_role}' approved for user"}
+        
+    elif input.action == "reject":
+        # Remove from pending_roles
+        await db.users.update_one(
+            {"id": user_id},
+            {"$pull": {"pending_roles": requested_role}}
+        )
+        
+        # Update request status
+        await db.role_requests.update_one(
+            {"id": input.request_id},
+            {"$set": {
+                "status": "rejected",
+                "reviewed_at": datetime.now(timezone.utc),
+                "reviewed_by": admin_user.id,
+                "rejection_reason": input.rejection_reason or "Not specified"
+            }}
+        )
+        
+        return {"success": True, "message": "Role request rejected"}
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action")
 
 @api_router.get("/admin/admins")
 async def get_all_admins(request: Request):
