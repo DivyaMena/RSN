@@ -1746,7 +1746,7 @@ export default function AdminDashboard({ user, logout }) {
                         {expandedId === school.id && (
                           <div className="ml-12 mt-2 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                             <h4 className="font-semibold text-sm mb-3">Complete School Details</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                               <div>
                                 <p className="font-semibold text-blue-900 mb-1">Basic Information</p>
                                 <p><span className="font-medium">School Name:</span> {school.school_name}</p>
@@ -1777,6 +1777,17 @@ export default function AdminDashboard({ user, logout }) {
                                 <p><span className="font-medium">Preferred Days:</span> {school.preferred_days?.join(', ')}</p>
                               </div>
                             </div>
+                            {school.school_board_pic && (
+                              <div className="mt-4">
+                                <p className="font-semibold text-blue-900 mb-2">School Board Picture</p>
+                                <img 
+                                  src={`${BACKEND_URL}${school.school_board_pic}`} 
+                                  alt="School Board" 
+                                  className="max-w-xs h-40 object-contain rounded-lg border-2 border-blue-300 shadow-sm"
+                                  onError={(e) => {e.target.style.display = 'none'}}
+                                />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
