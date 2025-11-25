@@ -10,6 +10,8 @@ import { BookOpen, LogOut, Settings, Calendar, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDateIST, getCurrentDateIST } from '../utils/dateUtils';
 import DonateButton from '../components/DonateButton';
+import RoleSwitcher from '../components/RoleSwitcher';
+import AddRoleButton from '../components/AddRoleButton';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
