@@ -527,7 +527,7 @@ export default function CoordinatorDashboard({ user, logout }) {
           {/* All Tutors Tab */}
           <TabsContent value="tutors">
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">All Approved Tutors</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">All Tutors</h2>
               <div className="space-y-4">
                 {tutors.map(tutorData => (
                   <div key={tutorData.tutor.id} className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50">
