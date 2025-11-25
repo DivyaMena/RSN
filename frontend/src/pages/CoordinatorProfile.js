@@ -40,6 +40,8 @@ export default function CoordinatorProfile({ user, logout }) {
       setLocation(res.data.location || '');
       setAlternatePhone(res.data.alternate_phone || '');
       setAvailabilityStatus(res.data.availability_status || 'available');
+      setUnavailableFrom(res.data.unavailable_from || '');
+      setUnavailableTo(res.data.unavailable_to || '');
       
       // Calculate if editing is allowed
       if (res.data.last_profile_update) {
