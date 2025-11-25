@@ -304,7 +304,15 @@ export default function CoordinatorProfile({ user, logout }) {
           )}
 
           {/* Save Button */}
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-between items-center pt-4">
+            <Button
+              onClick={() => setShowDeleteDialog(true)}
+              variant="destructive"
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete My Account
+            </Button>
             <Button
               onClick={handleSave}
               disabled={!canEdit || saving}
@@ -316,6 +324,40 @@ export default function CoordinatorProfile({ user, logout }) {
           </div>
         </div>
       </main>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>⚠️ Delete Account - Not Interested to Volunteer</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete your coordinator account?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <p className="text-sm text-gray-700">
+              <strong>This action will:</strong>
+            </p>
+            <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+              <li>Permanently delete your coordinator profile</li>
+              <li>Remove you from all assigned batches</li>
+              <li>Notify admins about your departure</li>
+              <li>This action cannot be undone</li>
+            </ul>
+            <p className="text-sm text-red-600 font-semibold mt-4">
+              Note: Admin will be notified via email about your account deletion.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleting}>
+              {deleting ? 'Deleting...' : 'Yes, Delete My Account'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
