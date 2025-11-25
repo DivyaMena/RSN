@@ -181,6 +181,8 @@ export default function TutorDashboard({ user, logout }) {
             </div>
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-700 truncate max-w-[120px] sm:max-w-none">Welcome, {user.name}</span>
+              <RoleSwitcher currentRole="tutor" />
+              <AddRoleButton currentRole="tutor" />
               <DonateButton />
               <Button onClick={() => navigate('/profile')} variant="outline" size="sm" className="text-xs">
                 My Profile
