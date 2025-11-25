@@ -1367,6 +1367,8 @@ export default function AdminDashboard({ user, logout }) {
                               <p><span className="font-medium">Email:</span> {coordinator.email}</p>
                               <p><span className="font-medium">Phone:</span> {coordinator.phone_number || 'N/A'}</p>
                               <p><span className="font-medium">Location:</span> {coordinator.location || 'N/A'}</p>
+                              <p><span className="font-medium">Address:</span> {coordinator.address || 'N/A'}</p>
+                              <p><span className="font-medium">Pincode:</span> {coordinator.pincode || 'N/A'}</p>
                               <p><span className="font-medium">State:</span> {coordinator.state || 'N/A'}</p>
                               <p><span className="font-medium">Status:</span> {coordinator.status}</p>
                               <p><span className="font-medium">Approval Status:</span> {coordinator.approval_status}</p>
