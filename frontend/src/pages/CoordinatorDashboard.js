@@ -1620,7 +1620,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                 <div className="flex items-start space-x-6">
                   {selectedTutorDetails.tutor?.photo_url && (
                     <img 
-                      src={selectedTutorDetails.tutor.photo_url} 
+                      src={`${BACKEND_URL}${selectedTutorDetails.tutor.photo_url}`} 
                       alt="Tutor" 
                       className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-lg"
                     />
