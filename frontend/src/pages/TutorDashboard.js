@@ -72,33 +72,68 @@ export default function TutorDashboard({ user, logout }) {
 
       // Fetch curriculum for tutor's opted classes and subjects
       const curriculumData = {};
+      
       const tutorBoard = tutorRes.data.board_preference;
-      const tutorClasses = tutorRes.data.classes_can_teach || [];
       const tutorSubjects = tutorRes.data.subjects_can_teach || [];
+      const tutorClasses = tutorRes.data.classes_can_teach || [];
       
       for (const classLevel of tutorClasses) {
         for (const subject of tutorSubjects) {
-          const key = `${tutorBoard}-${classLevel}-${subject}`;
-          try {
-            const res = await axios.get(
-              `${API}/curriculum?board=${tutorBoard}&class_level=${classLevel}&subject=${subject}`,
-              { withCredentials: true }
-            );
-            if (res.data && res.data.length > 0) {
-              curriculumData[key] = res.data.sort((a, b) => {
-                // First sort by lesson number
-                if (a.topic_number !== b.topic_number) {
-                  return a.topic_number - b.topic_number;
-                }
-                // Then sort alphabetically by topic name (handles A, B, C)
-                return a.topic_name.localeCompare(b.topic_name);
-              });
+          // Map subjects based on class level
+          // Classes 6, 7, 8: PHY/BIO should map to SCI
+          // Classes 9, 10: SCI should map to PHY and BIO
+          let actualSubjects = [];
+          
+          if (classLevel >= 6 && classLevel <= 8) {
+            // For classes 6-8, use Science (SCI) regardless of PHY/BIO selection
+            if (subject === 'PHY' || subject === 'BIO' || subject === 'SCI') {
+              actualSubjects = ['SCI'];
+            } else {
+              actualSubjects = [subject];
             }
-          } catch (error) {
-            console.error(`Failed to fetch curriculum for ${key}`);
+          } else if (classLevel >= 9 && classLevel <= 10) {
+            // For classes 9-10, use PHY and BIO separately
+            if (subject === 'SCI') {
+              actualSubjects = ['PHY', 'BIO'];
+            } else if (subject === 'PHY' || subject === 'BIO') {
+              actualSubjects = [subject];
+            } else {
+              actualSubjects = [subject];
+            }
+          } else {
+            actualSubjects = [subject];
+          }
+          
+          // Fetch curriculum for each mapped subject
+          for (const mappedSubject of actualSubjects) {
+            const key = `${tutorBoard}-${classLevel}-${subject}`; // Keep original subject in key for display
+            const fetchKey = `${tutorBoard}-${classLevel}-${mappedSubject}`; // Use mapped subject for fetching
+            
+            // Skip if already fetched
+            if (curriculumData[key]) continue;
+            
+            try {
+              const res = await axios.get(
+                `${API}/curriculum?board=${tutorBoard}&class_level=${classLevel}&subject=${mappedSubject}`,
+                { withCredentials: true }
+              );
+              if (res.data && res.data.length > 0) {
+                curriculumData[key] = res.data.sort((a, b) => {
+                  // First sort by lesson number
+                  if (a.topic_number !== b.topic_number) {
+                    return a.topic_number - b.topic_number;
+                  }
+                  // Then sort alphabetically by topic name (handles A, B, C)
+                  return a.topic_name.localeCompare(b.topic_name);
+                });
+              }
+            } catch (error) {
+              console.error(`Failed to fetch curriculum for ${fetchKey}`);
+            }
           }
         }
       }
+      
       setCurriculum(curriculumData);
     } catch (error) {
       toast.error('Failed to fetch data');
