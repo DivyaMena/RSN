@@ -432,37 +432,67 @@ export default function TutorDashboard({ user, logout }) {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Class {classLevel}</h3>
                   
                   <div className="space-y-4">
-                    {tutorProfile.subjects_can_teach.map(subject => {
-                      const curriculumKey = `${tutorProfile.board_preference}-${classLevel}-${subject}`;
-                      const curriculumItems = (curriculum[curriculumKey] || []).sort((a, b) => {
-                        // First sort by lesson number
-                        if (a.topic_number !== b.topic_number) {
-                          return a.topic_number - b.topic_number;
-                        }
-                        // Then sort alphabetically by topic name (handles A, B, C)
-                        return a.topic_name.localeCompare(b.topic_name);
-                      });
-                      const isExpanded = expandedCurriculum[curriculumKey];
+                    {(() => {
+                      // Determine which subjects to display based on class level
+                      let subjectsToDisplay = [];
+                      const tutorSubjects = tutorProfile.subjects_can_teach;
                       
-                      return (
-                        <div key={subject} className="border border-gray-200 rounded-lg overflow-hidden">
-                          <button
-                            onClick={() => toggleCurriculum(curriculumKey)}
-                            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 hover:from-blue-100 hover:to-green-100 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-lg flex items-center justify-center text-white font-bold">
-                                {subject}
+                      // Check if tutor teaches science-related subjects
+                      const hasScienceSubjects = tutorSubjects.some(s => ['SCI', 'PHY', 'BIO'].includes(s));
+                      
+                      if (classLevel >= 6 && classLevel <= 8) {
+                        // For classes 6-8: Show SCI if they teach any science subject
+                        if (hasScienceSubjects) {
+                          subjectsToDisplay.push('SCI');
+                        }
+                        // Add other non-science subjects
+                        subjectsToDisplay.push(...tutorSubjects.filter(s => !['SCI', 'PHY', 'BIO'].includes(s)));
+                      } else if (classLevel >= 9 && classLevel <= 10) {
+                        // For classes 9-10: Show PHY and BIO if they teach any science subject
+                        if (hasScienceSubjects) {
+                          subjectsToDisplay.push('PHY', 'BIO');
+                        }
+                        // Add other non-science subjects
+                        subjectsToDisplay.push(...tutorSubjects.filter(s => !['SCI', 'PHY', 'BIO'].includes(s)));
+                      } else {
+                        // For other classes, show as is
+                        subjectsToDisplay = tutorSubjects;
+                      }
+                      
+                      // Remove duplicates
+                      subjectsToDisplay = [...new Set(subjectsToDisplay)];
+                      
+                      return subjectsToDisplay.map(subject => {
+                        const curriculumKey = `${tutorProfile.board_preference}-${classLevel}-${subject}`;
+                        const curriculumItems = (curriculum[curriculumKey] || []).sort((a, b) => {
+                          // First sort by lesson number
+                          if (a.topic_number !== b.topic_number) {
+                            return a.topic_number - b.topic_number;
+                          }
+                          // Then sort alphabetically by topic name (handles A, B, C)
+                          return a.topic_name.localeCompare(b.topic_name);
+                        });
+                        const isExpanded = expandedCurriculum[curriculumKey];
+                        
+                        return (
+                          <div key={subject} className="border border-gray-200 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() => toggleCurriculum(curriculumKey)}
+                              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 hover:from-blue-100 hover:to-green-100 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-xs">
+                                  {subject}
+                                </div>
+                                <div className="text-left">
+                                  <h4 className="font-semibold text-gray-900">{SUBJECTS[subject]}</h4>
+                                  <p className="text-sm text-gray-600">
+                                    {curriculumItems.length} {curriculumItems.length === 1 ? 'topic' : 'topics'}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="text-left">
-                                <h4 className="font-semibold text-gray-900">{SUBJECTS[subject]}</h4>
-                                <p className="text-sm text-gray-600">
-                                  {curriculumItems.length} {curriculumItems.length === 1 ? 'topic' : 'topics'}
-                                </p>
-                              </div>
-                            </div>
-                            <span className="text-gray-500 text-xl">{isExpanded ? '▼' : '▶'}</span>
-                          </button>
+                              <span className="text-gray-500 text-xl">{isExpanded ? '▼' : '▶'}</span>
+                            </button>
                           
                           {isExpanded && (
                             <div className="p-4 bg-white">
