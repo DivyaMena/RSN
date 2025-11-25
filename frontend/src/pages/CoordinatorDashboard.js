@@ -449,6 +449,8 @@ export default function CoordinatorDashboard({ user, logout }) {
             </div>
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline truncate">Welcome, {user.name}</span>
+              <RoleSwitcher currentRole="coordinator" />
+              <AddRoleButton currentRole="coordinator" />
               <DonateButton />
               <Button onClick={() => navigate('/profile')} variant="outline" size="sm" className="text-xs">
                 <User className="h-4 w-4 sm:mr-2" />
