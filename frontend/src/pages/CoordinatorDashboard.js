@@ -933,6 +933,17 @@ export default function CoordinatorDashboard({ user, logout }) {
                             </div>
                           </div>
                         </div>
+                        {school.school_board_pic && (
+                          <div className="mt-4">
+                            <p className="font-semibold text-blue-900 mb-2">School Board Picture</p>
+                            <img 
+                              src={`${BACKEND_URL}${school.school_board_pic}`} 
+                              alt="School Board" 
+                              className="max-w-xs h-40 object-contain rounded-lg border-2 border-blue-300 shadow-sm"
+                              onError={(e) => {e.target.style.display = 'none'}}
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
