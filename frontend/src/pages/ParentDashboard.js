@@ -237,6 +237,8 @@ export default function ParentDashboard({ user, logout }) {
             </div>
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-700 truncate max-w-[120px] sm:max-w-none">Welcome, {user.name}</span>
+              <RoleSwitcher currentRole="parent" />
+              <AddRoleButton currentRole="parent" />
               <DonateButton />
               <Button onClick={() => navigate('/profile')} variant="outline" size="sm" className="text-xs">
                 <User className="h-4 w-4 sm:mr-2" />
