@@ -531,7 +531,7 @@ export default function CoordinatorDashboard({ user, logout }) {
                         <div className="flex-shrink-0">
                           {tutorData.tutor?.photo_url || tutorData.user?.photo_url ? (
                             <img 
-                              src={tutorData.tutor?.photo_url || tutorData.user?.photo_url} 
+                              src={`${BACKEND_URL}${tutorData.tutor?.photo_url || tutorData.user?.photo_url}`} 
                               alt={tutorData.user?.name}
                               className="w-16 h-16 object-cover rounded-full border-2 border-gray-300"
                             />
