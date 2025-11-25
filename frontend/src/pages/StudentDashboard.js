@@ -146,67 +146,6 @@ export default function StudentDashboard({ user, logout }) {
     }));
   };
 
-  const handleBatchSelection = async (batchId) => {
-    setRemedialBatch(batchId);
-    setRemedialCurriculum('');
-    setAvailableCurriculum([]);
-    
-    // Find the selected batch
-    const batch = batches.find(b => b.id === batchId);
-    if (!batch) return;
-    
-    // Fetch curriculum for this batch's subject
-    try {
-      const res = await axios.get(
-        `${API}/curriculum?board=${batch.board}&class_level=${batch.class_level}&subject=${batch.subject}`,
-        { withCredentials: true }
-      );
-      const sortedCurriculum = (res.data || []).sort((a, b) => {
-        // First sort by lesson number
-        if (a.topic_number !== b.topic_number) {
-          return a.topic_number - b.topic_number;
-        }
-        // Then sort alphabetically by topic name (handles A, B, C)
-        return a.topic_name.localeCompare(b.topic_name);
-      });
-      setAvailableCurriculum(sortedCurriculum);
-    } catch (error) {
-      console.error('Failed to fetch curriculum');
-      toast.error('Failed to load curriculum topics');
-    }
-  };
-
-  const handleRemedialRequest = async () => {
-    if (!remedialBatch || !remedialCurriculum || !remedialNotes) {
-      toast.error('Please fill all fields');
-      return;
-    }
-
-    setSubmittingRemedial(true);
-    try {
-      // Find the curriculum item to get the topic name
-      const curriculumItem = availableCurriculum.find(c => c.id === remedialCurriculum);
-      const topicName = curriculumItem ? curriculumItem.topic_name : 'Topic';
-
-      await axios.post(`${API}/remedial/request`, {
-        batch_id: remedialBatch,
-        topic: topicName,
-        reason: remedialNotes
-      }, { withCredentials: true });
-
-      toast.success('Remedial request sent to coordinator');
-      setShowRemedialDialog(false);
-      setRemedialBatch('');
-      setRemedialCurriculum('');
-      setRemedialNotes('');
-      setAvailableCurriculum([]);
-    } catch (error) {
-      toast.error('Failed to send remedial request');
-    } finally {
-      setSubmittingRemedial(false);
-    }
-  };
-
   const handleJoinClass = (batch) => {
     setSelectedBatch(batch);
     setShowJoinDialog(true);
