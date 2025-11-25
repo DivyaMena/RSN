@@ -475,6 +475,26 @@ class RegisterSchoolInput(BaseModel):
     time_schedule: Optional[dict] = None
     terms_accepted: bool
 
+class RoleRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    requested_role: str  # tutor, coordinator, parent
+    status: str = "pending"  # pending, approved, rejected
+    request_data: Optional[dict] = None  # Store registration data (for tutor: subjects, classes, etc.)
+    requested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    reviewed_at: Optional[datetime] = None
+    reviewed_by: Optional[str] = None  # Admin/Coordinator user_id who approved/rejected
+    rejection_reason: Optional[str] = None
+
+class AddRoleInput(BaseModel):
+    requested_role: str  # tutor, coordinator, parent
+    
+class ApproveRoleInput(BaseModel):
+    request_id: str
+    action: str  # "approve" or "reject"
+    rejection_reason: Optional[str] = None
+
 # ============= HELPER FUNCTIONS =============
 
 def generate_user_code(state: str, role: str) -> str:
