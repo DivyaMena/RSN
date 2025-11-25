@@ -46,9 +46,50 @@ export default function RegisterSchool() {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size should be less than 5MB');
+      return;
+    }
+
+    setUploadingFile(true);
+
+    try {
+      const formDataToUpload = new FormData();
+      formDataToUpload.append('file', file);
+
+      const response = await axios.post(`${API}/upload`, formDataToUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true
+      });
+
+      // Set the uploaded file URL
+      handleChange('school_board_pic', response.data.url);
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error('Failed to upload image');
+      console.error('Upload error:', error);
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   const handleSubjectToggle = (subject) => {
