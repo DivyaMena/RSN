@@ -661,32 +661,34 @@ export default function AdminDashboard({ user, logout }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src="/logo.jpg" alt="Rising Stars Nation" className="h-12 w-12 rounded-lg object-cover" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Rising Stars Nation
-              </h1>
-              <p className="text-xs text-gray-500">Admin Dashboard</p>
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <img src="/logo.jpg" alt="Rising Stars Nation" className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover flex-shrink-0" />
+              <div>
+                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  Rising Stars Nation
+                </h1>
+                <p className="text-xs text-gray-500">Admin Dashboard</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500">
-                {user.is_main_admin ? 'Main Admin' : 'Co-Admin'}
-              </p>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <div className="text-left sm:text-right">
+                <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                <p className="text-xs text-gray-500">
+                  {user.is_main_admin ? 'Main Admin' : 'Co-Admin'}
+                </p>
+              </div>
+              <DonateButton />
+              <Button onClick={() => window.location.href = '/profile'} variant="outline" size="sm" className="text-xs">
+                <User className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">My Profile</span>
+              </Button>
+              <Button onClick={logout} variant="outline" size="sm" className="text-xs">
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
             </div>
-            <DonateButton />
-            <Button onClick={() => window.location.href = '/profile'} variant="outline" size="sm">
-              <User className="h-4 w-4 mr-2" />
-              My Profile
-            </Button>
-            <Button onClick={logout} variant="outline" size="sm">
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
           </div>
         </div>
       </header>
