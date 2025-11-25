@@ -1378,6 +1378,18 @@ export default function AdminDashboard({ user, logout }) {
                               <p><span className="font-medium">State:</span> {coordinator.state || 'N/A'}</p>
                               <p><span className="font-medium">Status:</span> {coordinator.status}</p>
                               <p><span className="font-medium">Approval Status:</span> {coordinator.approval_status}</p>
+                              <p><span className="font-medium">Availability:</span> 
+                                <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                                  coordinator.availability_status === 'unavailable' 
+                                    ? 'bg-red-100 text-red-800' 
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {coordinator.availability_status || 'available'}
+                                </span>
+                              </p>
+                              {coordinator.availability_status === 'unavailable' && coordinator.unavailable_from && (
+                                <p className="text-red-600"><span className="font-medium">Unavailable Period:</span> {coordinator.unavailable_from} to {coordinator.unavailable_to}</p>
+                              )}
                               <p><span className="font-medium">Created:</span> {new Date(coordinator.created_at).toLocaleString()}</p>
                             </div>
                           </div>
