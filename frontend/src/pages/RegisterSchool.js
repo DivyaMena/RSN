@@ -345,17 +345,37 @@ export default function RegisterSchool() {
             {/* School Board Picture */}
             <div className="border-b pb-6">
               <h2 className="text-xl font-semibold mb-4">School Board Picture</h2>
-              <div>
-                <label className="block text-sm font-medium mb-2">Image URL</label>
-                <div className="flex gap-2">
-                  <Upload className="h-5 w-5 text-gray-400 mt-2" />
-                  <Input
-                    value={formData.school_board_pic}
-                    onChange={(e) => handleChange('school_board_pic', e.target.value)}
-                    placeholder="https://example.com/school-board.jpg"
-                  />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Upload Image File</label>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors border border-blue-200">
+                      <Upload className="h-4 w-4" />
+                      <span className="text-sm font-medium">{uploadingFile ? 'Uploading...' : 'Choose File'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        disabled={uploadingFile}
+                        className="hidden"
+                      />
+                    </label>
+                    {formData.school_board_pic && (
+                      <span className="text-xs text-green-600">✓ Image uploaded</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Select an image file (JPG, PNG, etc.) - Max 5MB</p>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Upload your image to any hosting service and paste the URL here</p>
+                
+                {formData.school_board_pic && (
+                  <div className="mt-3">
+                    <img 
+                      src={`${BACKEND_URL}${formData.school_board_pic}`} 
+                      alt="School Board" 
+                      className="max-w-xs h-32 object-contain rounded-lg border"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
