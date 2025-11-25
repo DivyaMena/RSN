@@ -439,22 +439,24 @@ export default function CoordinatorDashboard({ user, logout }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src="/logo.jpg" alt="Rising Stars Nation" className="h-12 w-12 rounded-lg object-cover" />
-            <span className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <span className="text-gray-700 hidden sm:inline">Welcome, {user.name}</span>
-            <DonateButton />
-            <Button onClick={() => navigate('/profile')} variant="outline" size="sm">
-              <User className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">My Profile</span>
-            </Button>
-            <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm">
-              <LogOut className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <img src="/logo.jpg" alt="Rising Stars Nation" className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover flex-shrink-0" />
+              <span className="text-base sm:text-xl font-bold truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rising Stars Nation</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline truncate">Welcome, {user.name}</span>
+              <DonateButton />
+              <Button onClick={() => navigate('/profile')} variant="outline" size="sm" className="text-xs">
+                <User className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">My Profile</span>
+              </Button>
+              <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm" className="text-xs">
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
