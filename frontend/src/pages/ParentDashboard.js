@@ -9,6 +9,8 @@ import { Checkbox } from '../components/ui/checkbox';
 import { BookOpen, LogOut, Plus, Users, User } from 'lucide-react';
 import { toast } from 'sonner';
 import DonateButton from '../components/DonateButton';
+import RoleSwitcher from '../components/RoleSwitcher';
+import AddRoleButton from '../components/AddRoleButton';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
