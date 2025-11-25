@@ -1122,6 +1122,102 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("session_token", path="/", samesite="none", secure=True)
     return {"success": True}
 
+# ============= ROLE MANAGEMENT ROUTES =============
+
+@api_router.post("/users/request-role")
+async def request_additional_role(input: AddRoleInput, request: Request):
+    """Request to add an additional role to user account"""
+    user = await require_auth(request)
+    
+    # Validate requested role
+    valid_roles = ["parent", "tutor", "coordinator", "school"]
+    if input.requested_role not in valid_roles:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    # Check if user already has this role
+    user_doc = await db.users.find_one({"id": user.id}, {"_id": 0})
+    current_roles = user_doc.get("roles", [user_doc.get("role")])
+    pending_roles = user_doc.get("pending_roles", [])
+    
+    if input.requested_role in current_roles:
+        raise HTTPException(status_code=400, detail="You already have this role")
+    
+    if input.requested_role in pending_roles:
+        raise HTTPException(status_code=400, detail="You already have a pending request for this role")
+    
+    # Parent role is automatic when adding kids - no approval needed
+    if input.requested_role == "parent":
+        # Update user to add parent role immediately
+        if not user_doc.get("roles"):
+            new_roles = [user_doc.get("role"), "parent"]
+        else:
+            new_roles = current_roles + ["parent"]
+        
+        await db.users.update_one(
+            {"id": user.id},
+            {"$set": {
+                "roles": new_roles,
+                "primary_role": user_doc.get("primary_role") or user_doc.get("role")
+            }}
+        )
+        return {"success": True, "message": "Parent role added automatically", "auto_approved": True}
+    
+    # For tutor, coordinator - needs approval
+    # Add to pending_roles
+    await db.users.update_one(
+        {"id": user.id},
+        {"$push": {"pending_roles": input.requested_role}}
+    )
+    
+    # Create role request
+    role_request = RoleRequest(
+        user_id=user.id,
+        requested_role=input.requested_role,
+        status="pending"
+    )
+    
+    await db.role_requests.insert_one(role_request.model_dump())
+    
+    return {
+        "success": True,
+        "message": f"Request for {input.requested_role} role submitted. Waiting for approval.",
+        "auto_approved": False
+    }
+
+@api_router.get("/users/my-roles")
+async def get_my_roles(request: Request):
+    """Get current user's roles and pending role requests"""
+    user = await require_auth(request)
+    
+    user_doc = await db.users.find_one({"id": user.id}, {"_id": 0})
+    
+    return {
+        "current_roles": user_doc.get("roles", [user_doc.get("role")]),
+        "primary_role": user_doc.get("primary_role") or user_doc.get("role"),
+        "pending_roles": user_doc.get("pending_roles", [])
+    }
+
+@api_router.post("/users/switch-role")
+async def switch_primary_role(request: Request, role: str):
+    """Switch user's primary role (which dashboard to show)"""
+    user = await require_auth(request)
+    
+    user_doc = await db.users.find_one({"id": user.id}, {"_id": 0})
+    current_roles = user_doc.get("roles", [user_doc.get("role")])
+    
+    if role not in current_roles:
+        raise HTTPException(status_code=400, detail="You don't have this role")
+    
+    await db.users.update_one(
+        {"id": user.id},
+        {"$set": {
+            "primary_role": role,
+            "role": role  # Update main role field for backward compatibility
+        }}
+    )
+    
+    return {"success": True, "message": f"Switched to {role} dashboard"}
+
 # ============= ADMIN ROUTES =============
 
 async def require_admin(request: Request):
