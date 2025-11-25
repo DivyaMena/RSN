@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { BookOpen, LogOut, Plus, Users, CheckCircle, XCircle, Eye, UserCheck, Shield, Ban, UserX, User, School, ChevronDown, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import DonateButton from '../components/DonateButton';
+import RoleSwitcher from '../components/RoleSwitcher';
+import AddRoleButton from '../components/AddRoleButton';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
