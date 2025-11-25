@@ -1070,6 +1070,21 @@ async def login(input: LoginInput, response: Response):
         if input.role == "admin" or input.role == "rsn":
             if not (user.is_main_admin or user.is_co_admin):
                 raise HTTPException(status_code=403, detail="Access denied. This area is restricted to RSN team only.")
+        
+        # Initialize roles field for backward compatibility (migrate old users)
+        if not user_doc.get("roles"):
+            await db.users.update_one(
+                {"id": user.id},
+                {"$set": {
+                    "roles": [user.role],
+                    "primary_role": user.role,
+                    "pending_roles": []
+                }}
+            )
+            # Update the user object with initialized values
+            user.roles = [user.role]
+            user.primary_role = user.role
+            user.pending_roles = []
     
     # Create session
     session_token = str(uuid.uuid4())
