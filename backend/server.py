@@ -87,7 +87,10 @@ class User(BaseModel):
     name: str
     picture: Optional[str] = None
     photo_url: Optional[str] = None  # User photo/selfie upload
-    role: str  # parent, tutor, coordinator, admin, student, school
+    role: str  # Primary role for backward compatibility: parent, tutor, coordinator, admin, student, school
+    roles: List[str] = Field(default_factory=list)  # NEW: All active roles ["parent", "tutor"]
+    primary_role: Optional[str] = None  # NEW: Which dashboard to show by default
+    pending_roles: List[str] = Field(default_factory=list)  # NEW: Roles waiting for approval ["coordinator"]
     password_hash: Optional[str] = None  # For email/password login
     state: Optional[str] = None  # TS, AP, TN
     user_code: Optional[str] = None  # RSN-TS-T-12345 or RSN-TS-P-12345
