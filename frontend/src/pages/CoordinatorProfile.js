@@ -20,9 +20,13 @@ export default function CoordinatorProfile({ user, logout }) {
   const [location, setLocation] = useState('');
   const [alternatePhone, setAlternatePhone] = useState('');
   const [availabilityStatus, setAvailabilityStatus] = useState('available');
+  const [unavailableFrom, setUnavailableFrom] = useState('');
+  const [unavailableTo, setUnavailableTo] = useState('');
   
   const [daysUntilNextEdit, setDaysUntilNextEdit] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchProfile();
