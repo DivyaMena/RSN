@@ -741,6 +741,10 @@ export default function AdminDashboard({ user, logout }) {
               <FileText className="h-4 w-4 mr-1" />
               Reports
             </TabsTrigger>
+            <TabsTrigger value="role-requests" className="text-xs flex items-center justify-center">
+              <UserPlus className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Role Requests</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
