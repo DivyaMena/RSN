@@ -367,14 +367,14 @@ export default function TutorDashboard({ user, logout }) {
                       <h4 className="font-semibold text-gray-900 mb-2">Assigned Tutors:</h4>
                       <div className="space-y-2">
                         {tutors.map((tutorData, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                            <div>
-                              <p className="font-medium text-gray-900">{tutorData.tutor_user?.name}</p>
-                              <p className="text-sm text-gray-600">{tutorData.tutor_user?.email}</p>
+                          <div key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 rounded-lg p-3 gap-2">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{tutorData.tutor_user?.name}</p>
+                              <p className="text-xs sm:text-sm text-gray-600 truncate">{tutorData.tutor_user?.email}</p>
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600">Days:</p>
-                              <p className="text-sm font-medium text-blue-600">{tutorData.assignment?.assigned_days.join(', ')}</p>
+                            <div className="flex-shrink-0">
+                              <p className="text-xs sm:text-sm text-gray-600">Days:</p>
+                              <p className="text-xs sm:text-sm font-medium text-blue-600 break-words">{tutorData.assignment?.assigned_days.join(', ')}</p>
                             </div>
                           </div>
                         ))}
