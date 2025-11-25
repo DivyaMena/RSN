@@ -91,9 +91,7 @@ export default function Login() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="h-16 w-16 bg-gradient-to-br from-blue-600 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
-              <BookOpen className="h-10 w-10 text-white" />
-            </div>
+            <img src="/logo.jpg" alt="Rising Stars Nation" className="h-16 w-16 object-cover rounded-xl shadow-lg" />
           </div>
           <h1 
             className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2"
