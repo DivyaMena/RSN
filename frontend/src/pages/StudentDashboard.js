@@ -309,17 +309,6 @@ export default function StudentDashboard({ user, logout }) {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Quick Actions</h2>
-          <div className="flex gap-4">
-            <Button onClick={() => setShowRemedialDialog(true)} className="bg-gradient-to-r from-orange-500 to-red-500">
-              <Send className="h-4 w-4 mr-2" />
-              Request Remedial Class
-            </Button>
-          </div>
-        </div>
-
         {/* Academic Batches */}
         {academicBatches.length > 0 && (
           <div className="mb-8">
