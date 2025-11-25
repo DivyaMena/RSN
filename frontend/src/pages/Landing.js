@@ -146,7 +146,7 @@ export default function Landing() {
             <div>
               <h3 className="text-lg font-bold mb-4">Contact Us</h3>
               <div className="space-y-2 text-gray-400 text-sm">
-                <p><strong className="text-white">Email:</strong> risingstarsnation2025@gmail.com</p>
+                <p><strong className="text-white">Email:</strong> contact@risingstarsnation.org</p>
                 <p><strong className="text-white">Organization:</strong> SHARANYA DEVELOPMENT FOUNDATION</p>
                 <p className="pt-2 text-xs text-gray-500">For donations and support, use the "Donate Now" button above.</p>
               </div>
