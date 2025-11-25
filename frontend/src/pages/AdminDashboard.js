@@ -811,6 +811,35 @@ export default function AdminDashboard({ user, logout }) {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Academic Year Management - Moved to bottom */}
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Academic Year Management
+                  </span>
+                  <Button
+                    onClick={() => setShowRolloverDialog(true)}
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600"
+                  >
+                    Trigger Rollover
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center gap-4 text-sm">
+                  <p className="text-gray-700">
+                    Current Year: <span className="font-bold text-blue-600">{reportAcademicYear || 'Loading...'}</span>
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Rollover promotes students to next class
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Manage Admins Tab */}
