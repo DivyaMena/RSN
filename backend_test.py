@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 
 class RisingStarsAPITester:
-    def __init__(self, base_url="https://risingstarsnation.org"):
+    def __init__(self, base_url="https://admin-report-tool-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None
@@ -16,9 +16,9 @@ class RisingStarsAPITester:
         self.tests_passed = 0
         self.failed_tests = []
         
-        # Real test credentials from database
+        # Real test credentials from database - Updated as per review request
         self.test_credentials = {
-            "admin": {"email": "idonateforneedy@gmail.com", "password": "RisingStars@2025"},
+            "admin": {"email": "risingstarsnation2025@gmail.com", "password": "RisingStars@2025"},
             "student": {"email": "4krishnakumar@gmail.com", "password": "12-11-2013"}  # Parent email + student DOB
         }
         
