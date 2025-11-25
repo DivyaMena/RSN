@@ -247,7 +247,7 @@ export default function Login() {
         <div className="mt-8 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200">
           <h3 className="text-sm font-bold text-gray-900 mb-2 text-center">Contact Us</h3>
           <div className="text-xs text-gray-600 space-y-1">
-            <p className="text-center"><strong>Email:</strong> risingstarsnation2025@gmail.com</p>
+            <p className="text-center"><strong>Email:</strong> contact@risingstarsnation.org</p>
             <p className="text-center"><strong>Organization:</strong> SHARANYA DEVELOPMENT FOUNDATION</p>
           </div>
         </div>
