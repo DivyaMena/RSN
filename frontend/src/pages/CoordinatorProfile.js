@@ -118,6 +118,25 @@ export default function CoordinatorProfile({ user, logout }) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await axios.delete(`${API}/users/me/account`, {
+        withCredentials: true,
+        data: { reason: 'Not interested to volunteer' }
+      });
+      toast.success('Your account has been deleted. Admin has been notified.');
+      setTimeout(() => {
+        logout();
+      }, 2000);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete account');
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
