@@ -3540,6 +3540,69 @@ async def update_my_user_profile(
     
     return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
 
+@api_router.delete("/users/me/account")
+async def delete_my_account(request: Request, reason: Optional[str] = None):
+    """Delete coordinator/user account - sends notification to admins"""
+    user = await require_auth(request)
+    
+    # Only coordinators, tutors, and parents can delete their accounts
+    if user.role not in ["coordinator", "tutor", "parent"]:
+        raise HTTPException(status_code=403, detail="Account deletion not allowed for this role")
+    
+    # Send notification email to admins
+    try:
+        admins = await db.users.find({"$or": [{"is_main_admin": True}, {"is_co_admin": True}]}, {"_id": 0, "email": 1, "name": 1}).to_list(100)
+        
+        for admin in admins:
+            subject = f"Account Deletion Notice - {user.role.capitalize()}: {user.name}"
+            body = f"""
+            <html>
+            <body>
+                <h2>Account Deletion Notice</h2>
+                <p><strong>User:</strong> {user.name}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Role:</strong> {user.role.capitalize()}</p>
+                <p><strong>Reason:</strong> {reason or 'Not specified'}</p>
+                <p><strong>Deleted on:</strong> {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC</p>
+                <br>
+                <p>The user has requested to delete their account and will no longer be available in the system.</p>
+                <p>Best regards,<br>Rising Stars Nation System</p>
+            </body>
+            </html>
+            """
+            
+            await send_email(admin["email"], subject, body)
+    except Exception as e:
+        print(f"Failed to send account deletion email: {str(e)}")
+        # Continue with deletion even if email fails
+    
+    # Delete user account and related data
+    if user.role == "coordinator":
+        # Remove coordinator from batch assignments
+        await db.batches.update_many(
+            {"coordinator_id": user.id},
+            {"$unset": {"coordinator_id": ""}}
+        )
+    elif user.role == "tutor":
+        # Delete tutor profile
+        await db.tutors.delete_one({"user_id": user.id})
+        # Remove tutor from batch assignments
+        await db.tutor_batch_assignments.delete_many({"tutor_id": user.id})
+    elif user.role == "parent":
+        # Update students to mark parent as deleted (don't delete students)
+        await db.students.update_many(
+            {"parent_id": user.id},
+            {"$set": {"parent_deleted": True}}
+        )
+    
+    # Delete user record
+    await db.users.delete_one({"id": user.id})
+    
+    # Delete user sessions
+    await db.user_sessions.delete_many({"user_id": user.id})
+    
+    return {"success": True, "message": "Account deleted successfully"}
+
 @api_router.put("/students/me/profile")
 async def update_my_student_profile(
     subjects: Optional[List[str]] = None,
