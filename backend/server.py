@@ -3461,6 +3461,8 @@ async def update_my_user_profile(
     location: Optional[str] = None,
     alternate_phone: Optional[str] = None,
     availability_status: Optional[str] = None,
+    unavailable_from: Optional[str] = None,
+    unavailable_to: Optional[str] = None,
     request: Request = None
 ):
     """Update user profile (coordinator/parent) - restricted to once every 15 days"""
@@ -3497,10 +3499,44 @@ async def update_my_user_profile(
         update_data["alternate_phone"] = alternate_phone
     if availability_status is not None:
         update_data["availability_status"] = availability_status
+    if unavailable_from is not None:
+        update_data["unavailable_from"] = unavailable_from
+    if unavailable_to is not None:
+        update_data["unavailable_to"] = unavailable_to
     
     update_data["last_profile_update"] = datetime.now(timezone.utc)
     
     await db.users.update_one({"id": user.id}, {"$set": update_data})
+    
+    # Send email to admins if coordinator becomes unavailable
+    if user.role == "coordinator" and availability_status == "unavailable" and unavailable_from and unavailable_to:
+        try:
+            # Get all admins
+            admins = await db.users.find({"$or": [{"is_main_admin": True}, {"is_co_admin": True}]}, {"_id": 0, "email": 1, "name": 1}).to_list(100)
+            
+            for admin in admins:
+                subject = f"Coordinator Unavailability Notice - {user.name}"
+                body = f"""
+                <html>
+                <body>
+                    <h2>Coordinator Unavailability Notice</h2>
+                    <p><strong>Coordinator:</strong> {user.name}</p>
+                    <p><strong>Email:</strong> {user.email}</p>
+                    <p><strong>Status:</strong> Unavailable</p>
+                    <p><strong>From Date:</strong> {unavailable_from}</p>
+                    <p><strong>To Date:</strong> {unavailable_to}</p>
+                    <p><strong>Updated on:</strong> {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC</p>
+                    <br>
+                    <p>Please reassign batches if needed.</p>
+                    <p>Best regards,<br>Rising Stars Nation System</p>
+                </body>
+                </html>
+                """
+                
+                await send_email(admin["email"], subject, body)
+        except Exception as e:
+            print(f"Failed to send unavailability email: {str(e)}")
+            # Don't fail the request if email fails
     
     return {"message": "Profile updated successfully", "next_edit_available": (datetime.now(timezone.utc) + timedelta(days=15)).isoformat()}
 
