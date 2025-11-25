@@ -82,17 +82,17 @@ export default function TutorDashboard({ user, logout }) {
       
       for (const classLevel of tutorClasses) {
         for (const subject of tutorSubjects) {
-          // For classes 6-8: Show only SCI (Science)
-          // For classes 9-10: Show PHY and BIO
-          if (classLevel >= 6 && classLevel <= 8) {
-            // For junior classes, only fetch Science curriculum
+          // For classes 6 & 7: Show only SCI (Science)
+          // For classes 8, 9, 10: Show PHY and BIO
+          if (classLevel >= 6 && classLevel <= 7) {
+            // For classes 6-7, only fetch Science curriculum
             if (subject === 'PHY' || subject === 'BIO' || subject === 'SCI') {
               toFetch.add(`${tutorBoard}-${classLevel}-SCI`);
             } else {
               toFetch.add(`${tutorBoard}-${classLevel}-${subject}`);
             }
-          } else if (classLevel >= 9 && classLevel <= 10) {
-            // For senior classes, fetch PHY and BIO separately
+          } else if (classLevel >= 8 && classLevel <= 10) {
+            // For classes 8-10, fetch PHY and BIO separately
             if (subject === 'SCI' || subject === 'PHY' || subject === 'BIO') {
               toFetch.add(`${tutorBoard}-${classLevel}-PHY`);
               toFetch.add(`${tutorBoard}-${classLevel}-BIO`);
