@@ -77,25 +77,52 @@ export default function TutorDashboard({ user, logout }) {
       const tutorSubjects = tutorRes.data.subjects_can_teach || [];
       const tutorClasses = tutorRes.data.classes_can_teach || [];
       
+      // Create a set to track which class-subject combos to fetch (avoid duplicates)
+      const toFetch = new Set();
+      
       for (const classLevel of tutorClasses) {
         for (const subject of tutorSubjects) {
-          const key = `${tutorBoard}-${classLevel}-${subject}`;
-          try {
-            const res = await axios.get(
-              `${API}/curriculum?board=${tutorBoard}&class_level=${classLevel}&subject=${subject}`,
-              { withCredentials: true }
-            );
-            if (res.data) {
-              curriculumData[key] = res.data.sort((a, b) => {
-                if (a.topic_number !== b.topic_number) {
-                  return a.topic_number - b.topic_number;
-                }
-                return a.topic_name.localeCompare(b.topic_name);
-              });
+          // For classes 6-8: Show only SCI (Science)
+          // For classes 9-10: Show PHY and BIO
+          if (classLevel >= 6 && classLevel <= 8) {
+            // For junior classes, only fetch Science curriculum
+            if (subject === 'PHY' || subject === 'BIO' || subject === 'SCI') {
+              toFetch.add(`${tutorBoard}-${classLevel}-SCI`);
+            } else {
+              toFetch.add(`${tutorBoard}-${classLevel}-${subject}`);
             }
-          } catch (error) {
-            console.error(`Failed to fetch curriculum for ${key}`);
+          } else if (classLevel >= 9 && classLevel <= 10) {
+            // For senior classes, fetch PHY and BIO separately
+            if (subject === 'SCI' || subject === 'PHY' || subject === 'BIO') {
+              toFetch.add(`${tutorBoard}-${classLevel}-PHY`);
+              toFetch.add(`${tutorBoard}-${classLevel}-BIO`);
+            } else {
+              toFetch.add(`${tutorBoard}-${classLevel}-${subject}`);
+            }
+          } else {
+            toFetch.add(`${tutorBoard}-${classLevel}-${subject}`);
           }
+        }
+      }
+      
+      // Now fetch curriculum for each unique combo
+      for (const key of toFetch) {
+        const [board, classLevel, subject] = key.split('-');
+        try {
+          const res = await axios.get(
+            `${API}/curriculum?board=${board}&class_level=${classLevel}&subject=${subject}`,
+            { withCredentials: true }
+          );
+          if (res.data) {
+            curriculumData[key] = res.data.sort((a, b) => {
+              if (a.topic_number !== b.topic_number) {
+                return a.topic_number - b.topic_number;
+              }
+              return a.topic_name.localeCompare(b.topic_name);
+            });
+          }
+        } catch (error) {
+          console.error(`Failed to fetch curriculum for ${key}`);
         }
       }
       
