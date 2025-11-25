@@ -499,36 +499,132 @@ class RisingStarsAPITester:
         
         return True
 
+    def test_admin_dashboard_fixes(self):
+        """Test the specific admin dashboard fixes mentioned in review request"""
+        self.log("\n🔧 Testing Admin Dashboard Fixes...")
+        
+        # Login as admin with the correct credentials
+        if not self.login_as_role("admin"):
+            self.log("❌ Cannot test admin dashboard without admin access")
+            return False
+        
+        # Test 1: Get all tutors to check address and pincode display
+        success, tutors = self.run_test(
+            "Get All Tutors (Check Address & Pincode)",
+            "GET",
+            "admin/tutors",
+            200
+        )
+        
+        if success and tutors:
+            self.log(f"✅ Retrieved {len(tutors)} tutors")
+            
+            # Check if tutors have address and pincode fields
+            for tutor in tutors[:3]:  # Check first 3 tutors
+                tutor_data = tutor.get("tutor", {}) if "tutor" in tutor else tutor
+                user_data = tutor.get("user", {}) if "user" in tutor else {}
+                
+                tutor_name = user_data.get("name", "Unknown")
+                address = tutor_data.get("current_address")
+                pincode = tutor_data.get("pincode")
+                
+                self.log(f"   Tutor: {tutor_name}")
+                if address:
+                    self.log(f"   ✅ Address: {address}")
+                else:
+                    self.log(f"   ❌ Address: Missing")
+                    
+                if pincode:
+                    self.log(f"   ✅ Pincode: {pincode}")
+                else:
+                    self.log(f"   ❌ Pincode: Missing")
+                    
+                # Check for selfie and aadhaar images
+                photo_url = tutor_data.get("photo_url")
+                aadhaar_page1_url = tutor_data.get("aadhaar_page1_url")
+                
+                if photo_url:
+                    self.log(f"   ✅ Selfie URL: {photo_url}")
+                else:
+                    self.log(f"   ❌ Selfie URL: Missing")
+                    
+                if aadhaar_page1_url:
+                    self.log(f"   ✅ Aadhaar URL: {aadhaar_page1_url}")
+                else:
+                    self.log(f"   ❌ Aadhaar URL: Missing")
+        
+        # Test 2: Get all coordinators to check address and pincode display
+        success, coordinators = self.run_test(
+            "Get All Coordinators (Check Address & Pincode)",
+            "GET",
+            "admin/coordinators",
+            200
+        )
+        
+        if success and coordinators:
+            self.log(f"✅ Retrieved {len(coordinators)} coordinators")
+            
+            # Check if coordinators have address and pincode fields
+            for coord in coordinators[:2]:  # Check first 2 coordinators
+                coord_name = coord.get("name", "Unknown")
+                location = coord.get("location")
+                phone = coord.get("phone_number")
+                
+                self.log(f"   Coordinator: {coord_name}")
+                if location:
+                    self.log(f"   ✅ Location/Address: {location}")
+                else:
+                    self.log(f"   ❌ Location/Address: Missing")
+                    
+                if phone:
+                    self.log(f"   ✅ Phone: {phone}")
+                else:
+                    self.log(f"   ❌ Phone: Missing")
+        
+        return True
+    
+    def test_file_upload_endpoints(self):
+        """Test file upload endpoints and image serving"""
+        self.log("\n📁 Testing File Upload Endpoints...")
+        
+        # Test uploaded file access
+        test_files = [
+            "28f612eb-2eb6-4d03-a560-830f20ccc0b7.jpg",
+            "60f6e41d-bcc1-4193-af20-d0dcde648980.jpg", 
+            "d1f6e798-2320-43bd-85db-7ff1eb977112.png",
+            "df20818e-e1dd-4830-bfc4-ae79f550ac97.png"
+        ]
+        
+        for filename in test_files:
+            success, _ = self.run_test(
+                f"Access Uploaded File ({filename})",
+                "GET",
+                f"uploads/{filename}",
+                200
+            )
+            
+            if success:
+                self.log(f"   ✅ File accessible: {filename}")
+            else:
+                self.log(f"   ❌ File not accessible: {filename}")
+        
+        return True
+
     def run_all_tests(self):
         """Run comprehensive API test suite for Rising Stars Nation Educational Platform"""
-        self.log("🚀 Starting Rising Stars Nation Educational Platform API Test Suite")
+        self.log("🚀 Starting Admin Dashboard Testing for Rising Stars Nation")
         self.log(f"🌐 Testing against: {self.base_url}")
-        self.log("📋 Testing critical flows from review request...")
+        self.log("📋 Testing specific fixes from review request...")
         
         try:
-            # Test basic authentication
+            # Test admin login with correct credentials
             self.test_auth_flow()
             
-            # Test curriculum endpoints (public access)
-            self.test_curriculum_endpoints()
+            # Test the specific admin dashboard fixes
+            self.test_admin_dashboard_fixes()
             
-            # Test admin dashboard functionality
-            self.test_admin_dashboard_endpoints()
-            
-            # Test coordinator dashboard functionality  
-            self.test_coordinator_dashboard_endpoints()
-            
-            # Test tutor dashboard functionality
-            self.test_tutor_dashboard_endpoints()
-            
-            # Test student dashboard functionality
-            self.test_student_dashboard_endpoints()
-            
-            # Test student data access
-            self.test_student_endpoints()
-            
-            # Test remedial system
-            self.test_remedial_endpoints()
+            # Test file upload endpoints
+            self.test_file_upload_endpoints()
             
         except Exception as e:
             self.log(f"❌ Test suite error: {str(e)}")
