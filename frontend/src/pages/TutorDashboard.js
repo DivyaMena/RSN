@@ -440,15 +440,15 @@ export default function TutorDashboard({ user, logout }) {
                       // Check if tutor teaches science-related subjects
                       const hasScienceSubjects = tutorSubjects.some(s => ['SCI', 'PHY', 'BIO'].includes(s));
                       
-                      if (classLevel >= 6 && classLevel <= 8) {
-                        // For classes 6-8: Show SCI if they teach any science subject
+                      if (classLevel >= 6 && classLevel <= 7) {
+                        // For classes 6-7: Show SCI if they teach any science subject
                         if (hasScienceSubjects) {
                           subjectsToDisplay.push('SCI');
                         }
                         // Add other non-science subjects
                         subjectsToDisplay.push(...tutorSubjects.filter(s => !['SCI', 'PHY', 'BIO'].includes(s)));
-                      } else if (classLevel >= 9 && classLevel <= 10) {
-                        // For classes 9-10: Show PHY and BIO if they teach any science subject
+                      } else if (classLevel >= 8 && classLevel <= 10) {
+                        // For classes 8-10: Show PHY and BIO if they teach any science subject
                         if (hasScienceSubjects) {
                           subjectsToDisplay.push('PHY', 'BIO');
                         }
