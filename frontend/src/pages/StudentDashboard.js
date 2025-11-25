@@ -45,13 +45,6 @@ export default function StudentDashboard({ user, logout }) {
   const [curriculum, setCurriculum] = useState({});
   const [expandedCurriculum, setExpandedCurriculum] = useState({});
   const [loading, setLoading] = useState(true);
-  
-  // Remedial request state
-  const [showRemedialDialog, setShowRemedialDialog] = useState(false);
-  const [remedialBatch, setRemedialBatch] = useState('');
-  const [remedialCurriculum, setRemedialCurriculum] = useState('');
-  const [remedialNotes, setRemedialNotes] = useState('');
-  const [submittingRemedial, setSubmittingRemedial] = useState(false);
   const [availableCurriculum, setAvailableCurriculum] = useState([]);
   
   // Join class state
