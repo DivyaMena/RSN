@@ -247,6 +247,34 @@ export default function CoordinatorProfile({ user, logout }) {
             </select>
           </div>
 
+          {/* Unavailable Date Range - Only show when unavailable is selected */}
+          {availabilityStatus === 'unavailable' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="unavailableFrom" className="text-gray-900">From Date</Label>
+                <Input
+                  id="unavailableFrom"
+                  type="date"
+                  value={unavailableFrom}
+                  onChange={(e) => setUnavailableFrom(e.target.value)}
+                  disabled={!canEdit}
+                  className={!canEdit ? 'bg-gray-100' : ''}
+                />
+              </div>
+              <div>
+                <Label htmlFor="unavailableTo" className="text-gray-900">To Date</Label>
+                <Input
+                  id="unavailableTo"
+                  type="date"
+                  value={unavailableTo}
+                  onChange={(e) => setUnavailableTo(e.target.value)}
+                  disabled={!canEdit}
+                  className={!canEdit ? 'bg-gray-100' : ''}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Save Button */}
           <div className="flex justify-end pt-4">
             <Button
