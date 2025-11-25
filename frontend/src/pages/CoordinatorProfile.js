@@ -76,13 +76,27 @@ export default function CoordinatorProfile({ user, logout }) {
 
     setSaving(true);
     try {
+      // Validate dates if unavailable
+      if (availabilityStatus === 'unavailable') {
+        if (!unavailableFrom || !unavailableTo) {
+          toast.error('Please select both From Date and To Date for unavailability');
+          return;
+        }
+        if (new Date(unavailableFrom) > new Date(unavailableTo)) {
+          toast.error('From Date must be before To Date');
+          return;
+        }
+      }
+
       await axios.put(
         `${API}/users/me/profile`,
         {
           phone_number: phoneNumber,
           location: location,
           alternate_phone: alternatePhone,
-          availability_status: availabilityStatus
+          availability_status: availabilityStatus,
+          unavailable_from: availabilityStatus === 'unavailable' ? unavailableFrom : null,
+          unavailable_to: availabilityStatus === 'unavailable' ? unavailableTo : null
         },
         { withCredentials: true }
       );
