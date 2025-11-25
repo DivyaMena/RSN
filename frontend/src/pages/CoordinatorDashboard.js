@@ -524,35 +524,35 @@ export default function CoordinatorDashboard({ user, logout }) {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">All Approved Tutors</h2>
               <div className="space-y-4">
                 {tutors.map(tutorData => (
-                  <div key={tutorData.tutor.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start space-x-4 flex-1">
+                  <div key={tutorData.tutor.id} className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                      <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
                         {/* Profile Thumbnail */}
                         <div className="flex-shrink-0">
                           {tutorData.tutor?.photo_url || tutorData.user?.photo_url ? (
                             <img 
                               src={`${BACKEND_URL}${tutorData.tutor?.photo_url || tutorData.user?.photo_url}`} 
                               alt={tutorData.user?.name}
-                              className="w-16 h-16 object-cover rounded-full border-2 border-gray-300"
+                              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-full border-2 border-gray-300"
                             />
                           ) : (
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-400 to-green-400 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-xl">
                               {tutorData.user?.name?.charAt(0).toUpperCase()}
                             </div>
                           )}
                         </div>
                         
                         {/* Tutor Info */}
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-lg">{tutorData.user?.name}</h3>
-                          <p className="text-sm text-gray-600">{tutorData.user?.email}</p>
-                          <p className="text-sm text-gray-600 mt-2">
-                            <span className="font-medium">Board:</span> {tutorData.tutor.board_preference} | 
-                            <span className="font-medium ml-2">Classes:</span> {tutorData.tutor.classes_can_teach?.join(', ')} | 
-                            <span className="font-medium ml-2">Subjects:</span> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}
-                          </p>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">{tutorData.user?.name}</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 truncate">{tutorData.user?.email}</p>
+                          <div className="text-xs sm:text-sm text-gray-600 mt-2 space-y-1">
+                            <p className="break-words"><span className="font-medium">Board:</span> {tutorData.tutor.board_preference}</p>
+                            <p className="break-words"><span className="font-medium">Classes:</span> {tutorData.tutor.classes_can_teach?.join(', ')}</p>
+                            <p className="break-words"><span className="font-medium">Subjects:</span> {tutorData.tutor.subjects_can_teach?.map(s => SUBJECTS[s]).join(', ')}</p>
+                          </div>
                           <div className="mt-2 flex items-center space-x-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
                               tutorData.tutor.status === 'active' ? 'bg-green-100 text-green-800' :
                               tutorData.tutor.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
                               tutorData.tutor.status === 'blacklisted' ? 'bg-red-100 text-red-800' :
@@ -563,22 +563,26 @@ export default function CoordinatorDashboard({ user, logout }) {
                           </div>
                         </div>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex flex-row sm:flex-col gap-2">
                         <Button
                           onClick={() => handleViewTutorDetails(tutorData)}
                           size="sm"
                           variant="outline"
+                          className="flex-1 sm:flex-none text-xs"
                         >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
+                          <Eye className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">View Details</span>
+                          <span className="sm:hidden ml-1">View</span>
                         </Button>
                         <Button
                           onClick={() => handleChangeStatus(tutorData)}
                           size="sm"
                           variant="outline"
+                          className="flex-1 sm:flex-none text-xs"
                         >
-                          <Shield className="h-4 w-4 mr-2" />
-                          Change Status
+                          <Shield className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Change Status</span>
+                          <span className="sm:hidden ml-1">Status</span>
                         </Button>
                       </div>
                     </div>
