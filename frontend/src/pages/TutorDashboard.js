@@ -519,7 +519,8 @@ export default function TutorDashboard({ user, logout }) {
                           )}
                         </div>
                       );
-                    })}
+                    });
+                  })()}
                   </div>
                 </div>
               ))}
