@@ -1614,16 +1614,20 @@ async def create_coordinator_assignment(input: dict, request: Request):
         created_by=user.id
     )
     
+    class_level_to_add = None
+    
     if assignment_type == "class":
         if not input.get("class_level"):
             raise HTTPException(status_code=400, detail="Class level is required for class assignment")
         assignment.class_level = input.get("class_level")
+        class_level_to_add = int(input.get("class_level"))
     
     elif assignment_type == "class_subject":
         if not input.get("class_level") or not input.get("subject"):
             raise HTTPException(status_code=400, detail="Class level and subject are required")
         assignment.class_level = input.get("class_level")
         assignment.subject = input.get("subject")
+        class_level_to_add = int(input.get("class_level"))
     
     elif assignment_type == "batch_range":
         if not input.get("class_level") or not input.get("subject") or not input.get("batch_start") or not input.get("batch_end"):
@@ -1632,6 +1636,7 @@ async def create_coordinator_assignment(input: dict, request: Request):
         assignment.subject = input.get("subject")
         assignment.batch_start = input.get("batch_start")
         assignment.batch_end = input.get("batch_end")
+        class_level_to_add = int(input.get("class_level"))
     
     else:
         raise HTTPException(status_code=400, detail="Invalid assignment type")
@@ -1640,6 +1645,16 @@ async def create_coordinator_assignment(input: dict, request: Request):
     doc["created_at"] = doc["created_at"].isoformat()
     
     await db.coordinator_assignments.insert_one(doc)
+    
+    # CRITICAL: Also update the coordinator's classes_assigned field so it shows on their dashboard
+    if class_level_to_add:
+        current_classes = coordinator.get("classes_assigned", []) or []
+        if class_level_to_add not in current_classes:
+            current_classes.append(class_level_to_add)
+            await db.users.update_one(
+                {"id": coordinator_id},
+                {"$set": {"classes_assigned": current_classes}}
+            )
     
     return {"success": True, "message": "Coordinator assigned successfully"}
 
