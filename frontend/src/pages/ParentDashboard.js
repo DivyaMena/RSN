@@ -436,22 +436,24 @@ export default function ParentDashboard({ user, logout }) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Location</label>
+                      <label className="block text-sm font-medium mb-2">Location *</label>
                       <Input
                         data-testid="location-input"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                         placeholder="City/Town"
+                        required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Roll Number</label>
+                      <label className="block text-sm font-medium mb-2">Roll Number *</label>
                       <Input
                         data-testid="roll-no-input"
                         value={formData.roll_no}
                         onChange={(e) => setFormData({ ...formData, roll_no: e.target.value })}
                         placeholder="Enter roll number"
+                        required
                       />
                     </div>
                   </div>
