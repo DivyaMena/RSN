@@ -1,0 +1,96 @@
+# Rising Stars Nation - Product Requirements Document
+
+## Original Problem Statement
+An educational platform for providing free online tuition to students who need extra support (Classes 6-10). The platform supports multiple user roles: Admin, Co-Admin, Coordinator, Tutor, Parent, Student, and School.
+
+## Core Features
+1. **Role-Based Dashboards**: Separate dashboards for Admin, Coordinator, Tutor, Parent, and Student
+2. **Batch Management**: Create and manage batches of students with tutor assignments
+3. **Coordinator Assignments**: Assign coordinators to specific classes/boards
+4. **Academic Year Rollover**: Promote students to next class at year end
+5. **Reports System**: Generate enrollment, attendance, and performance reports
+6. **Multi-Role System**: Users can have multiple roles (e.g., Parent who is also a Tutor)
+7. **School Registration**: Schools can register to participate in the program
+8. **Curriculum Management**: Upload and manage curriculum content
+
+## User Roles
+- **Admin (RSN)**: Full platform control, can manage all users and settings
+- **Co-Admin**: Limited admin access, assigned by main admin
+- **Coordinator**: Manages tutors and students within assigned classes/boards
+- **Tutor**: Provides tutoring sessions, logs attendance
+- **Parent**: Registers students, monitors progress
+- **Student**: Accesses tutoring sessions
+- **School**: Partner schools for student outreach
+
+## Tech Stack
+- **Frontend**: React with Shadcn/UI components
+- **Backend**: FastAPI (Python)
+- **Database**: MongoDB
+- **Email**: SMTP via Gmail
+
+## What's Been Implemented
+
+### January 17, 2026 - Session Updates
+- [x] **Deployment Blockers Fixed**:
+  - Fixed CORS configuration (set to `*`)
+  - Added FRONTEND_URL to backend .env
+  - Optimized N+1 database queries with aggregation pipelines
+  - Added query limits to prevent memory issues
+  
+- [x] **Multi-Role System Frontend**:
+  - Added Role Requests tab in Admin Dashboard
+  - Implemented Approve/Reject functionality for role requests
+  - Backend APIs were already complete from previous session
+
+### Previous Sessions
+- [x] Reports section with multiple report types
+- [x] Academic Year Rollover feature
+- [x] Donate Us button
+- [x] Data visibility fixes (address/pincode, image URLs)
+- [x] Coordinator unavailability feature
+- [x] School registration with file upload
+- [x] Curriculum display logic fixes
+- [x] Mobile responsiveness improvements
+- [x] Brand logo integration
+
+## Pending Items
+
+### P1 - High Priority
+- [ ] Final user verification of all features
+
+### P2 - Medium Priority  
+- [ ] Coordinator Dashboard Redesign:
+  - Batches tab with filters (Board, Class, Subject, Day, Tutors)
+  - Tutors tab with sub-tabs (Active, Pending, Suspended, Blacklisted, Unavailable)
+  - Schools tab with filters
+- [ ] Pre-deployment configuration: Update REACT_APP_BACKEND_URL to production domain
+
+### P3 - Low Priority / Backlog
+- [ ] "Donate Us" button on registration pages (needs user clarification)
+- [ ] AdminDashboard.js and CoordinatorDashboard.js refactoring for better maintainability
+
+## API Endpoints
+
+### Multi-Role System
+- `POST /api/auth/request-role` - User requests additional role
+- `POST /api/auth/switch-role` - User switches active role
+- `GET /api/admin/role-requests` - Get pending role requests
+- `POST /api/admin/role-requests/approve` - Approve/reject role request
+
+### Reports
+- `GET /api/admin/reports/enrollments`
+- `GET /api/admin/reports/attendance`
+- `GET /api/admin/reports/performance`
+
+## Database Collections
+- `users` - All user accounts with roles array and active_role
+- `students` - Student profiles
+- `tutors` - Tutor profiles
+- `schools` - School registrations
+- `batches` - Batch configurations
+- `role_requests` - Pending role change requests
+- `coordinator_assignments` - Class/board assignments
+
+## Credentials
+- **Admin**: risingstarsnation2025@gmail.com / RisingStars@2025
+- **Co-Admin**: idonateforneedy@gmail.com / RisingStars@2025
