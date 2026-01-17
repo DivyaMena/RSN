@@ -203,6 +203,7 @@ export default function AdminDashboard({ user, logout }) {
       fetchStateBoards();
       fetchBatches();
     }
+    if (activeTab === 'role-requests') fetchRoleRequests();
   }, [activeTab]);
 
   const fetchDashboardStats = async () => {
