@@ -1625,22 +1625,35 @@ async def create_coordinator_assignment(input: dict, request: Request):
 
 @api_router.get("/admin/coordinator-assignments")
 async def get_coordinator_assignments(request: Request):
-    """Get all coordinator assignments"""
+    """Get all coordinator assignments with coordinator details using aggregation"""
     await require_admin(request)
     
-    assignments = await db.coordinator_assignments.find({}, {"_id": 0}).to_list(length=None)
+    # Use aggregation to avoid N+1 query pattern
+    pipeline = [
+        {"$lookup": {
+            "from": "users",
+            "localField": "coordinator_id",
+            "foreignField": "id",
+            "as": "coordinator_data"
+        }},
+        {"$unwind": {"path": "$coordinator_data", "preserveNullAndEmptyArrays": True}},
+        {"$project": {
+            "_id": 0,
+            "id": 1,
+            "coordinator_id": 1,
+            "classes": 1,
+            "boards": 1,
+            "created_at": 1,
+            "coordinator": {
+                "id": "$coordinator_data.id",
+                "name": "$coordinator_data.name",
+                "email": "$coordinator_data.email"
+            }
+        }},
+        {"$limit": 500}
+    ]
     
-    # Populate coordinator details
-    result = []
-    for assignment in assignments:
-        coordinator = await db.users.find_one(
-            {"id": assignment.get("coordinator_id")},
-            {"_id": 0, "name": 1, "email": 1, "id": 1}
-        )
-        
-        assignment["coordinator"] = coordinator
-        result.append(assignment)
-    
+    result = await db.coordinator_assignments.aggregate(pipeline).to_list(length=500)
     return result
 
 @api_router.delete("/admin/coordinator-assignments/{assignment_id}")
