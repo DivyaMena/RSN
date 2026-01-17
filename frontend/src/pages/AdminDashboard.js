@@ -242,6 +242,50 @@ export default function AdminDashboard({ user, logout }) {
     }
   };
 
+  // Role Requests Functions
+  const fetchRoleRequests = async () => {
+    setRoleRequestsLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/role-requests`, {
+        withCredentials: true
+      });
+      setRoleRequests(response.data.requests || []);
+    } catch (error) {
+      console.error('Error fetching role requests:', error);
+      toast.error('Failed to load role requests');
+    } finally {
+      setRoleRequestsLoading(false);
+    }
+  };
+
+  const handleApproveRoleRequest = async (requestId) => {
+    try {
+      await axios.post(`${API}/admin/role-requests/approve`, {
+        request_id: requestId,
+        action: 'approve'
+      }, { withCredentials: true });
+      toast.success('Role request approved successfully');
+      fetchRoleRequests();
+    } catch (error) {
+      console.error('Error approving role request:', error);
+      toast.error(error.response?.data?.detail || 'Failed to approve role request');
+    }
+  };
+
+  const handleRejectRoleRequest = async (requestId) => {
+    try {
+      await axios.post(`${API}/admin/role-requests/approve`, {
+        request_id: requestId,
+        action: 'reject'
+      }, { withCredentials: true });
+      toast.success('Role request rejected');
+      fetchRoleRequests();
+    } catch (error) {
+      console.error('Error rejecting role request:', error);
+      toast.error(error.response?.data?.detail || 'Failed to reject role request');
+    }
+  };
+
   const fetchAdmins = async () => {
     try {
       const response = await axios.get(`${API}/admin/admins`, {
