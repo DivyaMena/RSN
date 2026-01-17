@@ -2649,6 +2649,88 @@ export default function AdminDashboard({ user, logout }) {
               </>
             )}
           </TabsContent>
+
+          {/* Role Requests Tab */}
+          <TabsContent value="role-requests" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Role Requests</h2>
+              <Button onClick={fetchRoleRequests} variant="outline" size="sm">
+                Refresh
+              </Button>
+            </div>
+            
+            {roleRequestsLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : roleRequests.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <UserPlus className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">No pending role requests</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {roleRequests.map((request) => (
+                  <Card key={request.id} className="border-l-4 border-l-blue-500">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <User className="h-5 w-5 text-gray-500" />
+                            <span className="font-semibold">{request.user?.name || 'Unknown User'}</span>
+                            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {request.user?.email}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <span className="font-medium">Current Role(s):</span>
+                              {(request.user?.roles || [request.user?.role]).filter(Boolean).map((role, idx) => (
+                                <span key={idx} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs capitalize">
+                                  {role}
+                                </span>
+                              ))}
+                            </span>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-700">Requesting:</span>
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium capitalize">
+                              {request.requested_role}
+                            </span>
+                          </div>
+                          {request.created_at && (
+                            <p className="text-xs text-gray-400 mt-2">
+                              Requested: {new Date(request.created_at).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleApproveRoleRequest(request.id)}
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            onClick={() => handleRejectRoleRequest(request.id)}
+                            size="sm"
+                            variant="destructive"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
 
