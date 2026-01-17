@@ -4254,3 +4254,54 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+# ============= DATABASE MIGRATIONS =============
+
+async def run_migrations():
+    """Run database migrations on startup"""
+    try:
+        logger.info("Running database migrations...")
+        
+        # Migration 1: Fix academic year for batches created with calendar year instead of academic year
+        # In January 2026, batches were incorrectly created with 2026-27 instead of 2025-26
+        correct_academic_year = get_current_academic_year()
+        
+        # Find batches that might have wrong academic year
+        # If we're before April, check for batches with next calendar year
+        today = datetime.now(timezone.utc)
+        if today.month < 4:
+            # We're in Jan-Mar, so academic year should be (year-1)-(year)
+            # But buggy code created (year)-(year+1)
+            wrong_year = f"{today.year}-{str(today.year + 1)[-2:]}"
+            
+            wrong_batches = await db.batches.find({"academic_year": wrong_year}).to_list(1000)
+            
+            if wrong_batches:
+                logger.info(f"Found {len(wrong_batches)} batches with incorrect academic year {wrong_year}")
+                
+                for batch in wrong_batches:
+                    old_code = batch.get("batch_code", "")
+                    new_code = old_code.replace(wrong_year, correct_academic_year)
+                    
+                    await db.batches.update_one(
+                        {"_id": batch["_id"]},
+                        {"$set": {
+                            "academic_year": correct_academic_year,
+                            "batch_code": new_code
+                        }}
+                    )
+                    logger.info(f"Fixed batch: {old_code} -> {new_code}")
+                
+                logger.info(f"Migration complete: Fixed {len(wrong_batches)} batches to academic year {correct_academic_year}")
+            else:
+                logger.info(f"No batches need academic year correction")
+        
+        logger.info("Database migrations completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Migration error: {str(e)}")
+
+@app.on_event("startup")
+async def startup_event():
+    """Run migrations and other startup tasks"""
+    await run_migrations()
