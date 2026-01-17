@@ -1560,7 +1560,7 @@ async def get_all_parents(request: Request):
     """Get all parents"""
     await require_admin(request)
     
-    parents = await db.users.find({"role": "parent"}, {"_id": 0, "password_hash": 0}).to_list(length=None)
+    parents = await db.users.find({"role": "parent"}, {"_id": 0, "password_hash": 0}).to_list(length=1000)
     return [User(**parent).model_dump() for parent in parents]
 
 @api_router.get("/admin/schools")
