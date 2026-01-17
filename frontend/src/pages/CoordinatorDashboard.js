@@ -85,6 +85,10 @@ export default function CoordinatorDashboard({ user, logout }) {
 
   const fetchData = async () => {
     try {
+      // First get coordinator profile to know assigned classes
+      const userRes = await axios.get(`${API}/auth/me`, { withCredentials: true });
+      const assignedClasses = userRes.data.classes_assigned || [];
+      
       const [batchesRes, tutorsRes, pendingRes, allSchoolsRes, remedialReqRes, remedialClassesRes] = await Promise.all([
         axios.get(`${API}/batches`, { withCredentials: true }),
         axios.get(`${API}/tutors`, { withCredentials: true }),
@@ -93,7 +97,13 @@ export default function CoordinatorDashboard({ user, logout }) {
         axios.get(`${API}/remedial/requests`, { withCredentials: true }).catch(() => ({ data: [] })),
         axios.get(`${API}/remedial/classes`, { withCredentials: true }).catch(() => ({ data: [] }))
       ]);
-      setBatches(batchesRes.data);
+      
+      // Filter batches by assigned classes (if coordinator has assignments)
+      const filteredBatches = assignedClasses.length > 0 
+        ? batchesRes.data.filter(batch => assignedClasses.includes(batch.class_level))
+        : batchesRes.data;
+      
+      setBatches(filteredBatches);
       setTutors(tutorsRes.data);
       setPendingTutors(pendingRes.data);
       setAllSchools(allSchoolsRes.data); // Store all schools
