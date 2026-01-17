@@ -158,6 +158,10 @@ export default function AdminDashboard({ user, logout }) {
   const [showRolloverDialog, setShowRolloverDialog] = useState(false);
   const [rolloverLoading, setRolloverLoading] = useState(false);
 
+  // Role Requests State
+  const [roleRequests, setRoleRequests] = useState([]);
+  const [roleRequestsLoading, setRoleRequestsLoading] = useState(false);
+
   // Helper function to get subjects based on class level
   const getSubjectsForClass = (classLevel) => {
     if (classLevel >= 6 && classLevel <= 7) {
