@@ -4263,43 +4263,79 @@ async def run_migrations():
         logger.info("Running database migrations...")
         
         # Migration 1: Fix academic year for batches created with calendar year instead of academic year
-        # In January 2026, batches were incorrectly created with 2026-27 instead of 2025-26
         correct_academic_year = get_current_academic_year()
-        
-        # Find batches that might have wrong academic year
-        # If we're before April, check for batches with next calendar year
         today = datetime.now(timezone.utc)
+        
         if today.month < 4:
-            # We're in Jan-Mar, so academic year should be (year-1)-(year)
-            # But buggy code created (year)-(year+1)
             wrong_year = f"{today.year}-{str(today.year + 1)[-2:]}"
-            
             wrong_batches = await db.batches.find({"academic_year": wrong_year}).to_list(1000)
             
             if wrong_batches:
-                logger.info(f"Found {len(wrong_batches)} batches with incorrect academic year {wrong_year}")
-                
+                logger.info(f"Migration 1: Found {len(wrong_batches)} batches with incorrect academic year {wrong_year}")
                 for batch in wrong_batches:
                     old_code = batch.get("batch_code", "")
                     new_code = old_code.replace(wrong_year, correct_academic_year)
-                    
                     await db.batches.update_one(
                         {"_id": batch["_id"]},
-                        {"$set": {
-                            "academic_year": correct_academic_year,
-                            "batch_code": new_code
-                        }}
+                        {"$set": {"academic_year": correct_academic_year, "batch_code": new_code}}
                     )
-                    logger.info(f"Fixed batch: {old_code} -> {new_code}")
-                
-                logger.info(f"Migration complete: Fixed {len(wrong_batches)} batches to academic year {correct_academic_year}")
+                    logger.info(f"  Fixed: {old_code} -> {new_code}")
             else:
-                logger.info(f"No batches need academic year correction")
+                logger.info("Migration 1: No batches need academic year correction")
         
-        logger.info("Database migrations completed successfully")
+        # Migration 2: Sync coordinator_assignments to user's classes_assigned field
+        logger.info("Migration 2: Syncing coordinator assignments to user profiles...")
+        
+        assignments = await db.coordinator_assignments.find({}).to_list(1000)
+        coordinator_classes = {}  # coordinator_id -> set of class_levels
+        
+        for assignment in assignments:
+            coord_id = assignment.get("coordinator_id")
+            class_level = assignment.get("class_level")
+            if coord_id and class_level:
+                if coord_id not in coordinator_classes:
+                    coordinator_classes[coord_id] = set()
+                coordinator_classes[coord_id].add(int(class_level))
+        
+        for coord_id, classes in coordinator_classes.items():
+            classes_list = sorted(list(classes))
+            # Get current classes_assigned
+            coord = await db.users.find_one({"id": coord_id}, {"_id": 0, "classes_assigned": 1, "email": 1})
+            if coord:
+                current_classes = set(coord.get("classes_assigned") or [])
+                if current_classes != set(classes_list):
+                    await db.users.update_one(
+                        {"id": coord_id},
+                        {"$set": {"classes_assigned": classes_list}}
+                    )
+                    logger.info(f"  Synced {coord.get('email')}: {list(current_classes)} -> {classes_list}")
+        
+        if not coordinator_classes:
+            logger.info("Migration 2: No coordinator assignments to sync")
+        else:
+            logger.info(f"Migration 2: Processed {len(coordinator_classes)} coordinators")
+        
+        # Migration 3: Ensure all batches have state field set (fix null states)
+        logger.info("Migration 3: Fixing batches with null state...")
+        null_state_batches = await db.batches.find({"state": None}).to_list(1000)
+        for batch in null_state_batches:
+            # Use board as state if available
+            new_state = batch.get("board") or "TS"
+            await db.batches.update_one(
+                {"_id": batch["_id"]},
+                {"$set": {"state": new_state}}
+            )
+            logger.info(f"  Fixed batch {batch.get('batch_code')}: state set to {new_state}")
+        
+        if not null_state_batches:
+            logger.info("Migration 3: No batches with null state")
+        
+        logger.info("All database migrations completed successfully")
         
     except Exception as e:
         logger.error(f"Migration error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
 
 @app.on_event("startup")
 async def startup_event():
