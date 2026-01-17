@@ -927,9 +927,8 @@ async def check_and_create_batch(student: Student, subject: str):
                 {"$set": {"student_ids": batch.student_ids, "status": batch.status}}
             )
     else:
-        # Create new batch
-        current_year = datetime.now(timezone.utc).year
-        academic_year = f"{current_year}-{str(current_year + 1)[-2:]}"
+        # Create new batch - use academic year (April to March), not calendar year
+        academic_year = get_current_academic_year()
         
         batch_code = await generate_batch_code(student.board, academic_year, student.class_level, subject)
         schedule_slots = generate_schedule_slots_for_batch(student.class_level, subject, batch_code)
