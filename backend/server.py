@@ -1552,7 +1552,7 @@ async def get_all_students(request: Request):
     """Get all students"""
     await require_admin(request)
     
-    students = await db.students.find({}, {"_id": 0}).to_list(length=None)
+    students = await db.students.find({}, {"_id": 0}).to_list(length=1000)
     return students
 
 @api_router.get("/admin/parents")
