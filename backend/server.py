@@ -1701,10 +1701,34 @@ async def delete_coordinator_assignment(assignment_id: str, request: Request):
     """Delete a coordinator assignment"""
     await require_admin(request)
     
+    # First get the assignment to know what class to remove
+    assignment = await db.coordinator_assignments.find_one({"id": assignment_id}, {"_id": 0})
+    
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    
     result = await db.coordinator_assignments.delete_one({"id": assignment_id})
     
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Assignment not found")
+    
+    # Remove the class from coordinator's classes_assigned field
+    if assignment.get("class_level"):
+        class_level = int(assignment["class_level"])
+        coordinator_id = assignment["coordinator_id"]
+        
+        # Check if coordinator has any other assignments for this class
+        other_assignments = await db.coordinator_assignments.find_one({
+            "coordinator_id": coordinator_id,
+            "class_level": class_level
+        })
+        
+        # Only remove from classes_assigned if no other assignments exist for this class
+        if not other_assignments:
+            await db.users.update_one(
+                {"id": coordinator_id},
+                {"$pull": {"classes_assigned": class_level}}
+            )
     
     return {"success": True, "message": "Assignment removed successfully"}
 
