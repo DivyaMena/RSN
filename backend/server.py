@@ -724,17 +724,17 @@ async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: 
             logging.error("Email configuration is incomplete")
             return
         
-        # Get all coordinators
-        coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0}).to_list(None)
+        # Get all coordinators (limited)
+        coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0, "email": 1}).to_list(500)
         coordinator_emails = [c["email"] for c in coordinators if c.get("email")]
         
-        # Get all students in the batch
+        # Get all students in the batch (limited by batch size)
         student_ids = batch.get("student_ids", [])
-        students = await db.students.find({"id": {"$in": student_ids}}, {"_id": 0}).to_list(None)
+        students = await db.students.find({"id": {"$in": student_ids}}, {"_id": 0, "parent_user_id": 1}).to_list(100)
         
-        # Get parent emails for students
+        # Get parent emails for students (limited)
         parent_user_ids = [s["parent_user_id"] for s in students if s.get("parent_user_id")]
-        parents = await db.users.find({"id": {"$in": parent_user_ids}}, {"_id": 0}).to_list(None)
+        parents = await db.users.find({"id": {"$in": parent_user_ids}}, {"_id": 0, "email": 1}).to_list(100)
         parent_emails = [p["email"] for p in parents if p.get("email")]
         
         # Add tutor email to recipients
@@ -848,12 +848,12 @@ async def send_log_entry_notification(log_entry: dict, batch: dict, tutor_name: 
 
 async def auto_assign_tutor_to_batch(batch: Batch):
     """Automatically assign tutor to batch based on priority"""
-    # Find eligible tutors
+    # Find eligible tutors (limited to top 100)
     eligible_tutors = await db.tutors.find({
         "state": batch.state,
         "classes_can_teach": batch.class_level,
         "subjects_can_teach": batch.subject
-    }).to_list(None)
+    }, {"_id": 0}).to_list(100)
     
     if not eligible_tutors:
         return
@@ -865,7 +865,7 @@ async def auto_assign_tutor_to_batch(batch: Batch):
     all_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     assigned_days_map = {}  # day -> tutor_id
     
-    existing_assignments = await db.batch_tutor_assignments.find({"batch_id": batch.id}).to_list(None)
+    existing_assignments = await db.batch_tutor_assignments.find({"batch_id": batch.id}, {"_id": 0}).to_list(50)
     for assignment in existing_assignments:
         for day in assignment["assigned_days"]:
             assigned_days_map[day] = assignment["tutor_id"]
@@ -1285,17 +1285,37 @@ async def get_admin_stats(request: Request):
 
 @api_router.get("/admin/role-requests")
 async def get_role_requests(request: Request):
-    """Get all pending role requests"""
+    """Get all pending role requests with user details using aggregation"""
     await require_admin(request)
     
-    requests = await db.role_requests.find({"status": "pending"}, {"_id": 0}).to_list(1000)
+    # Use aggregation to avoid N+1 query pattern
+    pipeline = [
+        {"$match": {"status": "pending"}},
+        {"$lookup": {
+            "from": "users",
+            "localField": "user_id",
+            "foreignField": "id",
+            "as": "user_data"
+        }},
+        {"$unwind": {"path": "$user_data", "preserveNullAndEmptyArrays": True}},
+        {"$project": {
+            "_id": 0,
+            "id": 1,
+            "user_id": 1,
+            "requested_role": 1,
+            "status": 1,
+            "created_at": 1,
+            "user": {
+                "name": "$user_data.name",
+                "email": "$user_data.email",
+                "role": "$user_data.role",
+                "roles": "$user_data.roles"
+            }
+        }},
+        {"$limit": 500}
+    ]
     
-    # Enrich with user data
-    for req in requests:
-        user = await db.users.find_one({"id": req["user_id"]}, {"_id": 0, "name": 1, "email": 1, "role": 1, "roles": 1})
-        if user:
-            req["user"] = user
-    
+    requests = await db.role_requests.aggregate(pipeline).to_list(length=500)
     return {"requests": requests}
 
 @api_router.post("/admin/role-requests/approve")
@@ -1490,7 +1510,7 @@ async def get_all_coordinators(request: Request):
     """Get all coordinators with their details"""
     await require_admin(request)
     
-    coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0, "password_hash": 0}).to_list(length=None)
+    coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0, "password_hash": 0}).to_list(length=500)
     
     result = []
     for coord in coordinators:
