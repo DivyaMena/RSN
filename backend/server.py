@@ -1022,14 +1022,29 @@ async def login(input: LoginInput, response: Response):
         
         parent = User(**parent_doc)
         
-        # Find student by parent_id and DOB
-        # Try multiple date formats: DD-MM-YYYY, YYYY-MM-DD, etc.
+        # Find student by parent_id (or parent_user_id) and DOB
+        # Support multiple date formats and field names for backwards compatibility
         student_doc = await db.students.find_one({
-            "parent_id": parent.id,
+            "$or": [
+                {"parent_id": parent.id},
+                {"parent_user_id": parent.id}
+            ],
             "dob": input.password
         }, {"_id": 0})
         
         if not student_doc:
+            # Debug: log what we're looking for
+            import logging
+            logging.error(f"Student login failed - Parent ID: {parent.id}, DOB entered: {input.password}")
+            # Try to find student without DOB to give better error message
+            student_check = await db.students.find_one({
+                "$or": [
+                    {"parent_id": parent.id},
+                    {"parent_user_id": parent.id}
+                ]
+            }, {"_id": 0, "name": 1, "dob": 1})
+            if student_check:
+                logging.error(f"Found student {student_check.get('name')} with DOB: {student_check.get('dob')}")
             raise HTTPException(status_code=401, detail="Invalid email or password. Please use parent's email and student's date of birth (in format DD-MM-YYYY)")
         
         student = Student(**student_doc)
