@@ -99,10 +99,12 @@ export default function StudentDashboard({ user, logout }) {
           const tutorsRes = await axios.get(`${API}/batches/${batch.id}/tutors`, { withCredentials: true });
           if (tutorsRes.data && tutorsRes.data.length > 0) {
             // Extract tutor and user data from the response
+            // API returns: { assignment, tutor, tutor_user }
             tutorData[batch.id] = tutorsRes.data.map(item => ({
               ...item.tutor,
-              name: item.user?.name || 'Unknown',
-              email: item.user?.email
+              name: item.tutor_user?.name || item.tutor?.name || 'Unknown',
+              email: item.tutor_user?.email || item.tutor?.email,
+              photo_url: item.tutor_user?.picture || item.tutor_user?.photo_url || item.tutor?.selfie_url
             }));
           }
         } catch (error) {
