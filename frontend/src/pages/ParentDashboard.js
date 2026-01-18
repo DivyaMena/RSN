@@ -535,6 +535,9 @@ export default function ParentDashboard({ user, logout }) {
                       <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{student.name}</h3>
                       <p className="text-sm text-gray-600 mt-1">Code: {student.student_code}</p>
                       <p className="text-sm text-gray-600">Class {student.class_level} | {student.board} Board</p>
+                      {student.dob && (
+                        <p className="text-sm text-gray-600">DOB: {student.dob} <span className="text-xs text-gray-400">(used for student login)</span></p>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <Button
