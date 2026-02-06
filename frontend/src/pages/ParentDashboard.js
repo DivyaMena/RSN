@@ -128,7 +128,7 @@ export default function ParentDashboard({ user, logout }) {
         aadhaarPage2Url = aadhaar2Response.data.url;
       }
 
-      const dobFormatted = `${formData.dob_year}-${formData.dob_month}-${formData.dob_day}`;
+      const dobFormatted = `${formData.dob_day.padStart(2, '0')}-${formData.dob_month.padStart(2, '0')}-${formData.dob_year}`;
 
       // Combine academic subjects and non-academic courses
       const allSubjects = [...formData.subjects, ...formData.non_academic_courses];
