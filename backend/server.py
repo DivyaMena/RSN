@@ -35,12 +35,22 @@ db = client[os.environ['DB_NAME']]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app = FastAPI()
-origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
-# print(":white_tick: CORS Origins:", origins)
+
+# CORS Configuration - handle wildcard specially for credentials
+cors_env = os.getenv("CORS_ORIGINS", "").strip()
+if cors_env == "*":
+    # For wildcard, we need to allow all origins dynamically
+    # Since credentials=True doesn't work with "*", we'll handle it via middleware
+    origins = ["*"]
+    allow_credentials = False  # Can't use credentials with wildcard
+else:
+    origins = [origin.strip() for origin in cors_env.split(",") if origin.strip()]
+    allow_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=origins if origins else ["*"],
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
