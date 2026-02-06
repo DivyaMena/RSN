@@ -1013,7 +1013,7 @@ async def login(input: LoginInput, response: Response):
     
     # Special handling for student login
     if input.role == "student":
-        # For students: email is parent's email, password is student's DOB
+        # For students: email is parent's email, password is student's DOB in DD-MM-YYYY format
         # Find parent by email
         parent_doc = await db.users.find_one({"email": input.email}, {"_id": 0})
         
@@ -1022,20 +1022,36 @@ async def login(input: LoginInput, response: Response):
         
         parent = User(**parent_doc)
         
-        # Find student by parent_id (or parent_user_id) and DOB
-        # Support multiple date formats and field names for backwards compatibility
+        # Convert DOB to multiple formats for backwards compatibility
+        # User enters DD-MM-YYYY, but old data might be in YYYY-MM-DD format
+        dob_entered = input.password
+        dob_formats_to_try = [dob_entered]
+        
+        # If entered as DD-MM-YYYY, also try YYYY-MM-DD
+        if len(dob_entered) == 10 and dob_entered[2] == '-' and dob_entered[5] == '-':
+            # Input is DD-MM-YYYY, convert to YYYY-MM-DD
+            parts = dob_entered.split('-')
+            if len(parts) == 3:
+                dob_formats_to_try.append(f"{parts[2]}-{parts[1]}-{parts[0]}")
+        # If entered as YYYY-MM-DD, also try DD-MM-YYYY
+        elif len(dob_entered) == 10 and dob_entered[4] == '-' and dob_entered[7] == '-':
+            parts = dob_entered.split('-')
+            if len(parts) == 3:
+                dob_formats_to_try.append(f"{parts[2]}-{parts[1]}-{parts[0]}")
+        
+        # Find student by parent_id (or parent_user_id) and DOB (try multiple formats)
         student_doc = await db.students.find_one({
             "$or": [
                 {"parent_id": parent.id},
                 {"parent_user_id": parent.id}
             ],
-            "dob": input.password
+            "dob": {"$in": dob_formats_to_try}
         }, {"_id": 0})
         
         if not student_doc:
             # Debug: log what we're looking for
             import logging
-            logging.error(f"Student login failed - Parent ID: {parent.id}, DOB entered: {input.password}")
+            logging.error(f"Student login failed - Parent ID: {parent.id}, DOB entered: {input.password}, tried formats: {dob_formats_to_try}")
             # Try to find student without DOB to give better error message
             student_check = await db.students.find_one({
                 "$or": [
