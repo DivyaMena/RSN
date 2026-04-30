@@ -84,3 +84,12 @@ frontend/node_modules/.cache/default-development/0.pack
 
 # NOTE: .env files are intentionally NOT ignored.
 # Emergent deployment requires them and will update with production values.
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
