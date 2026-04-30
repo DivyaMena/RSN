@@ -4276,7 +4276,10 @@ async def get_batch_attendance(batch_id: str, request: Request, date: Optional[s
 app.include_router(api_router)
 
 # Serve uploaded files at /api/uploads/
-app.mount("/api/uploads", StaticFiles(directory="/app/backend/uploaded_files"), name="uploads")
+# Ensure the uploads directory exists before mounting (fixes Render deployment error)
+UPLOAD_DIR = "/app/backend/uploaded_files"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # app.add_middleware(
 #     CORSMiddleware,
