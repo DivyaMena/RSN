@@ -2838,7 +2838,7 @@ async def upload_file(request: Request):
         import os
         file_extension = os.path.splitext(uploaded_file.filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_extension}"
-        file_path = f"/app/backend/uploaded_files/{unique_filename}"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
         
         # Save file
         content = await uploaded_file.read()
@@ -4276,8 +4276,8 @@ async def get_batch_attendance(batch_id: str, request: Request, date: Optional[s
 app.include_router(api_router)
 
 # Serve uploaded files at /api/uploads/
-# Ensure the uploads directory exists before mounting (fixes Render deployment error)
-UPLOAD_DIR = "/app/backend/uploaded_files"
+# Use a path relative to this file so it works on Render, local, and Emergent (no hardcoded /app)
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploaded_files")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
