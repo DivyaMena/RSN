@@ -30,6 +30,14 @@ An educational platform for providing free online tuition to students who need e
 
 ## What's Been Implemented
 
+### April 30, 2026 - Deployment Readiness
+- [x] **Deployment Blockers Resolved**:
+  - Rewrote `/app/.gitignore` — fully removed `*.env`, `.env`, `.env.*` duplicates
+  - Added Migration 4 in `server.py` startup: auto-seeds Main Admin + Co-Admin with `RisingStars@2025` on every boot
+  - Verified both admin logins return valid tokens via curl
+  - CORS_ORIGINS correctly lists production custom domain (risingstarsnation.org) + preview + localhost
+- [x] Deployment agent re-verified: **status: pass — no blockers**
+
 ### January 17, 2026 - Session Updates
 - [x] **Deployment Blockers Fixed**:
   - Fixed CORS configuration (set to `*`)
