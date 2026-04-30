@@ -137,7 +137,7 @@ function App() {
             user.role === 'student' ? <StudentDashboard user={user} logout={logout} /> :
             user.role === 'tutor' ? <TutorDashboard user={user} logout={logout} /> :
             user.role === 'coordinator' ? <CoordinatorDashboard user={user} logout={logout} /> :
-            user.role === 'admin' ? <AdminDashboard user={user} logout={logout} /> :
+            (user.role === 'admin' || user.role === 'RSN') ? <AdminDashboard user={user} logout={logout} /> :
             user.role === 'school' ? <SchoolDashboard user={user} logout={logout} /> :
             <Navigate to="/role-selection" />
           } />
@@ -149,7 +149,7 @@ function App() {
             user.role === 'coordinator' ? <CoordinatorProfile user={user} logout={logout} /> :
             user.role === 'parent' ? <ParentProfile user={user} logout={logout} /> :
             user.role === 'student' ? <StudentProfile user={user} logout={logout} /> :
-            user.role === 'admin' ? <AdminProfile user={user} logout={logout} /> :
+            (user.role === 'admin' || user.role === 'RSN') ? <AdminProfile user={user} logout={logout} /> :
             <Navigate to="/dashboard" />
           } />
         </Routes>
