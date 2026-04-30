@@ -28,7 +28,30 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+
+# Detect TLS-required connections (MongoDB Atlas / any mongodb+srv:// URL).
+# Render's Python TLS stack can fail to negotiate with Atlas's certificate chain
+# (TLSV1_ALERT_INTERNAL_ERROR). We apply tls + tlsAllowInvalidCertificates
+# ONLY when the URL is an Atlas/SRV URL — local Mongo (mongodb://localhost:27017)
+# must not have TLS forced on it or startup will crash.
+_is_atlas_url = (
+    mongo_url.startswith("mongodb+srv://")
+    or "mongodb.net" in mongo_url
+)
+
+_mongo_kwargs = {
+    "serverSelectionTimeoutMS": 30000,
+    "connectTimeoutMS": 30000,
+}
+if _is_atlas_url:
+    _mongo_kwargs.update({
+        "tls": True,
+        "tlsAllowInvalidCertificates": True,
+        "retryWrites": True,
+        "w": "majority",
+    })
+
+client = AsyncIOMotorClient(mongo_url, **_mongo_kwargs)
 db = client[os.environ['DB_NAME']]
 
 # Password hashing
