@@ -1,146 +1,142 @@
 <analysis>**original_problem_statement:**
-The initial request was to create a Reports section in the Admin Panel to generate and download enrollment reports based on a date range and course filter. This evolved to include:
-- Generating reports for Students, Tutors, Coordinators, and Parents, not just course enrollments.
-- Replacing the course filter with more useful filters: Academic Year, Board, Class, and Subject.
-- Implementing an academic year management system with a manual, admin-triggered rollover process to advance students to the next grade and hide previous year's data from non-admin users.
-- Adding a Donate Us button with a QR code and bank details on all pages of the application.
-- A final request to wipe all transactional data from the database for a clean start.
+The initial scope involved adding a Reports section, an Academic Year Rollover feature, and a Donate Us button. This session expanded significantly to include: Multi-role system allowing users (Parents, Tutors, Coordinators) to hold multiple roles with an admin approval workflow; Coordinator availability and assignment bug fixes; correcting complex curriculum display logic; School registration form fixes; and numerous deployment, CORS, and data migration fixes.
 
-**PRODUCT REQUIREMENTS for the Reports section:**
-- **Location:** A new Reports tab within the Admin/Co-Admin dashboard.
-- **Functionality:**
-    - Select Academic Year, From Date, and To Date.
-    - Select a Report Type (Course Enrollments, Students, Tutors, Coordinators, Parents).
-    - Apply filters relevant to the report type (e.g., Board, Class, Subject for enrollments).
-    - View a summary and detailed count of records matching the filters.
-    - Download the generated report as a CSV or Excel file.
-- **Permissions:** Full access for Admin and Co-Admin roles.
-
-**PRODUCT REQUIREMENTS for Academic Year Rollover:**
-- **Trigger:** A manual button in the Admin dashboard.
-- **Action:**
-    - Promote students to the next class level (e.g., Class 9 -> Class 10). Class 10 students are marked as Graduated.
-    - This is a backend process that updates student records.
-- **Data Visibility:**
-    - After the rollover, non-admin users (Tutors, Coordinators, Parents, Students) should only see data (e.g., batches) from the current academic year.
-    - Admins and Co-Admins can view data from any academic year using filters.
-
-**PRODUCT REQUIREMENTS for Donate Us feature:**
-- **UI Element:** A button or link, Donate Us or Donate Now.
-- **Content:** A modal or section displaying a QR code image and the following bank details: SHARANYA DEVELOPMENT FOUNDATION, Account Number: 197401000613, IFSC Code: ICIC0001974, SAVINGS ACCOUNT, ICICI Bank, Branch: Bandlaguda Jagir.
-- **Location:** On all pages, including the homepage, login page, and all user dashboards.
+**PRODUCT REQUIREMENTS for Multi-Role System:**
+- A user should be able to have more than one role.
+- Users should be able to request an additional role from their dashboard.
+- Admins/Co-Admins must have a dedicated section to view, approve, or reject these role requests.
+- Users should be able to switch between their active roles, which changes the dashboard they see.
 
 **User's preferred language**: English
+INSTRUCT NEXT AGENT: Respond in English.
 
-**what currently exists?**
-A full-stack educational platform with role-based dashboards. The application now includes a comprehensive Reports section in the Admin Dashboard with dynamic filters and download options (CSV/Excel). A complete academic year management system has been implemented, allowing an admin to manually trigger a student rollover and ensuring non-admin users only see data for the current academic year. A reusable Donate Us component has been created and integrated across all dashboards, the landing page, and the login page. The database has been wiped of all transactional data (students, tutors, etc.) at the user's request, leaving only the main admin account and essential state board configurations.
+**what currently exists?** 
+A comprehensive educational platform with role-based dashboards. The Multi-role system (backend and frontend admin approvals) is fully implemented. The  deployment blocker has been resolved. Coordinator assignment syncing, batch academic year generation logic, and Student login (DOB formatting to ) have been fixed. Startup database migration scripts are active to heal data inconsistencies. CORS has been strictly configured to support secure credentials.
 
 **Last working item**:
-The agent cleaned the database of all registration and test data as requested by the user. Prior to that, it fixed a bug where the Current Academic Year was showing Loading... on the admin overview tab and added the Donate Us button to the homepage and login page.
-
-- **Last item agent was working**: Cleaning the database by deleting all documents from , , , , , and  collections.
-- **Status**: COMPLETED (User has not verified the overall features yet, but the cleanup task is done).
-- **Agent Testing Done**: Y (for the cleanup script)
-- **Which testing method agent to use?** Frontend and Backend testing agents should be used to verify the entire Reports and Academic Year functionality end-to-end.
+- **Last item agent was working**: Adding a startup database migration/seeding script to ensure the main Admin () and Co-Admin () users are reliably created/retained in the database with the password .
+- **Reasoning**: The user explicitly requested to make these credentials permanently work across environments (especially production) since these roles cannot be created via standard external sign-up flows.
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?** backend testing agent or manual testing by / to verify the DB seeds the admins correctly upon backend startup.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- There are no outstanding issues. All user requests from this session have been addressed. The next step is full-feature verification by the user.
+Issue 1: Ensure Admin and Co-Admin default credentials seeding (P0)
+- **Attempted fixes**: Agent was about to add logic to  startup events to upsert these users but stopped.
+- **Next debug checklist**: In , add logic inside the application startup event ( or ) to insert or update the admin and co-admin accounts with their hashed  password and respective boolean flags.
+- **Why fix this issue and what will be achieved with the fix?** Will guarantee that the client is never locked out of their production admin accounts, even on a fresh database.
+- **Status**: IN PROGRESS
+- **Is recurring issue?** N
+- **Should Test frontend/backend/both after fix?** Backend
+- **Blocked on other issue**: None
 
 **In progress Task List**:
-- There are no tasks currently in progress.
+Task 1: Coordinator Dashboard Redesign is Incomplete (P2)
+- **Where to resume**: The user previously requested a major redesign of . Old elements were removed, but the new structure with filtered tabs (Batches, Tutors, Schools) is still not implemented.
+- **What will be achieved with this?** A more organized and functional Coordinator dashboard matching user requirements.
+- **Status**: NOT STARTED (Carried over from previous fork)
+- **Should Test frontend/backend/both after fix?** Frontend
+- **Blocked on something**: None
 
 **Upcoming and Future Tasks**
-- **P0: User Verification**: The user needs to test the newly implemented Reports, Academic Year Rollover, and Donate Us features.
-- **P1: Data Migration Script**: Create a one-time migration script to add the  field to any existing student or batch records created before this feature was implemented. (This was not needed since the DB was wiped, but will be necessary if the app is used before the first rollover).
-- **P2: Clarify Donate Us on Registration Pages**: Confirm with the user if the Donate Us button should also be added to the Tutor and Student registration pages.
+- **Upcoming Tasks:**
+  - **P1: Final User Verification**: Verify all features in production post-deployment (multi-role system, logins, coordinator dashboard batch visibility).
+  - **P2: Pre-Deployment Configuration**: Before final push, ensure  in  to the production domain and  in  are correctly mapped if needed.
+- **Future Tasks:**
+  - **P3: Donate Us on Registration Pages**: Clarify with the user if the Donate Us button should be added to the Tutor and Student registration pages.
 
 **Completed work in this session**
-- **Reports Feature (Admin Dashboard)**:
-  - Created a new Reports tab.
-  - Implemented backend endpoint () to fetch data for various report types (Course Enrollments, Students, Tutors, etc.).
-  - Added frontend UI with filters for Academic Year, Date Range, Report Type, Board, Subject, and Class Level.
-  - Implemented CSV and Excel download functionality for all reports.
-- **Academic Year Management System**:
-  - Created a backend endpoint () for a manual, admin-triggered student class promotion.
-  - Added  field to  and  models.
-  - Updated all relevant backend queries for non-admin users to filter data based on the current academic year.
-  - Added an Academic Year Rollover button and confirmation dialog in the Admin Dashboard.
-- **Donate Us Feature**:
-  - Created a reusable React component () containing the QR code and bank details in a dialog.
-  - Integrated the  into the headers of all dashboards (Admin, Coordinator, Tutor, Parent, Student), the Landing page, and the Login page.
-- **Database Cleanup**:
-  - Executed a script to delete all documents from transactional collections (, , , , etc.) for a clean start.
-  - Seeded the database with essential  data.
-- **Bug Fixes**:
-  - Resolved admin login failures by programmatically creating the default admin user.
-  - Fixed an issue where the Board filter dropdown was not populating in the Reports tab.
-  - Fixed an issue causing Current Academic Year: Loading... to persist on the Admin overview.
+- Removed  from  to fix deployment blocker (DONE).
+- Fixed Unbounded (N+1) database queries across  API routes (DONE).
+- Multi-Role Frontend: Added Role Requests approval/rejection tab in  (DONE).
+- Coordinator Assignments: Fixed projection to include class level, and synced  creation with  array (DONE).
+- Academic Year Bug: Replaced hardcoded calendar year with  during batch creation (DONE).
+- Startup DB Migrations: Scripted auto-fixes for malformed academic years and coordinator syncs on app boot (DONE).
+- Login / DOB Logic: Standardized DOBs to  globally and fixed student login to query both  and  (DONE).
+- Tutor display on StudentDashboard: Fixed property mapping from  to  (DONE).
+- CORS Fixes: Removed  wildcard from origins to satisfy  browser requirements (DONE).
 
 **Earlier issues found/mentioned but not fixed**
-- None.
+- None beyond the incomplete Coordinator Dashboard redesign.
 
 **Known issue recurrence from previous fork**
-- None.
+- Issue recurrence in previous fork:  blocking environment files.
+- Recurrence count: 1
+- Status: RESOLVED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Dynamic Reporting**: A single backend endpoint handles multiple report types with various filters, returning aggregated data and downloadable files.
-- **Academic Year Logic**: The system now defines and manages academic years. A manual rollover process updates student data, and role-based access control ensures users only see data for the current year.
-- **Reusable UI Components**: The  was created as a self-contained, reusable component with a modal dialog, allowing for easy integration across the application.
-- **Database Seeding & Cleanup**: Scripts were used to programmatically clean and seed the database to prepare it for a production-like state.
+- React frontend with Shadcn UI, FastAPI backend, MongoDB.
+- Multi-role arrays inside JWTs.
+- FastAPI Startup events used for auto-running DB data migrations.
+- Strict CORS handling for Cross-Origin sessions.
 
 **key DB schema**
-- **students**: Added . The  field is now updated by the rollover process.
-- **batches**: Already had , which is now used for filtering.
+- **users:** , , 
+- **role_requests:** , , 
+- **coordinator_assignments:** synced concurrently with  to manage visibility.
 
 **changes in tech stack**
-- **Backend**:  was added to  for generating Excel files.
+- No major tech stack changes.
 
-**All files**
-- **Created**:
-  - : A new reusable component for the Donate Us feature.
-- **Updated Heavily**:
-  - : Added academic year utility functions, new models, the report generation endpoint, the academic year rollover endpoint, and updated numerous data-fetching queries to filter by academic year.
-  - : Major overhaul to add the Reports tab with all its UI (filters, tables, download buttons) and the Academic Year Rollover button and dialog.
-- **Updated**:
-  - , , , , , : Added the  component to the header/UI.
+**All files of reference**
+-  (Fixed blocking lines)
+-  (Added extensive query limits, fixed assignment sync logic, added DB migration functions, strict CORS config, auth routes)
+-  (Added Role Requests UI and fetch logic)
+-  (Pending redesign)
+-  (Updated to handle DD-MM-YYYY format properly)
+-  (Fixed tutor object references)
+-  (Created and updated to track progress)
+-  (Modified )
+
+**Areas that need refactoring**:
+-  and  are massive and should be broken down into smaller components.
 
 **key api endpoints**
-- : Generates a report (JSON, CSV, or Excel) based on specified filters.
-- : Triggers the manual process to advance students to the next academic year.
+-  (Supports standardized DOB checks)
+-  (Now updates both assignment collections and user properties)
+-  & 
 
 **Critical Info for New Agent**
-- The three major features requested by the user (Reports, Academic Year Rollover, Donate Button) are fully implemented on both the frontend and backend.
-- The database is currently **clean** of all user-generated data except for one admin account and the state boards.
-- The immediate next step is to guide the user through testing these new features. Be prepared to fix any bugs they discover.
-- The academic year rollover is a significant, irreversible action. When the user tests it, ensure they understand its impact.
-- The agent successfully handled complex, evolving requirements by breaking them down into phases and confirming each step with the user. Continue this collaborative approach.
+- **DO NOT test API with  via frontend**: Frontend routes must use the standard backend URL config. Avoid local network misroutings.
+- The  parameter requires explicitly defined  (comma-separated string in ), do NOT use the wildcard .
+- The user is extremely strict about the default format of dates being . Never use  in new frontend implementations.
+- Start directly by seeding the Admin users on startup as requested in the final interaction.
 
-**documents created in this job**
-- None.
+**documents and test reports created in this job**
+- 
 
-**Last 5 User Messages and any pending user messages**
-1.  **Request:** Add an academic year filter and a manual rollover mechanism. **Status:** Completed.
-2.  **Request:** Add a Donate Us button with QR code and bank details everywhere. **Status:** Completed.
-3.  **Feedback:** The Current Academic Year shows Loading... and the Donate Us button is missing from the homepage. **Status:** Completed. Both issues were fixed.
-4.  **Request:** Delete all DB data from registrations to start clean. **Status:** Completed.
-5.  **Information:** The database is clean. **Status:** N/A (Agent provided this info).
+**Last 10 User Messages and any pending HUMAN messages**
+1. **Request**: did the deployement done completely? -> Agent analyzed with deployer agent and stated readiness.
+2. **Issue**: did u work on the co-ordinator assignment? check the screen shot... it is not visible on the assignment -> Agent fixed projection pipeline.
+3. **Issue**: recently assigned class 6 from main admin to co-ordinator and it is not being visible... randomly adding a class but on deploying, it is not working -> Agent found disconnect between  collection and  array. Added sync fix.
+4. **Issue**: class 6, mat batch is ready with 12 students... but batch is not visible in co-ordinator... dashboard -> Agent fixed batch creation script that incorrectly stored calendar year  instead of academic year .
+5. **Request**: create a migration script that automatically fixes this when the app starts -> Agent added startup migration logic to .
+6. **Issue**: recently deployed batch is not visible on divyapoosala@gmail.com nor on divyamena@gmail.com -> Agent investigated and found a data sync discrepancy specific to production missing the tutor profile.
+7. **Issue**: Student login failing... Tutor showing as Unknown -> Agent fixed StudentDashboard tutor object and updated student login to check .
+8. **Request**: Student login is happening with YYYY-MM-DD... I want all the dispay of DOBs and login access date formats as DD-MM-YYYY only. -> Agent implemented format strictness across full stack.
+9. **Issue**: NOT ABLE TO LOGIN ANY USERS, IT IS TAKING BACK TO RISINGSTARTSNATION.ORG WHY? -> Agent found CORS wildcard issue breaking secure cookie credentials. Configured strict domains.
+10. **Request**: Retain Admin and Co-Admin login Credentials, make them work. Cos those roles are not created from outside. -> **PENDING ACTION**: Agent needs to script creation/upsert of these users on server start.
 
 **Project Health Check:**
-- **Broken**: None.
-- **Mocked**: None.
+- Broken: None. (Login was broken due to CORS but is fixed locally).
+- Mocked: None.
+
+**3rd Party Integrations**
+- None utilized in this specific session.
 
 **Testing status**
-- **Testing agent used after significant changes**: NO. Agent implemented a large set of features and performed manual  tests and UI checks via screenshots, but a full end-to-end test using the testing agent has not been performed.
-- **Troubleshoot agent used after agent stuck in loop**: NO.
-- **Test files created**: None.
-- **Known regressions**: None.
+- Testing agent used after significant changes: NO
+- Troubleshoot agent used after agent stuck in loop: NO
+- Test files created: None
+- Known regressions: None
 
 **Credentials to test flow:**
-- **Admin**:  / 
+- Main Admin:  / 
+- Co-Admin:  / 
 
 **What agent forgot to execute**
-- The agent did not explicitly add the Donate Us button to the registration pages (, ). While everywhere was the user's request, the agent focused on dashboards and main entry points. This should be clarified with the user.</analysis>
+- The agent forgot to start/finish the  redesign (adding filtered tabs for Batches, Tutors, Schools) which was in the pending task list from the handoff.</analysis>
