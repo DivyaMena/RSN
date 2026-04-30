@@ -4371,6 +4371,64 @@ async def run_migrations():
         if not null_state_batches:
             logger.info("Migration 3: No batches with null state")
         
+        # Migration 4: Ensure Main Admin and Co-Admin accounts exist with known password
+        # These roles cannot be created via external sign-up, so must be seeded on startup
+        logger.info("Migration 4: Seeding Main Admin and Co-Admin accounts...")
+        admin_password = "RisingStars@2025"
+        admin_password_hash = pwd_context.hash(admin_password)
+        
+        admin_seeds = [
+            {
+                "email": "risingstarsnation2025@gmail.com",
+                "name": "Rising Stars Admin",
+                "is_main_admin": True,
+                "is_co_admin": False,
+                "can_manage_admins": True,
+                "user_code": "RSN-MAIN-ADMIN",
+            },
+            {
+                "email": "idonateforneedy@gmail.com",
+                "name": "RSN Co-Admin",
+                "is_main_admin": False,
+                "is_co_admin": True,
+                "can_manage_admins": False,
+                "user_code": "RSN-CO-ADMIN",
+            },
+        ]
+        
+        for seed in admin_seeds:
+            existing = await db.users.find_one({"email": seed["email"]}, {"_id": 0})
+            if existing:
+                # Reset password to known value + ensure admin flags are correct
+                await db.users.update_one(
+                    {"email": seed["email"]},
+                    {"$set": {
+                        "password_hash": admin_password_hash,
+                        "role": "admin",
+                        "is_main_admin": seed["is_main_admin"],
+                        "is_co_admin": seed["is_co_admin"],
+                        "can_manage_admins": seed["can_manage_admins"],
+                        "name": existing.get("name") or seed["name"],
+                    }}
+                )
+                logger.info(f"  Updated admin account: {seed['email']}")
+            else:
+                new_admin = User(
+                    email=seed["email"],
+                    name=seed["name"],
+                    role="admin",
+                    password_hash=admin_password_hash,
+                    is_main_admin=seed["is_main_admin"],
+                    is_co_admin=seed["is_co_admin"],
+                    can_manage_admins=seed["can_manage_admins"],
+                    state="TS",
+                    user_code=seed["user_code"],
+                )
+                doc = new_admin.model_dump()
+                doc["created_at"] = doc["created_at"].isoformat()
+                await db.users.insert_one(doc)
+                logger.info(f"  Created admin account: {seed['email']}")
+        
         logger.info("All database migrations completed successfully")
         
     except Exception as e:

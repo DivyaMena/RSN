@@ -30,10 +30,11 @@ next-env.d.ts
 dist/
 dist
 
-# Environment files (comprehensive coverage)
-
+# Credentials (NOT env files — env files must be committed for Emergent deployment)
 *token.json*
 *credentials.json*
+credentials.json
+.credentials
 
 # Logs and debug files
 npm-debug.log*
@@ -45,6 +46,7 @@ dump.rdb
 # System files
 .DS_Store
 *.pem
+*.key
 
 # Python
 __pycache__/
@@ -79,28 +81,6 @@ agenthub/agents/youtube/db
 # Mobile development
 android-sdk/
 frontend/node_modules/.cache/default-development/0.pack
--e 
-# Environment files - DO NOT ignore .env files, they are needed for deployment
-# Emergent will automatically update these with production values
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
+
+# NOTE: .env files are intentionally NOT ignored.
+# Emergent deployment requires them and will update with production values.
