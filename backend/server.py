@@ -34,6 +34,15 @@ db = client[os.environ['DB_NAME']]
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# RSN admin role aliases — both "admin" and "RSN" are valid admin role identifiers.
+# DB seed uses "RSN" (matching the frontend "I am a" dropdown), but legacy data and
+# many existing checks use "admin". We accept either everywhere.
+ADMIN_ROLES = ("admin", "RSN")
+
+def is_admin_role(role):
+    """Return True if the given role string identifies an RSN admin/co-admin."""
+    return role in ADMIN_ROLES if role else False
+
 app = FastAPI()
 
 # CORS Configuration - handle wildcard specially for credentials
@@ -97,9 +106,10 @@ class User(BaseModel):
     name: str
     picture: Optional[str] = None
     photo_url: Optional[str] = None  # User photo/selfie upload
-    role: str  # Primary role for backward compatibility: parent, tutor, coordinator, admin, student, school
+    role: str  # Primary role for backward compatibility: parent, tutor, coordinator, admin, RSN, student, school
     roles: List[str] = Field(default_factory=list)  # NEW: All active roles ["parent", "tutor"]
     primary_role: Optional[str] = None  # NEW: Which dashboard to show by default
+    active_role: Optional[str] = None  # NEW: Currently active role (mirrors primary_role for compatibility)
     pending_roles: List[str] = Field(default_factory=list)  # NEW: Roles waiting for approval ["coordinator"]
     password_hash: Optional[str] = None  # For email/password login
     state: Optional[str] = None  # TS, AP, TN
@@ -1103,11 +1113,15 @@ async def login(input: LoginInput, response: Response):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
         # Verify role matches (except for pending role users who haven't registered yet)
-        if user.role != "pending" and user.role != input.role:
-            raise HTTPException(status_code=403, detail=f"This account is registered as {user.role}, not {input.role}")
+        # Treat "admin" and "RSN" as equivalent (RSN is the dropdown label/seed value, "admin" is legacy)
+        if user.role != "pending":
+            user_role_norm = "admin" if is_admin_role(user.role) else user.role
+            input_role_norm = "admin" if is_admin_role(input.role) else input.role
+            if user_role_norm != input_role_norm:
+                raise HTTPException(status_code=403, detail=f"This account is registered as {user.role}, not {input.role}")
         
         # For admin role, check if user is actually admin or co-admin
-        if input.role == "admin" or input.role == "rsn":
+        if is_admin_role(input.role):
             if not (user.is_main_admin or user.is_co_admin):
                 raise HTTPException(status_code=403, detail="Access denied. This area is restricted to RSN team only.")
         
@@ -1453,11 +1467,14 @@ async def create_co_admin(input: dict, request: Request):
     if existing:
         raise HTTPException(status_code=400, detail="Email already exists")
     
-    # Create new co-admin user
+    # Create new co-admin user (role="RSN" matches frontend dropdown identifier)
     co_admin = User(
         email=input["email"],
         name=input["name"],
-        role="admin",
+        role="RSN",
+        roles=["RSN"],
+        primary_role="RSN",
+        active_role="RSN",
         password_hash=pwd_context.hash(input["password"]),
         is_main_admin=False,
         is_co_admin=True,
@@ -1999,13 +2016,13 @@ async def bulk_delete_co_admins(input: BulkDeleteInput, request: Request):
     errors = []
     
     for admin_id in input.ids:
-        # Check if it's the main admin
-        admin = await db.users.find_one({"id": admin_id, "role": "admin"})
+        # Check if it's the main admin (role can be "admin" legacy or "RSN" new)
+        admin = await db.users.find_one({"id": admin_id, "role": {"$in": list(ADMIN_ROLES)}})
         if admin and admin.get("is_main_admin"):
             errors.append(f"Cannot delete main admin")
             continue
         
-        result = await db.users.delete_one({"id": admin_id, "role": "admin", "is_co_admin": True})
+        result = await db.users.delete_one({"id": admin_id, "role": {"$in": list(ADMIN_ROLES)}, "is_co_admin": True})
         deleted_count += result.deleted_count
     
     return {
@@ -2673,7 +2690,7 @@ async def get_all_schools(request: Request):
     user = await get_current_user(request)
     
     # Allow both admin and coordinator to access
-    if user.role not in ["admin", "coordinator"]:
+    if user.role not in ["admin", "RSN", "coordinator"]:
         raise HTTPException(status_code=403, detail="Only admin and coordinator can view schools")
     
     schools = await db.schools.find({}, {"_id": 0}).to_list(length=None)
@@ -2747,7 +2764,7 @@ async def send_test_email(request: Request):
     """Send a test email to verify SMTP configuration"""
     user = await get_current_user(request)
     
-    if user.role != "admin":
+    if not is_admin_role(user.role):
         raise HTTPException(status_code=403, detail="Only admin can send test emails")
     
     try:
@@ -3041,7 +3058,7 @@ async def get_students(request: Request):
     
     if user.role == "parent":
         students = await db.students.find({"parent_id": user.id}, {"_id": 0}).to_list(None)
-    elif user.role in ["coordinator", "admin"]:
+    elif user.role in ["coordinator", "admin", "RSN"]:
         students = await db.students.find({}, {"_id": 0}).to_list(None)
     else:
         raise HTTPException(status_code=403, detail="Not authorized")
@@ -3080,7 +3097,7 @@ async def get_batches(request: Request):
     elif user.role == "coordinator":
         # Coordinators see current year only
         batches = await db.batches.find({"academic_year": current_year}, {"_id": 0}).to_list(None)
-    elif user.role == "admin":
+    elif is_admin_role(user.role):
         # Admins see all years (no filter)
         batches = await db.batches.find({}, {"_id": 0}).to_list(None)
     else:
@@ -3112,7 +3129,7 @@ async def create_batch_manual(input: CreateBatchInput, request: Request):
     """Manually create batch (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can create batches")
     
     # Generate global schedule slots for this batch
@@ -3141,7 +3158,7 @@ async def generate_assigned_schedule(batch_id: str, request: Request):
     """Generate and store assigned days/slots for batch based on rules (admin/coordinator only)"""
     user = await require_auth(request)
 
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can generate schedules")
 
     batch = await db.batches.find_one({"id": batch_id})
@@ -3156,7 +3173,7 @@ async def assign_tutor(input: AssignTutorInput, request: Request):
     """Assign tutor to batch (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can assign tutors")
     
     # Check if batch exists
@@ -3254,7 +3271,7 @@ async def get_available_tutors_for_batch(batch_id: str, request: Request):
     """Get available tutors for a batch based on schedule and qualifications"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can access this")
     
     # Get batch details
@@ -3330,7 +3347,7 @@ async def get_batch_students(batch_id: str, request: Request):
     """Get students in a batch (tutor, coordinator, admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["tutor", "coordinator", "admin"]:
+    if user.role not in ["tutor", "coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     batch = await db.batches.find_one({"id": batch_id}, {"_id": 0})
@@ -3434,7 +3451,7 @@ async def update_log_entry(entry_id: str, input: UpdateLogEntryInput, request: R
     """Update log board entry (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can edit log entries")
     
     entry = await db.logboard_entries.find_one({"id": entry_id})
@@ -3492,7 +3509,7 @@ async def upload_curriculum(items: List[CurriculumItem], request: Request):
     """Upload curriculum items (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can upload curriculum")
     
     # Insert or update curriculum items
@@ -3769,7 +3786,7 @@ async def get_tutors(request: Request):
     """Get all tutors (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators/admins can view all tutors")
     
     tutors = await db.tutors.find({}, {"_id": 0}).to_list(None)
@@ -3790,7 +3807,7 @@ async def get_tutor_by_id(tutor_id: str, request: Request):
     """Get tutor details (tutor + linked user) by tutor_id"""
     user = await require_auth(request)
 
-    if user.role not in ["coordinator", "admin", "parent", "student", "tutor"]:
+    if user.role not in ["coordinator", "admin", "RSN", "parent", "student", "tutor"]:
         raise HTTPException(status_code=403, detail="Not authorized to view tutor details")
 
     tutor = await db.tutors.find_one({"id": tutor_id}, {"_id": 0})
@@ -3805,7 +3822,7 @@ async def approve_tutor(tutor_id: str, request: Request):
     """Approve tutor registration (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can approve tutors")
     
     await db.tutors.update_one(
@@ -3820,7 +3837,7 @@ async def reject_tutor(tutor_id: str, reason: str, request: Request):
     """Reject tutor registration (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can reject tutors")
     
     await db.tutors.update_one(
@@ -3835,7 +3852,7 @@ async def update_tutor_status(tutor_id: str, status: str, request: Request):
     """Update tutor status (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can update status")
     
     valid_statuses = ["active", "suspended", "blacklisted", "unavailable"]
@@ -3891,7 +3908,7 @@ async def update_tutor_availability(tutor_id: str, update_data: TutorAvailabilit
     if not tutor:
         raise HTTPException(status_code=404, detail="Tutor not found")
     
-    if tutor["user_id"] != user.id and user.role not in ["coordinator", "admin"]:
+    if tutor["user_id"] != user.id and user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="You can only update your own availability")
     
     valid_statuses = ["available", "unavailable", "not_interested"]
@@ -3923,7 +3940,7 @@ async def get_pending_tutors(request: Request):
     """Get pending tutor registrations (coordinator/admin only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can view pending tutors")
     
     tutors = await db.tutors.find({"status": "pending"}, {"_id": 0}).to_list(None)
@@ -4044,7 +4061,7 @@ async def get_remedial_requests(request: Request, status: Optional[str] = None):
     """Get remedial requests (coordinator only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can view remedial requests")
     
     query = {}
@@ -4109,7 +4126,7 @@ async def pool_remedial_students(input: PoolRemedialStudentsInput, request: Requ
     """Pool multiple remedial requests into a single remedial class (coordinator only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can pool remedial students")
     
     # Fetch all the remedial requests
@@ -4166,7 +4183,7 @@ async def assign_tutor_to_remedial(input: AssignRemedialTutorInput, request: Req
     """Assign a tutor to a remedial class (coordinator only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can assign tutors")
     
     # Check if remedial class exists
@@ -4198,7 +4215,7 @@ async def get_remedial_classes(request: Request):
     """Get all remedial classes (coordinator only)"""
     user = await require_auth(request)
     
-    if user.role not in ["coordinator", "admin"]:
+    if user.role not in ["coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Only coordinators can view remedial classes")
     
     classes = await db.remedial_classes.find({}, {"_id": 0}).to_list(None)
@@ -4252,7 +4269,7 @@ async def get_student_attendance(student_id: str, request: Request):
         student = await db.students.find_one({"id": student_id, "user_id": user.id})
         if not student:
             raise HTTPException(status_code=403, detail="Not authorized")
-    elif user.role not in ["coordinator", "admin", "tutor"]:
+    elif user.role not in ["coordinator", "admin", "RSN", "tutor"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     attendance_records = await db.attendance.find({"student_id": student_id}, {"_id": 0}).to_list(None)
@@ -4263,7 +4280,7 @@ async def get_batch_attendance(batch_id: str, request: Request, date: Optional[s
     """Get attendance for entire batch"""
     user = await require_auth(request)
     
-    if user.role not in ["tutor", "coordinator", "admin"]:
+    if user.role not in ["tutor", "coordinator", "admin", "RSN"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
     query = {"batch_id": batch_id}
@@ -4402,24 +4419,31 @@ async def run_migrations():
         for seed in admin_seeds:
             existing = await db.users.find_one({"email": seed["email"]}, {"_id": 0})
             if existing:
-                # Reset password to known value + ensure admin flags are correct
+                # Reset password to known value + ensure admin flags + role="RSN"
                 await db.users.update_one(
                     {"email": seed["email"]},
                     {"$set": {
                         "password_hash": admin_password_hash,
-                        "role": "admin",
+                        "role": "RSN",
+                        "roles": ["RSN"],
+                        "primary_role": "RSN",
+                        "active_role": "RSN",
+                        "pending_roles": [],
                         "is_main_admin": seed["is_main_admin"],
                         "is_co_admin": seed["is_co_admin"],
                         "can_manage_admins": seed["can_manage_admins"],
                         "name": existing.get("name") or seed["name"],
                     }}
                 )
-                logger.info(f"  Updated admin account: {seed['email']}")
+                logger.info(f"  Updated admin account: {seed['email']} (role=RSN)")
             else:
                 new_admin = User(
                     email=seed["email"],
                     name=seed["name"],
-                    role="admin",
+                    role="RSN",
+                    roles=["RSN"],
+                    primary_role="RSN",
+                    active_role="RSN",
                     password_hash=admin_password_hash,
                     is_main_admin=seed["is_main_admin"],
                     is_co_admin=seed["is_co_admin"],

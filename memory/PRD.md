@@ -30,6 +30,18 @@ An educational platform for providing free online tuition to students who need e
 
 ## What's Been Implemented
 
+### April 30, 2026 - RSN Role Alignment + Login Verification
+- [x] **RSN as canonical admin role identifier**:
+  - Migration 4 now seeds Main Admin & Co-Admin with `role="RSN"`, `roles=["RSN"]`, `primary_role="RSN"`, `active_role="RSN"`
+  - Added `ADMIN_ROLES = ("admin", "RSN")` constant + `is_admin_role()` helper in `server.py`
+  - Updated all 38+ permission checks (backend) and route guards (frontend `App.js`, `LogBoard.js`) to accept either "admin" or "RSN"
+  - Login endpoint normalizes "admin"/"RSN" as equivalent (backwards compatible)
+  - Frontend Login dropdown now sends `value: "RSN"` matching the "RSN" label
+  - DB queries with `role:"admin"` updated to `role: {"$in": ["admin", "RSN"]}` (admin delete endpoint)
+- [x] **End-to-end login verified for ALL 6 roles + edge cases**: see `/app/memory/test_credentials.md` for the matrix
+- [x] **Google login confirmed implemented**: `/api/auth/session` (Emergent OAuth) + `handleGoogleLogin` in Login.js
+- [x] **Render-portable upload path**: `UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploaded_files")` — works on Render, local, Emergent
+
 ### April 30, 2026 - Deployment Readiness
 - [x] **Deployment Blockers Resolved**:
   - Rewrote `/app/.gitignore` — fully removed `*.env`, `.env`, `.env.*` duplicates

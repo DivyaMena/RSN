@@ -24,7 +24,7 @@ const ROLES = [
   { value: 'tutor', label: 'Tutor' },
   { value: 'coordinator', label: 'Co-Ordinator' },
   { value: 'school', label: 'School' },
-  { value: 'admin', label: 'RSN' },
+  { value: 'RSN', label: 'RSN' },
 ];
 
 export default function Login() {
@@ -36,7 +36,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  const isRSNRole = selectedRole === 'admin';
+  const isRSNRole = selectedRole === 'RSN';
 
   const handleLogin = async (e) => {
     e.preventDefault();

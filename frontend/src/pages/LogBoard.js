@@ -78,7 +78,7 @@ export default function LogBoard({ user, logout }) {
       }
 
       // Fetch students if tutor/coordinator
-      if (user.role === 'tutor' || user.role === 'coordinator' || user.role === 'admin') {
+      if (user.role === 'tutor' || user.role === 'coordinator' || user.role === 'admin' || user.role === 'RSN') {
         try {
           const studentsRes = await axios.get(`${API}/batches/${batchId}/students`, { withCredentials: true });
           setStudents(studentsRes.data);
@@ -278,7 +278,7 @@ export default function LogBoard({ user, logout }) {
   if (!batch) return null;
 
   const canCreateEntry = user.role === 'tutor';
-  const canEditEntry = user.role === 'coordinator' || user.role === 'admin';
+  const canEditEntry = user.role === 'coordinator' || user.role === 'admin' || user.role === 'RSN';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
