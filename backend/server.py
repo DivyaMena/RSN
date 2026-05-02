@@ -4419,7 +4419,7 @@ async def run_migrations():
         # Migration 4: Ensure Main Admin and Co-Admin accounts exist with known password
         # These roles cannot be created via external sign-up, so must be seeded on startup
         logger.info("Migration 4: Seeding Main Admin and Co-Admin accounts...")
-        admin_password = "RisingStars@2025"
+        admin_password = os.environ.get("ADMIN_PASSWORD", "RisingStars@2025")
         admin_password_hash = pwd_context.hash(admin_password)
         
         admin_seeds = [
