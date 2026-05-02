@@ -86,7 +86,7 @@ function App() {
       
       const response = await axios.get(`${API}/auth/me`, {
         withCredentials: true,
-        headers: testToken ? headers : undefined
+        headers: testToken ? headers : {}
       });
       setUser(response.data);
       setSessionToken(testToken || response.data.session_token);
