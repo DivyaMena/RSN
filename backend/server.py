@@ -4444,12 +4444,16 @@ async def run_migrations():
         for seed in admin_seeds:
             existing = await db.users.find_one({"email": seed["email"]}, {"_id": 0})
             if existing:
-                # Reset password to known value + ensure admin flags + role="RSN"
+                # Reset password + ensure admin flags + RSN role identifiers.
+                # NOTE: store role="admin" (legacy/canonical) for backwards compatibility
+                # with all cached frontend bundles. The "RSN" identity is fully expressed
+                # via roles=["RSN"], primary_role="RSN", active_role="RSN", is_main_admin.
+                # Login endpoint accepts both "admin" and "RSN" inputs — see is_admin_role().
                 await db.users.update_one(
                     {"email": seed["email"]},
                     {"$set": {
                         "password_hash": admin_password_hash,
-                        "role": "RSN",
+                        "role": "admin",
                         "roles": ["RSN"],
                         "primary_role": "RSN",
                         "active_role": "RSN",
@@ -4460,12 +4464,12 @@ async def run_migrations():
                         "name": existing.get("name") or seed["name"],
                     }}
                 )
-                logger.info(f"  Updated admin account: {seed['email']} (role=RSN)")
+                logger.info(f"  Updated admin account: {seed['email']} (role=admin, roles=[RSN])")
             else:
                 new_admin = User(
                     email=seed["email"],
                     name=seed["name"],
-                    role="RSN",
+                    role="admin",
                     roles=["RSN"],
                     primary_role="RSN",
                     active_role="RSN",
