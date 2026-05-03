@@ -76,22 +76,72 @@ function App() {
 
   const checkExistingSession = async () => {
     try {
-      // Check for test token in localStorage first
+      // ===== FULL DEBUG LOGGING =====
+      console.log('🔍 [AUTH] ================================================');
+      console.log('🔍 [AUTH] Starting checkExistingSession...');
+      console.log('🔍 [AUTH] ================================================');
+      
+      // Check localStorage content
+      console.log('🔍 [AUTH] All localStorage keys:', Object.keys(localStorage));
+      console.log('🔍 [AUTH] Full localStorage object:', { ...localStorage });
+      
+      // Get the specific test token
       const testToken = localStorage.getItem('test_session_token');
+      console.log('🔍 [AUTH] test_session_token value:', testToken);
+      console.log('🔍 [AUTH] test_session_token type:', typeof testToken);
+      console.log('🔍 [AUTH] test_session_token === null?', testToken === null);
+      console.log('🔍 [AUTH] test_session_token === undefined?', testToken === undefined);
+      console.log('🔍 [AUTH] test_session_token is empty string?', testToken === '');
+      
+      // Check cookies
+      console.log('🔍 [AUTH] document.cookie:', document.cookie);
+      console.log('🔍 [AUTH] All cookies:', document.cookie.split(';').map(c => c.trim()));
+      
+      // Prepare headers
       const headers = {};
       
       if (testToken) {
         headers['Authorization'] = `Bearer ${testToken}`;
+        console.log('✅ [AUTH] Token found! Adding Authorization header');
+        console.log('✅ [AUTH] Headers object:', headers);
+      } else {
+        console.log('❌ [AUTH] NO TOKEN FOUND in localStorage');
+        console.log('❌ [AUTH] Headers will be empty:', headers);
       }
+      
+      // Log axios config before request
+      console.log('🔍 [AUTH] About to call /auth/me with config:');
+      console.log('   URL:', `${API}/auth/me`);
+      console.log('   withCredentials:', true);
+      console.log('   headers:', headers);
+      console.log('   testToken truthy?', !!testToken);
+      console.log('   Will send headers?', testToken ? 'YES' : 'NO (empty object)');
       
       const response = await axios.get(`${API}/auth/me`, {
         withCredentials: true,
         headers: testToken ? headers : {}
       });
+      
+      console.log('✅ [AUTH] ================================================');
+      console.log('✅ [AUTH] /auth/me SUCCESS!');
+      console.log('✅ [AUTH] Response status:', response.status);
+      console.log('✅ [AUTH] User data:', response.data);
+      console.log('✅ [AUTH] ================================================');
+      
       setUser(response.data);
       setSessionToken(testToken || response.data.session_token);
+      
     } catch (error) {
-      console.log('No existing session');
+      console.log('❌ [AUTH] ================================================');
+      console.log('❌ [AUTH] /auth/me FAILED!');
+      console.log('❌ [AUTH] ================================================');
+      console.log('❌ [AUTH] Error type:', error.constructor.name);
+      console.log('❌ [AUTH] HTTP Status:', error.response?.status);
+      console.log('❌ [AUTH] Status text:', error.response?.statusText);
+      console.log('❌ [AUTH] Error data:', error.response?.data);
+      console.log('❌ [AUTH] Error message:', error.message);
+      console.log('❌ [AUTH] Full error object:', error);
+      console.log('❌ [AUTH] ================================================');
     } finally {
       setLoading(false);
     }
