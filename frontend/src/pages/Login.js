@@ -27,7 +27,7 @@ const ROLES = [
   { value: 'RSN', label: 'RSN' },
 ];
 
-export default function Login() {
+export default function Login({ setUser }) {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState('student');
   const [email, setEmail] = useState('');
@@ -58,15 +58,15 @@ export default function Login() {
 
       const { session_token, user } = response.data;
       
-      // Store token in localStorage as backup
+      // Store token in localStorage
       localStorage.setItem('test_session_token', session_token);
       
       toast.success(`Welcome back, ${user.name}!`);
-      
-      // Redirect to dashboard
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 500);
+
+      // Set user directly in App state - no page reload needed!
+      setUser(user);
+      navigate('/dashboard');
+
     } catch (error) {
       console.error('Login error:', error);
       const errorMsg = error.response?.data?.detail || 'Login failed. Please check your credentials.';
@@ -81,7 +81,6 @@ export default function Login() {
   };
 
   const handleRegister = () => {
-    // Redirect to Google OAuth for registration
     window.location.href = AUTH_URL;
   };
 
