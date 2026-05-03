@@ -77,6 +77,7 @@ An educational platform for providing free online tuition to students who need e
 
 ### P1 - High Priority
 - [ ] Final user verification of all features
+- [ ] Object Storage Migration: Render filesystem is ephemeral; school documents/photos wipe on every deploy. Migrate to S3 / Cloudflare R2 / Emergent object storage.
 
 ### P2 - Medium Priority  
 - [ ] Coordinator Dashboard Redesign:
@@ -88,6 +89,15 @@ An educational platform for providing free online tuition to students who need e
 ### P3 - Low Priority / Backlog
 - [ ] "Donate Us" button on registration pages (needs user clarification)
 - [ ] AdminDashboard.js and CoordinatorDashboard.js refactoring for better maintainability
+
+## Changelog
+
+### 2026-05-03 — Production auth fixed (Vercel + Render)
+- **Root cause**: Admin user records in production Atlas DB were missing the `id` field. On every login, `User(**user_doc)` auto-generated a fresh UUID via Pydantic default, so sessions were created with a user_id that didn't exist → `/auth/me` returned 401 → dashboard bounced to home.
+- **Fix (code)**: Migration 4 (`run_migrations()` in `server.py`) now self-heals admins missing `id`, `user_code`, or `created_at` on every startup.
+- **Fix (data)**: Directly patched production DB to assign stable `id` to both admin records and flushed stale sessions.
+- **Fix (CORS)**: Added `allow_origin_regex` default that auto-accepts `*.vercel.app`, `*.onrender.com`, and localhost, without breaking the explicit `CORS_ORIGINS` env var on Render (`https://risingstarsnation.org,https://www.risingstarsnation.org`).
+- **Verified via curl**: login → /auth/me → /api/admin/stats — all 200 on `https://rsn-backend-x6ax.onrender.com` with Origin `https://risingstarsnation.org`.
 
 ## API Endpoints
 

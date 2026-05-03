@@ -72,6 +72,16 @@ app = FastAPI()
 
 # CORS Configuration - handle wildcard specially for credentials
 cors_env = os.getenv("CORS_ORIGINS", "").strip()
+# Default regex covers Vercel production + preview deployments and common dev hosts.
+# This is additive to any explicit origins provided via CORS_ORIGINS env var.
+default_origin_regex = (
+    r"^https://([a-zA-Z0-9-]+\.)?vercel\.app$"
+    r"|^https://([a-zA-Z0-9-]+\.)?onrender\.com$"
+    r"|^https?://localhost(:\d+)?$"
+    r"|^https?://127\.0\.0\.1(:\d+)?$"
+)
+cors_origin_regex = os.getenv("CORS_ORIGIN_REGEX", default_origin_regex).strip() or default_origin_regex
+
 if cors_env == "*":
     # For wildcard, we need to allow all origins dynamically
     # Since credentials=True doesn't work with "*", we'll handle it via middleware
@@ -83,11 +93,15 @@ else:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if origins else ["*"],
+    allow_origins=origins if origins else [],
+    allow_origin_regex=cors_origin_regex if allow_credentials else None,
     allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+logging.info(f"CORS configured: explicit origins={origins}, regex={cors_origin_regex if allow_credentials else 'N/A'}, credentials={allow_credentials}")
 
 api_router = APIRouter(prefix="/api")
 
@@ -4449,20 +4463,30 @@ async def run_migrations():
                 # with all cached frontend bundles. The "RSN" identity is fully expressed
                 # via roles=["RSN"], primary_role="RSN", active_role="RSN", is_main_admin.
                 # Login endpoint accepts both "admin" and "RSN" inputs — see is_admin_role().
+                # CRITICAL: ensure `id` field exists — without it, Pydantic's User model
+                # auto-generates a new UUID on every login, breaking session lookups.
+                update_set = {
+                    "password_hash": admin_password_hash,
+                    "role": "admin",
+                    "roles": ["RSN"],
+                    "primary_role": "RSN",
+                    "active_role": "RSN",
+                    "pending_roles": [],
+                    "is_main_admin": seed["is_main_admin"],
+                    "is_co_admin": seed["is_co_admin"],
+                    "can_manage_admins": seed["can_manage_admins"],
+                    "name": existing.get("name") or seed["name"],
+                }
+                if not existing.get("id"):
+                    update_set["id"] = str(uuid.uuid4())
+                    logger.info(f"  Assigning missing id to admin {seed['email']}: {update_set['id']}")
+                if not existing.get("user_code"):
+                    update_set["user_code"] = seed["user_code"]
+                if not existing.get("created_at"):
+                    update_set["created_at"] = datetime.now(timezone.utc).isoformat()
                 await db.users.update_one(
                     {"email": seed["email"]},
-                    {"$set": {
-                        "password_hash": admin_password_hash,
-                        "role": "admin",
-                        "roles": ["RSN"],
-                        "primary_role": "RSN",
-                        "active_role": "RSN",
-                        "pending_roles": [],
-                        "is_main_admin": seed["is_main_admin"],
-                        "is_co_admin": seed["is_co_admin"],
-                        "can_manage_admins": seed["can_manage_admins"],
-                        "name": existing.get("name") or seed["name"],
-                    }}
+                    {"$set": update_set}
                 )
                 logger.info(f"  Updated admin account: {seed['email']} (role=admin, roles=[RSN])")
             else:

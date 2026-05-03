@@ -28,13 +28,16 @@ These accounts are guaranteed to exist after every deploy/restart. Their `role` 
 
 > ⚠️ The non-RSN test passwords are seeded on the **preview environment only**. In production, real users register via the platform flow.
 
-## Login End-to-End Status (verified April 30, 2026)
+## Login End-to-End Status (verified May 3, 2026)
 
 | Path | Status |
 |---|---|
-| RSN Main Admin via dropdown="RSN" | PASS |
-| RSN Co-Admin via dropdown="RSN" | PASS |
-| RSN Main Admin via dropdown="admin" (legacy) | PASS |
+| RSN Main Admin via dropdown="RSN" (preview) | PASS |
+| RSN Main Admin via dropdown="RSN" (production rsn-backend-x6ax.onrender.com) | PASS |
+| RSN Co-Admin via dropdown="RSN" (production) | PASS |
+| /auth/me with Bearer token (production) | PASS |
+| /api/admin/stats with Bearer token (production) | PASS |
+| CORS preflight from https://risingstarsnation.org | PASS |
 | Parent / Tutor / Coordinator / School | PASS |
 | Student (parent email + DOB DD-MM-YYYY) | PASS |
 | Wrong password / wrong role | Correctly rejected |
