@@ -76,22 +76,20 @@ function App() {
 
   const checkExistingSession = async () => {
     try {
-      // Check for test token in localStorage first
       const testToken = localStorage.getItem('test_session_token');
-      const headers = {};
-      
-      if (testToken) {
-        headers['Authorization'] = `Bearer ${testToken}`;
-      }
-      
+
       const response = await axios.get(`${API}/auth/me`, {
         withCredentials: true,
-        headers: testToken ? headers : undefined
+        headers: testToken ? { Authorization: `Bearer ${testToken}` } : {}
       });
+
       setUser(response.data);
       setSessionToken(testToken || response.data.session_token);
+
     } catch (error) {
-      console.log('No existing session');
+      // Not logged in - clear any stale token
+      localStorage.removeItem('test_session_token');
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -125,7 +123,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={!user ? <Landing /> : user.role === 'pending' ? <Navigate to="/role-selection" /> : <Navigate to="/dashboard" />} />
-          <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+          <Route path="/login" element={!user ? <Login setUser={setUser} /> : <Navigate to="/dashboard" />} />
           <Route path="/role-selection" element={user && user.role === 'pending' ? <RoleSelection user={user} /> : <Navigate to="/" />} />
           <Route path="/register/parent" element={user && user.role === 'pending' ? <RegisterParent setUser={setUser} /> : <Navigate to="/" />} />
           <Route path="/register/tutor" element={user && user.role === 'pending' ? <RegisterTutor setUser={setUser} /> : <Navigate to="/" />} />
