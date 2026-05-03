@@ -62,8 +62,15 @@ function App() {
       
       const { session_token, user: userData } = response.data;
       
-      // Set cookie
+      // Set cookie (works on most browsers)
       document.cookie = `session_token=${session_token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=none`;
+      // ALSO persist to localStorage as a Bearer-token fallback. Many mobile browsers
+      // (Android Chrome strict mode, Safari, incognito) block third-party cookies on
+      // cross-domain requests (Vercel frontend → Render backend), which causes
+      // subsequent authenticated calls (e.g., /users/register/coordinator) to 401.
+      // The axios interceptor below picks up this token and sends it as
+      // `Authorization: Bearer …` so auth still works without cookies.
+      localStorage.setItem('test_session_token', session_token);
       
       setSessionToken(session_token);
       setUser(userData);

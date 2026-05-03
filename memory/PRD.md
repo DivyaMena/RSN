@@ -92,6 +92,13 @@ An educational platform for providing free online tuition to students who need e
 
 ## Changelog
 
+### 2026-05-03 — "Not authenticated" on registration after Google OAuth (mobile)
+- **Symptom**: After Google login, users (Parent / Tutor / Coordinator) saw "Not authenticated" toast when uploading KYC files or submitting the registration form. School registration kept working because `/api/schools/register` is public.
+- **Root cause**: `processSessionId` in `App.js` (called after Google OAuth redirect) only set `document.cookie`, not localStorage. On Android Chrome / Safari / incognito, third-party cookies are blocked across `risingstarsnation.org` (Vercel) → `rsn-backend-x6ax.onrender.com` (Render), so the cookie was silently dropped. The Login.js path uses localStorage as a Bearer fallback, but Google-OAuth path didn't.
+- **Fix**: `processSessionId` now also `localStorage.setItem('test_session_token', session_token)` so the existing axios interceptor sends `Authorization: Bearer …` on every subsequent request. This unblocks `/upload-file`, `/users/register/parent|tutor|coordinator`, `/auth/me`, etc.
+- **Also fixed**: `setUser(response.data)` in `RegisterCoordinator.js` was treating the wrapped `{user, message}` response as the user — corrected to `setUser(response.data.user || response.data)`.
+- **Production DB confirmed clean**: 11 users, 2 schools (no stale dev data) — diagnosis in user message that "backend is connected to wrong DB" was incorrect.
+
 ### 2026-05-03 — Schools not showing on Admin dashboard (2 bugs)
 - **Bug 1 (stats)**: `/api/admin/stats` had `"totalSchools": 0` literally hardcoded — never counted the schools collection. Fixed to `db.schools.count_documents({})` + added `pendingSchools` count.
 - **Bug 2 (list)**: `/api/admin/schools` had two registrations of the same route. The first (line 1685) was a placeholder returning `[]`; FastAPI picked it and shadowed the real implementation (at ~line 2729). Removed the placeholder.

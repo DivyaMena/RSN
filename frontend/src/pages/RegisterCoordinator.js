@@ -63,7 +63,7 @@ export default function RegisterCoordinator({ setUser }) {
         },
         { withCredentials: true }
       );
-      setUser(response.data);
+      setUser(response.data.user || response.data);
       toast.success('Registration successful!');
       navigate('/dashboard');
     } catch (error) {
