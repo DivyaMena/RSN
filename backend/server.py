@@ -1352,6 +1352,7 @@ async def get_admin_stats(request: Request):
     total_students = await db.students.count_documents({})
     total_parents = await db.users.count_documents({"role": "parent"})
     total_batches = await db.batches.count_documents({})
+    total_schools = await db.schools.count_documents({})
     
     pending_coordinators = await db.users.count_documents({
         "role": "coordinator",
@@ -1363,6 +1364,7 @@ async def get_admin_stats(request: Request):
     
     pending_tutors = await db.tutors.count_documents({"approval_status": "pending"})
     pending_role_requests = await db.role_requests.count_documents({"status": "pending"})
+    pending_schools = await db.schools.count_documents({"approval_status": "pending"})
     
     return {
         "totalCoordinators": total_coordinators,
@@ -1370,10 +1372,11 @@ async def get_admin_stats(request: Request):
         "totalStudents": total_students,
         "totalParents": total_parents,
         "totalBatches": total_batches,
-        "totalSchools": 0,
+        "totalSchools": total_schools,
         "pendingCoordinators": pending_coordinators,
         "pendingTutors": pending_tutors,
-        "pendingRoleRequests": pending_role_requests
+        "pendingRoleRequests": pending_role_requests,
+        "pendingSchools": pending_schools
     }
 
 @api_router.get("/admin/role-requests")
