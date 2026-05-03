@@ -1315,6 +1315,170 @@ async def switch_primary_role(request: Request, role: str):
     
     return {"success": True, "message": f"Switched to {role} dashboard"}
 
+# ============= INCLUDE ROUTER AND MOUNT STATIC FILES =============
+
+app.include_router(api_router)
+
+# Serve uploaded files at /api/uploads/
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploaded_files")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
+
+# ============= DATABASE MIGRATIONS =============
+
+async def run_migrations():
+    """Run database migrations on startup"""
+    try:
+        logger.info("Running database migrations...")
+        
+        # Migration 1: Fix academic year for batches
+        correct_academic_year = get_current_academic_year()
+        today = datetime.now(timezone.utc)
+        
+        if today.month < 4:
+            wrong_year = f"{today.year}-{str(today.year + 1)[-2:]}"
+            wrong_batches = await db.batches.find({"academic_year": wrong_year}).to_list(1000)
+            
+            if wrong_batches:
+                logger.info(f"Migration 1: Found {len(wrong_batches)} batches with incorrect academic year {wrong_year}")
+                for batch in wrong_batches:
+                    old_code = batch.get("batch_code", "")
+                    new_code = old_code.replace(wrong_year, correct_academic_year)
+                    await db.batches.update_one(
+                        {"_id": batch["_id"]},
+                        {"$set": {"academic_year": correct_academic_year, "batch_code": new_code}}
+                    )
+            else:
+                logger.info("Migration 1: No batches need academic year correction")
+        
+        # Migration 2: Sync coordinator_assignments to user's classes_assigned field
+        logger.info("Migration 2: Syncing coordinator assignments to user profiles...")
+        
+        assignments = await db.coordinator_assignments.find({}).to_list(1000)
+        coordinator_classes = {}
+        
+        for assignment in assignments:
+            coord_id = assignment.get("coordinator_id")
+            class_level = assignment.get("class_level")
+            if coord_id and class_level:
+                if coord_id not in coordinator_classes:
+                    coordinator_classes[coord_id] = set()
+                coordinator_classes[coord_id].add(int(class_level))
+        
+        for coord_id, classes in coordinator_classes.items():
+            classes_list = sorted(list(classes))
+            coord = await db.users.find_one({"id": coord_id}, {"_id": 0, "classes_assigned": 1, "email": 1})
+            if coord:
+                current_classes = set(coord.get("classes_assigned") or [])
+                if current_classes != set(classes_list):
+                    await db.users.update_one(
+                        {"id": coord_id},
+                        {"$set": {"classes_assigned": classes_list}}
+                    )
+        
+        if not coordinator_classes:
+            logger.info("Migration 2: No coordinator assignments to sync")
+        else:
+            logger.info(f"Migration 2: Processed {len(coordinator_classes)} coordinators")
+        
+        # Migration 3: Ensure all batches have state field set
+        logger.info("Migration 3: Fixing batches with null state...")
+        null_state_batches = await db.batches.find({"state": None}).to_list(1000)
+        for batch in null_state_batches:
+            new_state = batch.get("board") or "TS"
+            await db.batches.update_one(
+                {"_id": batch["_id"]},
+                {"$set": {"state": new_state}}
+            )
+        
+        if not null_state_batches:
+            logger.info("Migration 3: No batches with null state")
+        
+        # Migration 4: Seed admin accounts
+        logger.info("Migration 4: Seeding Main Admin and Co-Admin accounts...")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "RisingStars@2025")
+        admin_password_hash = pwd_context.hash(admin_password)
+        
+        admin_seeds = [
+            {
+                "email": "risingstarsnation2025@gmail.com",
+                "name": "Rising Stars Admin",
+                "is_main_admin": True,
+                "is_co_admin": False,
+                "can_manage_admins": True,
+                "user_code": "RSN-MAIN-ADMIN",
+            },
+            {
+                "email": "idonateforneedy@gmail.com",
+                "name": "RSN Co-Admin",
+                "is_main_admin": False,
+                "is_co_admin": True,
+                "can_manage_admins": False,
+                "user_code": "RSN-CO-ADMIN",
+            },
+        ]
+        
+        for seed in admin_seeds:
+            existing = await db.users.find_one({"email": seed["email"]}, {"_id": 0})
+            if existing:
+                await db.users.update_one(
+                    {"email": seed["email"]},
+                    {"$set": {
+                        "password_hash": admin_password_hash,
+                        "role": "admin",
+                        "roles": ["RSN"],
+                        "primary_role": "RSN",
+                        "active_role": "RSN",
+                        "pending_roles": [],
+                        "is_main_admin": seed["is_main_admin"],
+                        "is_co_admin": seed["is_co_admin"],
+                        "can_manage_admins": seed["can_manage_admins"],
+                        "name": existing.get("name") or seed["name"],
+                    }}
+                )
+                logger.info(f"  Updated admin account: {seed['email']}")
+            else:
+                new_admin = User(
+                    email=seed["email"],
+                    name=seed["name"],
+                    role="admin",
+                    roles=["RSN"],
+                    primary_role="RSN",
+                    active_role="RSN",
+                    password_hash=admin_password_hash,
+                    is_main_admin=seed["is_main_admin"],
+                    is_co_admin=seed["is_co_admin"],
+                    can_manage_admins=seed["can_manage_admins"],
+                    state="TS",
+                    user_code=seed["user_code"],
+                )
+                doc = new_admin.model_dump()
+                doc["created_at"] = doc["created_at"].isoformat()
+                await db.users.insert_one(doc)
+                logger.info(f"  Created admin account: {seed['email']}")
+        
+        logger.info("All database migrations completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Migration error: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+
+@app.on_event("startup")
+async def startup_event():
+    """Run migrations on startup"""
+    await run_migrations()
+
 # [REST OF FILE CONTINUES - ADMIN ROUTES, STUDENT ROUTES, BATCH ROUTES, ETC.]
 # [File is too long to include full content - the key fix above is applied]
 # Copy the rest of your server.py file exactly as is below this point
