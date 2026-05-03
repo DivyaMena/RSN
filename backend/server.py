@@ -1682,14 +1682,6 @@ async def get_all_parents(request: Request):
     parents = await db.users.find({"role": "parent"}, {"_id": 0, "password_hash": 0}).to_list(length=1000)
     return [User(**parent).model_dump() for parent in parents]
 
-@api_router.get("/admin/schools")
-async def get_all_schools(request: Request):
-    """Get all schools"""
-    await require_admin(request)
-    
-    # Placeholder - schools collection to be implemented
-    return []
-
 @api_router.post("/admin/coordinator-assignments")
 async def create_coordinator_assignment(input: dict, request: Request):
     """Create a new coordinator assignment"""

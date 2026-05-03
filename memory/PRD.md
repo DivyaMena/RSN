@@ -92,6 +92,12 @@ An educational platform for providing free online tuition to students who need e
 
 ## Changelog
 
+### 2026-05-03 — Schools not showing on Admin dashboard (2 bugs)
+- **Bug 1 (stats)**: `/api/admin/stats` had `"totalSchools": 0` literally hardcoded — never counted the schools collection. Fixed to `db.schools.count_documents({})` + added `pendingSchools` count.
+- **Bug 2 (list)**: `/api/admin/schools` had two registrations of the same route. The first (line 1685) was a placeholder returning `[]`; FastAPI picked it and shadowed the real implementation (at ~line 2729). Removed the placeholder.
+- **Verified on preview**: `totalSchools=7`, `pendingSchools=3`, list returns all 7 schools with status.
+- **CSV upload (/api/admin/curriculum/upload-csv)**: tested with 2-row CSV → 200 OK, `items_updated=2`, robust encoding detection + idempotent upsert. Working correctly.
+
 ### 2026-05-03 — Production auth fixed (Vercel + Render)
 - **Root cause**: Admin user records in production Atlas DB were missing the `id` field. On every login, `User(**user_doc)` auto-generated a fresh UUID via Pydantic default, so sessions were created with a user_id that didn't exist → `/auth/me` returned 401 → dashboard bounced to home.
 - **Fix (code)**: Migration 4 (`run_migrations()` in `server.py`) now self-heals admins missing `id`, `user_code`, or `created_at` on every startup.
