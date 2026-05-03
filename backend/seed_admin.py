@@ -21,7 +21,7 @@ async def seed_rsn_admin():
     
     # Main admin details
     admin_email = "idonateforneedy@gmail.com"
-    admin_password = "RisingStars@2025"  # Default password - should be changed after first login
+    admin_password = os.environ.get("ADMIN_PASSWORD", "RSN@Admin2026!")  # Read from env; fallback for local use
     
     print(f"🔐 Setting up RSN Admin: {admin_email}")
     

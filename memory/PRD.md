@@ -122,5 +122,5 @@ An educational platform for providing free online tuition to students who need e
 - `coordinator_assignments` - Class/board assignments
 
 ## Credentials
-- **Admin**: risingstarsnation2025@gmail.com / RisingStars@2025
-- **Co-Admin**: idonateforneedy@gmail.com / RisingStars@2025
+- **Admin**: risingstarsnation2025@gmail.com / `RSN@Admin2026!` (from `ADMIN_PASSWORD` env var)
+- **Co-Admin**: idonateforneedy@gmail.com / `RSN@Admin2026!` (same env var)

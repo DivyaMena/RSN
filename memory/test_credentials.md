@@ -6,13 +6,13 @@ These accounts are guaranteed to exist after every deploy/restart. Their `role` 
 
 ### Main Admin
 - **Email:** risingstarsnation2025@gmail.com
-- **Password:** RisingStars@2025
+- **Password:** `RSN@Admin2026!` (from `ADMIN_PASSWORD` env var on Render; fallback hardcoded for local/preview)
 - **Login dropdown:** RSN
 - **Stored fields:** `role="RSN"`, `roles=["RSN"]`, `primary_role="RSN"`, `active_role="RSN"`, `is_main_admin=True`, `can_manage_admins=True`
 
 ### Co-Admin
 - **Email:** idonateforneedy@gmail.com
-- **Password:** RisingStars@2025
+- **Password:** `RSN@Admin2026!` (same `ADMIN_PASSWORD` env var)
 - **Login dropdown:** RSN
 - **Stored fields:** `role="RSN"`, `roles=["RSN"]`, `primary_role="RSN"`, `active_role="RSN"`, `is_co_admin=True`
 
