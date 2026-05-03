@@ -1,35 +1,37 @@
 <analysis>**original_problem_statement:**
-The initial scope involved adding a Reports section, an Academic Year Rollover feature, and a Donate Us button. This session expanded significantly to include: Multi-role system allowing users (Parents, Tutors, Coordinators) to hold multiple roles with an admin approval workflow; Coordinator availability and assignment bug fixes; correcting complex curriculum display logic; School registration form fixes; and numerous deployment, CORS, and data migration fixes.
+The initial scope involved adding a Reports section, an Academic Year Rollover feature, and a Donate Us button. This session expanded significantly to include: Multi-role system allowing users (Parents, Tutors, Coordinators) to hold multiple roles with an admin approval workflow; Coordinator availability and assignment bug fixes; correcting complex curriculum display logic; School registration form fixes; numerous deployment, CORS, and data migration fixes. Later, the focus shifted to fixing Render deployment SSL errors, seeding admin accounts correctly, supporting an RSN role login, and recovering the codebase from a destructive GitHub merge conflict.
 
-**PRODUCT REQUIREMENTS for Multi-Role System:**
+**PRODUCT REQUIREMENTS for Multi-Role System & Admin Seeding:**
 - A user should be able to have more than one role.
-- Users should be able to request an additional role from their dashboard.
-- Admins/Co-Admins must have a dedicated section to view, approve, or reject these role requests.
-- Users should be able to switch between their active roles, which changes the dashboard they see.
+- Admins must be reliably auto-seeded into the database to prevent lockout.
+- The Admin dropdown role on the frontend must support RSN.
 
 **User's preferred language**: English
 INSTRUCT NEXT AGENT: Respond in English.
 
-**what currently exists?** 
-A comprehensive educational platform with role-based dashboards. The Multi-role system (backend and frontend admin approvals) is fully implemented. The  deployment blocker has been resolved. Coordinator assignment syncing, batch academic year generation logic, and Student login (DOB formatting to ) have been fixed. Startup database migration scripts are active to heal data inconsistencies. CORS has been strictly configured to support secure credentials.
+**what currently exists?**
+A full-stack React + FastAPI + MongoDB platform. Admin credentials ( and ) are now auto-seeded with  on every backend startup. The system supports the RSN admin role from the frontend dropdown. A major GitHub merge conflict that wiped 3,000+ lines from  was resolved by pushing to a new branch and swapping the default branch. Render has successfully deployed the recovered codebase (93 routes now active), but production admin endpoints are currently returning 401 Unauthorized and the frontend is bouncing the user to the home page upon refresh.
 
 **Last working item**:
-- **Last item agent was working**: Adding a startup database migration/seeding script to ensure the main Admin () and Co-Admin () users are reliably created/retained in the database with the password .
-- **Reasoning**: The user explicitly requested to make these credentials permanently work across environments (especially production) since these roles cannot be created via standard external sign-up flows.
+- **Last item agent was working**: Debugging Production (Live) 401 Unauthorized / Session persistence issues.
+- **Reasoning**: The user's Vercel frontend + Render backend deployment is now running the correct, fully-restored code. However, the user reports that logging in on production says invalid email id or password, and refreshing the dashboard routes them back to the home page. Agent probed the Render backend and confirmed that while routes exist, endpoints like  and  are returning HTTP 401.
 - **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?** backend testing agent or manual testing by / to verify the DB seeds the admins correctly upon backend startup.
-- **User Testing Done**: N
+- **Agent Testing Done**: Y
+- **Which testing method agent to use?** Manual testing by  against the production Render URL and preview URL, backend testing agent.
+- **User Testing Done**: Y
 
 **All Pending/In progress Issue list**:
-Issue 1: Ensure Admin and Co-Admin default credentials seeding (P0)
-- **Attempted fixes**: Agent was about to add logic to  startup events to upsert these users but stopped.
-- **Next debug checklist**: In , add logic inside the application startup event ( or ) to insert or update the admin and co-admin accounts with their hashed  password and respective boolean flags.
-- **Why fix this issue and what will be achieved with the fix?** Will guarantee that the client is never locked out of their production admin accounts, even on a fresh database.
+Issue 1: Production (Vercel + Render) Login & 401 Unauthorized Session Bouncing (P0)
+- **Attempted fixes**: The agent recovered the missing  code on GitHub, and Render successfully deployed it.
+- **Next debug checklist**: 
+  - Investigate Cross-Origin cookie behavior: The frontend is on Vercel () and the backend is on Render (). Verify that  cookies are being set with  and  in  (line ~1185) so that the browser doesn't block them cross-domain. 
+  - Check if  in the Render environment variables correctly includes the Vercel URL.
+  - Verify that the  environment variable on Render exactly matches the Atlas database name where the users exist.
+- **Why fix this issue and what will be achieved with the fix?** Will allow the user to actually log in and stay logged into the production application.
 - **Status**: IN PROGRESS
-- **Is recurring issue?** N
-- **Should Test frontend/backend/both after fix?** Backend
-- **Blocked on other issue**: None
+- **Is recurring issue?** Y (auth/session issues specific to cross-origin production environments).
+- **Should Test frontend/backend/both after fix?** Both (Focus on HTTP headers and Cookies via curl).
+- **Blocked on other issue**: None.
 
 **In progress Task List**:
 Task 1: Coordinator Dashboard Redesign is Incomplete (P2)
@@ -41,102 +43,93 @@ Task 1: Coordinator Dashboard Redesign is Incomplete (P2)
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-  - **P1: Final User Verification**: Verify all features in production post-deployment (multi-role system, logins, coordinator dashboard batch visibility).
-  - **P2: Pre-Deployment Configuration**: Before final push, ensure  in  to the production domain and  in  are correctly mapped if needed.
+  - **P1: Object Storage Migration**: The Render filesystem is ephemeral, meaning uploaded school documents/photos will be wiped on every deploy. Migrate uploads to S3, Cloudflare R2, or Emergent object storage.
 - **Future Tasks:**
   - **P3: Donate Us on Registration Pages**: Clarify with the user if the Donate Us button should be added to the Tutor and Student registration pages.
 
 **Completed work in this session**
-- Removed  from  to fix deployment blocker (DONE).
-- Fixed Unbounded (N+1) database queries across  API routes (DONE).
-- Multi-Role Frontend: Added Role Requests approval/rejection tab in  (DONE).
-- Coordinator Assignments: Fixed projection to include class level, and synced  creation with  array (DONE).
-- Academic Year Bug: Replaced hardcoded calendar year with  during batch creation (DONE).
-- Startup DB Migrations: Scripted auto-fixes for malformed academic years and coordinator syncs on app boot (DONE).
-- Login / DOB Logic: Standardized DOBs to  globally and fixed student login to query both  and  (DONE).
-- Tutor display on StudentDashboard: Fixed property mapping from  to  (DONE).
-- CORS Fixes: Removed  wildcard from origins to satisfy  browser requirements (DONE).
+- : Added Atlas-specific MongoDB TLS connection options () to bypass Render handshake errors (DONE).
+- : Auto-seeded Main Admin and Co-Admin with , ,  for backward compatibility with cached frontends (DONE).
+-  & : Updated route guards to accept both  and  (DONE).
+- : Updated role dropdown to send  value for admins (DONE).
+- Deployment Recovery: Guided the user to recover 3,114 deleted lines of code by creating a new branch and updating GitHub default branch settings (DONE).
+- Fixed Render deployment  for the  directory by making the path relative to  (DONE).
 
 **Earlier issues found/mentioned but not fixed**
-- None beyond the incomplete Coordinator Dashboard redesign.
+- None beyond the pending 401 debugging and the Coordinator Dashboard redesign.
 
 **Known issue recurrence from previous fork**
-- Issue recurrence in previous fork:  blocking environment files.
+- Issue recurrence in previous fork: Frontend dev server hitting Linux  watcher limits () in the preview environment, causing it to serve stale JavaScript bundles.
 - Recurrence count: 1
-- Status: RESOLVED
+- Status: RESOLVED (Locally mitigated by force restarting supervisor, but next agent should be aware if preview UI doesn't reflect code changes).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
 - React frontend with Shadcn UI, FastAPI backend, MongoDB.
-- Multi-role arrays inside JWTs.
-- FastAPI Startup events used for auto-running DB data migrations.
-- Strict CORS handling for Cross-Origin sessions.
+- Vercel (Frontend) to Render (Backend) cross-origin communication requires strict CORS and explicit cookie flags (, ).
+- FastAPI Startup events used for auto-running DB data migrations (Admin users are force-updated to  on every backend boot).
 
 **key DB schema**
-- **users:** , , 
-- **role_requests:** , , 
-- **coordinator_assignments:** synced concurrently with  to manage visibility.
+- **users:** , , , , , 
+- **user_sessions:** , , 
 
 **changes in tech stack**
-- No major tech stack changes.
+- Modified  instantiation to conditionally use  and  for production Atlas URIs.
 
 **All files of reference**
--  (Fixed blocking lines)
--  (Added extensive query limits, fixed assignment sync logic, added DB migration functions, strict CORS config, auth routes)
--  (Added Role Requests UI and fetch logic)
--  (Pending redesign)
--  (Updated to handle DD-MM-YYYY format properly)
--  (Fixed tutor object references)
--  (Created and updated to track progress)
--  (Modified )
+-  (Modified auth logic, admin seeding, MongoDB connection, upload mounts)
+-  (Updated role checks)
+-  (Updated role dropdown values)
+-  (Updated role checks)
+-  (Updated test credentials documentation)
 
 **Areas that need refactoring**:
--  and  are massive and should be broken down into smaller components.
+-  is nearly 4,500 lines and handles all models, migrations, and routes. Should eventually be split into modular routers.
 
 **key api endpoints**
--  (Supports standardized DOB checks)
--  (Now updates both assignment collections and user properties)
--  & 
+-  
+-  (Currently returning 401 on production)
+-  (Currently returning 401 on production)
 
 **Critical Info for New Agent**
-- **DO NOT test API with  via frontend**: Frontend routes must use the standard backend URL config. Avoid local network misroutings.
-- The  parameter requires explicitly defined  (comma-separated string in ), do NOT use the wildcard .
-- The user is extremely strict about the default format of dates being . Never use  in new frontend implementations.
-- Start directly by seeding the Admin users on startup as requested in the final interaction.
+- **The code in the Emergent workspace is CORRECT and complete (100 routes).** Do not delete or overwrite the  file attempting to restore routes. The routes exist locally and on preview.
+- **Production URL Auth Bouncing**: The user is using Vercel for the frontend and Render for the backend. The  cookie is likely being dropped by browsers due to missing  flags on the  call in , which is mandatory for cross-site cookies.
+- Admin passwords revert to  on every backend restart due to Migration 4. Explain this to the user if they say their recently changed password isn't working.
 
 **documents and test reports created in this job**
 - 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. **Request**: did the deployement done completely? -> Agent analyzed with deployer agent and stated readiness.
-2. **Issue**: did u work on the co-ordinator assignment? check the screen shot... it is not visible on the assignment -> Agent fixed projection pipeline.
-3. **Issue**: recently assigned class 6 from main admin to co-ordinator and it is not being visible... randomly adding a class but on deploying, it is not working -> Agent found disconnect between  collection and  array. Added sync fix.
-4. **Issue**: class 6, mat batch is ready with 12 students... but batch is not visible in co-ordinator... dashboard -> Agent fixed batch creation script that incorrectly stored calendar year  instead of academic year .
-5. **Request**: create a migration script that automatically fixes this when the app starts -> Agent added startup migration logic to .
-6. **Issue**: recently deployed batch is not visible on divyapoosala@gmail.com nor on divyamena@gmail.com -> Agent investigated and found a data sync discrepancy specific to production missing the tutor profile.
-7. **Issue**: Student login failing... Tutor showing as Unknown -> Agent fixed StudentDashboard tutor object and updated student login to check .
-8. **Request**: Student login is happening with YYYY-MM-DD... I want all the dispay of DOBs and login access date formats as DD-MM-YYYY only. -> Agent implemented format strictness across full stack.
-9. **Issue**: NOT ABLE TO LOGIN ANY USERS, IT IS TAKING BACK TO RISINGSTARTSNATION.ORG WHY? -> Agent found CORS wildcard issue breaking secure cookie credentials. Configured strict domains.
-10. **Request**: Retain Admin and Co-Admin login Credentials, make them work. Cos those roles are not created from outside. -> **PENDING ACTION**: Agent needs to script creation/upsert of these users on server start.
+1. **Issue**: Login failed. Please check your credentials using RSN at Preview also. -> Agent diagnosed frontend was serving a cached JS bundle due to  limit; applied backward-compatible backend fix.
+2. **Issue**: Welcome back Admin and then came back to home page -> Agent explained  route guards were kicking them out because it checked for  not . Fixed.
+3. **Issue/Theory**: User theorized  field was wrong in Atlas. -> Agent proved theory wrong and explained  or stale localStorage token was likely the culprit.
+4. **Issue**: frontend sends bearer but backend checks for Bearer. This fails! + screenshot of 404 on Render -> Agent diagnosed Render only had 7 routes deployed because the GitHub codebase was an old stub.
+5. **Request**: Please fix server.py so it has ALL the following working routes... The admin dashboard is showing all zeros and 404 errors -> Agent proved the Emergent workspace *does* have all 100 routes, but Render was deploying a broken GitHub merge.
+6. **Issue**: The GitHub merge accidentally deleted 3,114 lines from server.py... Please save the complete server.py to GitHub -> Agent guided user on creating a new branch to push to.
+7. **Issue**: i created new branch as u said... if i compare and accept the commit change and merge them, it is failing. -> Agent instructed user to bypass the PR and change the default branch in GitHub settings to the newly pushed branch, then delete the corrupted .
+8. **Action**: A -> User executed the branch swap in GitHub.
+9. **Issue (PENDING ACTION)**: If i refersh from it is automatically routing to home page. also invalid email id or password. can you check, iam checking at live not preview -> Agent checked Render: verified the 100 routes are now successfully deployed, but admin routes and  are returning HTTP 401 Unauthorized. **Next Agent must debug the cross-origin session/cookie/DB configuration for Vercel/Render.**
 
 **Project Health Check:**
-- Broken: None. (Login was broken due to CORS but is fixed locally).
+- Broken: Production (Vercel/Render) login session persistence (401 errors).
 - Mocked: None.
 
 **3rd Party Integrations**
-- None utilized in this specific session.
+- None
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions: None
+- Known regressions: None locally, but Cross-Origin production cookies might be dropping.
 
 **Credentials to test flow:**
-- Main Admin:  / 
-- Co-Admin:  / 
+- Main Admin:  /  (Role: RSN)
+- Co-Admin:  /  (Role: RSN)
 
 **What agent forgot to execute**
-- The agent forgot to start/finish the  redesign (adding filtered tabs for Batches, Tutors, Schools) which was in the pending task list from the handoff.</analysis>
+- Did not verify if  for the  includes  to support the Vercel (Frontend) to Render (Backend) cross-domain architecture, which is the most likely cause of the current production 401 issues.
+- Coordinator Dashboard Redesign task remains pending.</analysis>

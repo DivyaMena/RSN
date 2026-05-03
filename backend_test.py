@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 
 class RisingStarsAPITester:
-    def __init__(self, base_url="https://rising-stars-auth.preview.emergentagent.com"):
+    def __init__(self, base_url="https://multi-role-system-2.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None
