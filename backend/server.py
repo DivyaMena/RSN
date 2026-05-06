@@ -105,6 +105,12 @@ logging.info(f"CORS configured: explicit origins={origins}, regex={cors_origin_r
 
 api_router = APIRouter(prefix="/api")
 
+# Lightweight health endpoint — used by the frontend to wake Render's cold instance
+# while the user reads the landing page, and by external uptime monitors.
+@api_router.get("/health")
+async def health_check():
+    return {"status": "ok", "time": datetime.now(timezone.utc).isoformat()}
+
 # ============= ACADEMIC YEAR UTILITIES =============
 
 def get_current_academic_year() -> str:

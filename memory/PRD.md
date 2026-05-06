@@ -92,6 +92,14 @@ An educational platform for providing free online tuition to students who need e
 
 ## Changelog
 
+### 2026-05-06 — Home page took ~25s to load on first visit
+- **Root cause**: Two compounding factors:
+  1. Render free tier spins down after 15min idle; cold-start takes 25-40s.
+  2. `App.js` blocked ALL rendering behind a fullscreen spinner while waiting for `/api/auth/me`, so the landing page never showed until the cold backend responded.
+- **Fix (frontend)**: For first-time visitors (no `test_session_token` in localStorage), render the Landing page instantly — skip the `/auth/me` blocking check entirely. For returning users, keep the existing check. Also added a fire-and-forget `GET /api/health` on mount to start warming the backend while the user reads the landing page, so clicking "Login"/"Get Started" hits a hot server.
+- **Fix (backend)**: Added `GET /api/health` lightweight endpoint (no DB call, no auth) for wake-up pings and external uptime monitoring.
+- **Next level optimization (optional, user action)**: Set up a cron-job.org / UptimeRobot pinging `https://rsn-backend-x6ax.onrender.com/api/health` every 10 minutes — prevents cold starts entirely. Free.
+
 ### 2026-05-03 — "Not authenticated" on registration after Google OAuth (mobile)
 - **Symptom**: After Google login, users (Parent / Tutor / Coordinator) saw "Not authenticated" toast when uploading KYC files or submitting the registration form. School registration kept working because `/api/schools/register` is public.
 - **Root cause**: `processSessionId` in `App.js` (called after Google OAuth redirect) only set `document.cookie`, not localStorage. On Android Chrome / Safari / incognito, third-party cookies are blocked across `risingstarsnation.org` (Vercel) → `rsn-backend-x6ax.onrender.com` (Render), so the cookie was silently dropped. The Login.js path uses localStorage as a Bearer fallback, but Google-OAuth path didn't.

@@ -41,16 +41,27 @@ function App() {
   const [sessionToken, setSessionToken] = useState(null);
 
   useEffect(() => {
-    // Check for session_id in URL fragment
+    // Fire-and-forget: warm the Render backend (free tier spins down after 15min
+    // idle and cold-starts take ~25-40s). Triggering this immediately means by the
+    // time a visitor clicks "Login" / "Get Started", the backend is awake.
+    axios.get(`${API}/health`).catch(() => {});
+
+    // Check for session_id in URL fragment (returning from Google OAuth redirect)
     const hash = window.location.hash;
     if (hash && hash.includes('session_id=')) {
       const sessionId = hash.split('session_id=')[1].split('&')[0];
       processSessionId(sessionId);
       // Clean URL
       window.history.replaceState(null, '', window.location.pathname);
-    } else {
-      // Check for existing session
+    } else if (localStorage.getItem('test_session_token')) {
+      // Returning logged-in user — check their session before rendering (so
+      // we can route them to their dashboard, not the landing page).
       checkExistingSession();
+    } else {
+      // First-time visitor / logged-out — render the landing page immediately.
+      // Do NOT block on /auth/me; that call is what made cold-starts feel like
+      // a 25-second blank screen.
+      setLoading(false);
     }
   }, []);
 
