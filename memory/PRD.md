@@ -92,6 +92,17 @@ An educational platform for providing free online tuition to students who need e
 
 ## Changelog
 
+### 2026-05-10 — Duplicate students + duplicate batches with same `batch_code`
+- **Symptoms** (from screenshots):
+  1. Parent could double-click "Register Student" → multiple students with identical details inserted.
+  2. Two batches with the SAME `batch_code` (e.g., `RSN-AP-2026-27-C10-CHS-001`) appeared on Coordinator dashboard, neither at capacity.
+  3. New batches were spawning before the previous one reached 25/25 capacity.
+- **Root cause (single bug, three symptoms)**: race condition. Concurrent `/api/students` requests both ran `check_and_create_batch`, neither saw the other's batch yet → both created a new batch with the same auto-incremented serial. `generate_batch_code` was a non-atomic find-then-increment, and there was no unique index on `batches.batch_code`.
+- **Fix (frontend `ParentDashboard.js`)**: added `submitting` state; "Register Student" button is now `disabled={submitting}` and shows "Registering…" while in flight. Re-clicks are no-ops.
+- **Fix (backend `check_and_create_batch`)**: rewritten as an atomic `find_one_and_update` with `$addToSet` and a capacity guard `student_ids.{24}: {$exists: false}`. Picks the OLDEST non-full batch first so capacity fills before a new batch opens. Status transitions (waitlist → active at 10, full at 25) recomputed from the post-update size. New-batch creation falls into a 5-attempt retry loop on duplicate-key error.
+- **Fix (Migration 0)**: on every backend startup, merges any existing duplicate `batch_code` rows (keeps oldest, unions student_ids, recomputes status) and creates a unique index on `batches.batch_code`. Idempotent.
+- **Production data healed**: ran the same merge directly against Atlas — **15 duplicate batch pairs** merged. Final batch count: 25 (was 40). Unique index created.
+
 ### 2026-05-06 — Home page took ~25s to load on first visit
 - **Root cause**: Two compounding factors:
   1. Render free tier spins down after 15min idle; cold-start takes 25-40s.

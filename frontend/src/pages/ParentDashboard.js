@@ -21,6 +21,7 @@ export default function ParentDashboard({ user, logout }) {
   const [batches, setBatches] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
@@ -82,6 +83,10 @@ export default function ParentDashboard({ user, logout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Guard against double-submission (which previously created duplicate
+    // students AND duplicate batches with the same code due to a race condition).
+    if (submitting) return;
+    
     // Validation
     if (!formData.name || !formData.dob_day || !formData.dob_month || !formData.dob_year || !formData.student_photo || !formData.class_level || !formData.board || !formData.school_name || 
         !formData.location || !formData.roll_no || formData.subjects.length === 0 || !formData.aadhaar_page1 || !formData.accept_terms) {
@@ -89,6 +94,7 @@ export default function ParentDashboard({ user, logout }) {
       return;
     }
 
+    setSubmitting(true);
     try {
       // Upload files first
       let photoUrl = null;
@@ -173,6 +179,8 @@ export default function ParentDashboard({ user, logout }) {
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error.response?.data?.detail || 'Failed to register student');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -510,8 +518,8 @@ export default function ParentDashboard({ user, logout }) {
                     </label>
                   </div>
 
-                  <Button data-testid="submit-student-btn" type="submit" className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white">
-                    Register Student
+                  <Button data-testid="submit-student-btn" type="submit" disabled={submitting} className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white disabled:opacity-60 disabled:cursor-not-allowed">
+                    {submitting ? 'Registering…' : 'Register Student'}
                   </Button>
                 </form>
               </DialogContent>

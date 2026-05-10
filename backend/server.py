@@ -959,45 +959,65 @@ async def auto_assign_tutor_to_batch(batch: Batch):
             break
 
 async def check_and_create_batch(student: Student, subject: str):
-    """Check if batch should be created and create if threshold met"""
-    # Find existing batch (waitlist or active) for this combination
-    existing_batch = await db.batches.find_one({
-        "state": student.board,
-        "class_level": student.class_level,
-        "subject": subject,
-        "board": student.board,
-        "status": {"$in": ["waitlist", "active"]}
-    }, {"_id": 0})
-    
-    if existing_batch:
-        batch = Batch(**existing_batch)
-        
-        # Add student to batch if not already added
-        if student.id not in batch.student_ids:
-            batch.student_ids.append(student.id)
-            
-            # Check if batch should be activated
-            if len(batch.student_ids) >= 10 and batch.status == "waitlist":
-                batch.status = "active"
-                # Auto-assign tutor when batch becomes active
-                await auto_assign_tutor_to_batch(batch)
-            
-            # Check if batch is full
-            if len(batch.student_ids) >= 25:
-                batch.status = "full"
-            
-            # Update batch
+    """
+    Find or create a batch for (state, class, subject) and add the student to it.
+
+    Rules:
+    - Reuse the LATEST non-full batch (status in {waitlist, active}) — never create
+      a new batch while an earlier one still has space (capacity 25).
+    - Only create a new batch when no non-full batch exists.
+    - Race-safe: uses an atomic findOneAndUpdate to add the student, and retries
+      batch_code generation if a concurrent request grabbed the same serial.
+    """
+    BATCH_CAPACITY = 25
+    ACTIVATE_THRESHOLD = 10
+
+    # 1) Atomic add to an existing non-full batch (no race possible).
+    #    $addToSet prevents duplicate student_ids; the size check ensures we never
+    #    overflow capacity — a concurrent insert that pushes us past 25 fails the
+    #    filter and we fall through to create a new batch.
+    existing = await db.batches.find_one_and_update(
+        {
+            "state": student.board,
+            "class_level": student.class_level,
+            "subject": subject,
+            "board": student.board,
+            "status": {"$in": ["waitlist", "active"]},
+            f"student_ids.{BATCH_CAPACITY - 1}": {"$exists": False},  # current size < 25
+        },
+        {"$addToSet": {"student_ids": student.id}},
+        sort=[("created_at", 1)],   # oldest non-full batch first (fill up before opening new)
+        return_document=True,
+        projection={"_id": 0},
+    )
+
+    if existing:
+        # Update status transitions in a follow-up update (only one of these will fire).
+        new_size = len(existing.get("student_ids", []))
+        new_status = existing.get("status")
+        if new_size >= BATCH_CAPACITY:
+            new_status = "full"
+        elif new_size >= ACTIVATE_THRESHOLD and existing.get("status") == "waitlist":
+            new_status = "active"
+
+        if new_status != existing.get("status"):
             await db.batches.update_one(
-                {"id": batch.id},
-                {"$set": {"student_ids": batch.student_ids, "status": batch.status}}
+                {"id": existing["id"]},
+                {"$set": {"status": new_status}},
             )
-    else:
-        # Create new batch - use academic year (April to March), not calendar year
-        academic_year = get_current_academic_year()
-        
+            if new_status == "active":
+                # Auto-assign tutor when batch transitions to active
+                batch_obj = Batch(**{**existing, "status": new_status})
+                await auto_assign_tutor_to_batch(batch_obj)
+        return
+
+    # 2) No non-full batch exists → create a new one. Retry on duplicate batch_code
+    #    (rare race where two concurrent requests both reach this branch).
+    academic_year = get_current_academic_year()
+    last_err = None
+    for _ in range(5):
         batch_code = await generate_batch_code(student.board, academic_year, student.class_level, subject)
         schedule_slots = generate_schedule_slots_for_batch(student.class_level, subject, batch_code)
-
         batch = Batch(
             batch_code=batch_code,
             state=student.board,
@@ -1007,12 +1027,19 @@ async def check_and_create_batch(student: Student, subject: str):
             board=student.board,
             student_ids=[student.id],
             status="waitlist",
-            schedule_slots=schedule_slots
+            schedule_slots=schedule_slots,
         )
-        
         doc = batch.model_dump()
         doc["created_at"] = doc["created_at"].isoformat()
-        await db.batches.insert_one(doc)
+        try:
+            await db.batches.insert_one(doc)
+            return
+        except Exception as e:
+            # DuplicateKeyError on batch_code unique index → retry with next serial
+            last_err = e
+            continue
+    if last_err:
+        raise last_err
 
 # ============= AUTH ROUTES =============
 
@@ -4363,6 +4390,48 @@ async def run_migrations():
     try:
         logger.info("Running database migrations...")
         
+        # Migration 0: Merge duplicate batches (same batch_code) and ensure unique index.
+        # A pre-existing race condition allowed two batches to share the same batch_code
+        # when parents double-clicked Register. We merge their student_ids before
+        # creating the unique index so Mongo doesn't reject the index build.
+        logger.info("Migration 0: De-duplicating batches by batch_code...")
+        dup_pipeline = [
+            {"$group": {
+                "_id": "$batch_code",
+                "ids": {"$push": "$id"},
+                "docs": {"$push": "$$ROOT"},
+                "count": {"$sum": 1},
+            }},
+            {"$match": {"count": {"$gt": 1}}},
+        ]
+        async for group in db.batches.aggregate(dup_pipeline):
+            docs = group["docs"]
+            # Keep the oldest as canonical; merge student_ids from the rest.
+            docs.sort(key=lambda d: d.get("created_at") or "")
+            keep = docs[0]
+            merged_students = list(dict.fromkeys(keep.get("student_ids") or []))
+            for dup in docs[1:]:
+                for sid in (dup.get("student_ids") or []):
+                    if sid not in merged_students:
+                        merged_students.append(sid)
+            new_status = keep.get("status") or "waitlist"
+            if len(merged_students) >= 25:
+                new_status = "full"
+            elif len(merged_students) >= 10 and new_status == "waitlist":
+                new_status = "active"
+            await db.batches.update_one(
+                {"id": keep["id"]},
+                {"$set": {"student_ids": merged_students, "status": new_status}},
+            )
+            for dup in docs[1:]:
+                await db.batches.delete_one({"id": dup["id"]})
+            logger.info(f"  Merged {len(docs)} duplicates of {group['_id']} → 1 batch with {len(merged_students)} students")
+        try:
+            await db.batches.create_index("batch_code", unique=True)
+            logger.info("Migration 0: Unique index on batches.batch_code ensured")
+        except Exception as e:
+            logger.warning(f"Migration 0: Could not create unique index on batch_code: {e}")
+
         # Migration 1: Fix academic year for batches created with calendar year instead of academic year
         correct_academic_year = get_current_academic_year()
         today = datetime.now(timezone.utc)
