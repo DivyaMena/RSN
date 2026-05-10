@@ -20,6 +20,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
 import ParentProfile from './pages/ParentProfile';
 import LogBoard from './pages/LogBoard';
+import AwaitingApproval from './pages/AwaitingApproval';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
@@ -138,19 +139,50 @@ function App() {
     );
   }
 
+  // Derive an "awaiting admin approval" state.
+  // After /users/register/coordinator (and future /register/tutor), the backend
+  // keeps role="pending" but populates pending_roles=["coordinator"] (or "tutor")
+  // and approval_status="pending". For legacy users who registered before the
+  // approval gate existed, we also gate role==="coordinator" with a non-approved
+  // approval_status.
+  const pendingApprovalRole =
+    user && (
+      (Array.isArray(user.pending_roles) && user.pending_roles.length > 0 && user.pending_roles[0])
+      || ((user.role === 'coordinator' || user.role === 'tutor')
+          && user.approval_status && user.approval_status !== 'approved'
+          && user.approval_status !== null
+          ? user.role
+          : null)
+    );
+
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={!user ? <Landing /> : user.role === 'pending' ? <Navigate to="/role-selection" /> : <Navigate to="/dashboard" />} />
+          <Route path="/" element={
+            !user ? <Landing /> :
+            pendingApprovalRole ? <Navigate to="/awaiting-approval" /> :
+            user.role === 'pending' ? <Navigate to="/role-selection" /> :
+            <Navigate to="/dashboard" />
+          } />
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
-          <Route path="/role-selection" element={user && user.role === 'pending' ? <RoleSelection user={user} /> : <Navigate to="/" />} />
-          <Route path="/register/parent" element={user && user.role === 'pending' ? <RegisterParent setUser={setUser} /> : <Navigate to="/" />} />
-          <Route path="/register/tutor" element={user && user.role === 'pending' ? <RegisterTutor setUser={setUser} /> : <Navigate to="/" />} />
-          <Route path="/register/coordinator" element={user && user.role === 'pending' ? <RegisterCoordinator setUser={setUser} /> : <Navigate to="/" />} />
-          <Route path="/register/school" element={user && user.role === 'pending' ? <RegisterSchool setUser={setUser} /> : <Navigate to="/" />} />
+          <Route path="/awaiting-approval" element={
+            user && pendingApprovalRole
+              ? <AwaitingApproval user={user} logout={logout} role={pendingApprovalRole} />
+              : <Navigate to="/" />
+          } />
+          <Route path="/role-selection" element={
+            user && user.role === 'pending' && !pendingApprovalRole
+              ? <RoleSelection user={user} />
+              : <Navigate to="/" />
+          } />
+          <Route path="/register/parent" element={user && user.role === 'pending' && !pendingApprovalRole ? <RegisterParent setUser={setUser} /> : <Navigate to="/" />} />
+          <Route path="/register/tutor" element={user && user.role === 'pending' && !pendingApprovalRole ? <RegisterTutor setUser={setUser} /> : <Navigate to="/" />} />
+          <Route path="/register/coordinator" element={user && user.role === 'pending' && !pendingApprovalRole ? <RegisterCoordinator setUser={setUser} /> : <Navigate to="/" />} />
+          <Route path="/register/school" element={user && user.role === 'pending' && !pendingApprovalRole ? <RegisterSchool setUser={setUser} /> : <Navigate to="/" />} />
           <Route path="/dashboard" element={
             !user ? <Navigate to="/" /> :
+            pendingApprovalRole ? <Navigate to="/awaiting-approval" /> :
             user.role === 'parent' ? <ParentDashboard user={user} logout={logout} /> :
             user.role === 'student' ? <StudentDashboard user={user} logout={logout} /> :
             user.role === 'tutor' ? <TutorDashboard user={user} logout={logout} /> :

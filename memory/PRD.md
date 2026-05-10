@@ -92,6 +92,20 @@ An educational platform for providing free online tuition to students who need e
 
 ## Changelog
 
+### 2026-05-10 — Coordinator approval workflow: 3-gap fix
+- **Audit finding**: `siridigicreations@gmail.com` registered and got full coordinator access with **zero admin involvement**. DB proof: `role="coordinator"` but `approval_status` and `status` fields were missing entirely; no `role_requests` row.
+- **Root cause (3 gaps)**:
+  - **Gap A**: `register_coordinator` set `role="coordinator"` directly — no `approval_status="pending"`, no `pending_roles` entry, no `role_requests` audit row.
+  - **Gap B**: every `/coordinator/*` endpoint guarded by `if user.role != "coordinator"` only — never checked `approval_status`.
+  - **Gap C**: `App.js` routed any `role==="coordinator"` user straight to `<CoordinatorDashboard>`; no awaiting-approval screen existed.
+- **Fix applied (5 parts)**:
+  1. **`register_coordinator`**: now sets `role="pending"`, `approval_status="pending"`, `status="pending"`, `roles=["coordinator"]`, `primary_role/active_role="coordinator"`, pushes `"coordinator"` into `pending_roles`, AND inserts a `role_requests` row for the audit trail. Also fixed `generate_user_code` to produce `RSN-{STATE}-C-{UID}` for coordinators (was always `-P-`).
+  2. **New `require_approved_coordinator` middleware** in `server.py` — re-reads user from DB so `approval_status` reflects the latest admin action mid-session; blocks if `role != "coordinator"` OR `approval_status != "approved"` OR `status in {suspended, blacklisted, rejected, terminated}`. All `/coordinator/*` endpoints + `/coordinators/me/availability-requests` now use it.
+  3. **`update_coordinator_status` approve action** now flips `role` from `"pending"` back to `"coordinator"`, clears `pending_roles`, sets `primary_role/active_role`, AND closes the matching `role_requests` row with `decided_by`/`decided_at`. Reject action also clears `pending_roles` and closes the request row.
+  4. **Frontend**: new `pages/AwaitingApproval.js` page (icon, name, email check-back message, logout). `App.js` derives a `pendingApprovalRole` flag and routes ANY non-approved coordinator/tutor (whether `role==="pending"` with `pending_roles` populated, or legacy `role==="coordinator"` with non-approved `approval_status`) to `/awaiting-approval`. Hides registration routes too so they can't re-submit.
+  5. **Production DB heal**: ran a one-time fix on Atlas — `siridigicreations@gmail.com` reset to `role="pending"`, `approval_status="pending"`, `status="pending"`, `pending_roles=["coordinator"]`, plus matching `role_requests` row inserted. They are now locked out until admin approves them in `/dashboard → Coordinators` tab.
+- **Side effect**: Admin's `GET /admin/coordinators` and `pendingCoordinators` stat counter now include users in either `role="coordinator"` OR `role="pending" + pending_roles="coordinator"` state — so admins can see and act on the pending submissions.
+
 ### 2026-05-10 — Duplicate students + duplicate batches with same `batch_code`
 - **Symptoms** (from screenshots):
   1. Parent could double-click "Register Student" → multiple students with identical details inserted.

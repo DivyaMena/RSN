@@ -169,6 +169,8 @@ class User(BaseModel):
     invite_expires_at: Optional[datetime] = None  # Invite expiration
 
     availability_status: Optional[str] = None  # for coordinator/admin availability
+    approval_status: Optional[str] = None  # "pending" | "approved" | "rejected" — for coordinator (and future tutor) approval gate
+    status: Optional[str] = None  # "pending" | "active" | "suspended" | "blacklisted" | "rejected" | "terminated"
     unavailable_from: Optional[str] = None
     unavailable_to: Optional[str] = None
     last_profile_update: Optional[datetime] = None  # Track when profile choices were last updated (for coordinator/parent)
@@ -564,7 +566,8 @@ class ApproveRoleInput(BaseModel):
 
 def generate_user_code(state: str, role: str) -> str:
     """Generate user code: RSN-{STATE}-{ROLE_LETTER}-{UID}"""
-    role_letter = "T" if role == "tutor" else "P"
+    role_letters = {"tutor": "T", "coordinator": "C", "parent": "P"}
+    role_letter = role_letters.get(role, "P")
     uid = random.randint(1, 99999)
     return f"RSN-{state}-{role_letter}-{uid:05d}"
 
@@ -1368,6 +1371,27 @@ async def require_admin(request: Request):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+async def require_approved_coordinator(request: Request):
+    """Require an approved coordinator. Blocks coordinators whose admin approval
+    is still pending or who were rejected/suspended/blacklisted/terminated."""
+    user = await require_auth(request)
+    # Re-read from DB so approval_status reflects the latest admin action even
+    # within an existing session.
+    fresh = await db.users.find_one(
+        {"id": user.id},
+        {"_id": 0, "role": 1, "approval_status": 1, "status": 1},
+    ) or {}
+    role = fresh.get("role") or user.role
+    approval = fresh.get("approval_status")
+    status_field = fresh.get("status")
+    if role != "coordinator":
+        raise HTTPException(status_code=403, detail="Coordinator access required")
+    if approval != "approved":
+        raise HTTPException(status_code=403, detail="Your coordinator account is pending admin approval")
+    if status_field in {"suspended", "blacklisted", "rejected", "terminated"}:
+        raise HTTPException(status_code=403, detail=f"Your coordinator account is {status_field}. Please contact admin.")
+    return user
+
 async def require_main_admin(request: Request):
     """Require main admin access only"""
     user = await require_auth(request)
@@ -1388,10 +1412,9 @@ async def get_admin_stats(request: Request):
     total_schools = await db.schools.count_documents({})
     
     pending_coordinators = await db.users.count_documents({
-        "role": "coordinator",
         "$or": [
-            {"approval_status": "pending"},
-            {"status": "pending"}
+            {"role": "coordinator", "approval_status": "pending"},
+            {"role": "pending", "pending_roles": "coordinator"},
         ]
     })
     
@@ -1639,10 +1662,21 @@ async def remove_co_admin(admin_id: str, request: Request):
 
 @api_router.get("/admin/coordinators")
 async def get_all_coordinators(request: Request):
-    """Get all coordinators with their details"""
+    """Get all coordinators with their details (includes those pending approval)."""
     await require_admin(request)
     
-    coordinators = await db.users.find({"role": "coordinator"}, {"_id": 0, "password_hash": 0}).to_list(length=500)
+    # Include both fully-approved coordinators (role=coordinator) AND users who
+    # submitted the coordinator registration form but are still role=pending
+    # awaiting admin approval (those have "coordinator" in their pending_roles
+    # or roles array).
+    coordinators = await db.users.find(
+        {"$or": [
+            {"role": "coordinator"},
+            {"pending_roles": "coordinator"},
+            {"roles": "coordinator", "role": "pending"},
+        ]},
+        {"_id": 0, "password_hash": 0},
+    ).to_list(length=500)
     
     result = []
     for coord in coordinators:
@@ -1652,6 +1686,7 @@ async def get_all_coordinators(request: Request):
             "email": coord.get("email"),
             "state": coord.get("state"),
             "user_code": coord.get("user_code"),
+            "role": coord.get("role"),
             "approval_status": coord.get("approval_status", "pending"),
             "status": coord.get("status", "pending"),
             "availability_status": coord.get("availability_status", "available")
@@ -1662,21 +1697,30 @@ async def get_all_coordinators(request: Request):
 @api_router.put("/admin/coordinators/{coordinator_id}/status")
 async def update_coordinator_status(coordinator_id: str, input: dict, request: Request):
     """Update coordinator status (approve, reject, suspend, blacklist, etc.)"""
-    await require_admin(request)
+    admin_user = await require_admin(request)
     
     action = input.get("action")
     
     update_data = {}
+    unset_data = {}
     
     if action == "approve":
+        # Flip the user from role="pending" (set during registration) back to
+        # role="coordinator" so the /coordinator/* gate (require_approved_coordinator)
+        # lets them through.
         update_data = {
+            "role": "coordinator",
             "approval_status": "approved",
-            "status": "active"
+            "status": "active",
+            "primary_role": "coordinator",
+            "active_role": "coordinator",
+            "pending_roles": [],
         }
     elif action == "reject":
         update_data = {
             "approval_status": "rejected",
-            "status": "rejected"
+            "status": "rejected",
+            "pending_roles": [],
         }
     elif action == "suspend":
         update_data = {"status": "suspended"}
@@ -1689,13 +1733,26 @@ async def update_coordinator_status(coordinator_id: str, input: dict, request: R
     else:
         raise HTTPException(status_code=400, detail="Invalid action")
     
+    # Match on id only — at approve time the user may still have role="pending",
+    # so filtering by role="coordinator" would miss them.
     result = await db.users.update_one(
-        {"id": coordinator_id, "role": "coordinator"},
-        {"$set": update_data}
+        {"id": coordinator_id},
+        {"$set": update_data, **({"$unset": unset_data} if unset_data else {})}
     )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Coordinator not found")
+
+    # Close any open role_request row so it disappears from the pending list.
+    if action in {"approve", "reject"}:
+        await db.role_requests.update_many(
+            {"user_id": coordinator_id, "requested_role": "coordinator", "status": "pending"},
+            {"$set": {
+                "status": action + ("d" if action.endswith("e") else "ed"),  # approve→approved, reject→rejected
+                "decided_by": admin_user.id,
+                "decided_at": datetime.now(timezone.utc).isoformat(),
+            }}
+        )
     
     return {"success": True, "message": f"Coordinator {action}d successfully"}
 
@@ -2707,10 +2764,7 @@ async def trigger_academic_year_rollover(request: Request):
 @api_router.put("/coordinator/schools/{school_id}/approve")
 async def approve_school(school_id: str, request: Request):
     """Coordinator approves school registration"""
-    user = await get_current_user(request)
-    
-    if user.role != "coordinator":
-        raise HTTPException(status_code=403, detail="Only coordinators can approve schools")
+    user = await require_approved_coordinator(request)
     
     result = await db.schools.update_one(
         {"id": school_id},
@@ -2725,10 +2779,7 @@ async def approve_school(school_id: str, request: Request):
 @api_router.put("/coordinator/schools/{school_id}/reject")
 async def reject_school(school_id: str, request: Request):
     """Coordinator rejects school registration"""
-    user = await get_current_user(request)
-    
-    if user.role != "coordinator":
-        raise HTTPException(status_code=403, detail="Only coordinators can reject schools")
+    user = await require_approved_coordinator(request)
     
     result = await db.schools.update_one(
         {"id": school_id},
@@ -2743,10 +2794,7 @@ async def reject_school(school_id: str, request: Request):
 @api_router.get("/coordinator/schools/pending")
 async def get_pending_schools(request: Request):
     """Get schools waiting for approval"""
-    user = await get_current_user(request)
-    
-    if user.role != "coordinator":
-        raise HTTPException(status_code=403, detail="Only coordinators can view pending schools")
+    await require_approved_coordinator(request)
     
     schools = await db.schools.find({"approval_status": "pending"}, {"_id": 0}).to_list(length=None)
     return schools
@@ -2989,10 +3037,7 @@ async def register_tutor(input: RegisterTutorInput, request: Request):
 @api_router.post("/coordinators/me/availability-requests")
 async def create_coordinator_availability_request(request: Request):
     """Coordinator submits an availability request (sent to Admin for action)"""
-    user = await require_auth(request)
-
-    if user.role != "coordinator":
-        raise HTTPException(status_code=403, detail="Only coordinators can submit availability requests")
+    user = await require_approved_coordinator(request)
 
     data = await request.json()
     request_type = data.get("request_type")
@@ -3022,7 +3067,8 @@ async def create_coordinator_availability_request(request: Request):
 
 @api_router.post("/users/register/coordinator")
 async def register_coordinator(input: RegisterCoordinatorInput, request: Request):
-    """Register as coordinator (requires admin approval in production)"""
+    """Register as coordinator. The user remains role="pending" until an admin
+    approves them via PUT /api/admin/coordinators/{id}/status (action="approve")."""
     user = await require_auth(request)
     
     if user.role != "pending":
@@ -3030,16 +3076,23 @@ async def register_coordinator(input: RegisterCoordinatorInput, request: Request
     
     user_code = generate_user_code(input.state, "coordinator")
     
-    # Update user core info
+    # Keep role="pending" so the user cannot access /coordinator/* endpoints until
+    # admin approval. approval_status / status / pending_roles all reflect that.
     await db.users.update_one(
         {"id": user.id},
         {"$set": {
-            "role": "coordinator",
+            "role": "pending",
+            "approval_status": "pending",
+            "status": "pending",
             "state": input.state,
             "user_code": user_code,
             "name": input.name,
             "photo_url": input.selfie_url,
-        }}
+            "roles": ["coordinator"],
+            "primary_role": "coordinator",
+            "active_role": "coordinator",
+        },
+         "$addToSet": {"pending_roles": "coordinator"}}
     )
 
     # Store coordinator profile details in a separate collection for future use
@@ -3058,12 +3111,31 @@ async def register_coordinator(input: RegisterCoordinatorInput, request: Request
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.coordinators.insert_one(coordinator_profile)
-    
-    user.role = "coordinator"
+
+    # Audit-trail row consumed by the admin "Role Requests" tab and stats counters.
+    role_request = RoleRequest(
+        user_id=user.id,
+        requested_role="coordinator",
+        status="pending",
+    )
+    rr_doc = role_request.model_dump()
+    if isinstance(rr_doc.get("created_at"), datetime):
+        rr_doc["created_at"] = rr_doc["created_at"].isoformat()
+    await db.role_requests.insert_one(rr_doc)
+
+    # Mirror the new state onto the returned User object so the frontend can show
+    # the "Awaiting Approval" screen on next render without an extra fetch.
+    user.role = "pending"
+    user.approval_status = "pending"
+    user.status = "pending"
     user.state = input.state
     user.user_code = user_code
-    
-    return {"user": user, "message": "Coordinator registration submitted"}
+    user.roles = ["coordinator"]
+    user.primary_role = "coordinator"
+    user.active_role = "coordinator"
+    user.pending_roles = ["coordinator"]
+
+    return {"user": user, "message": "Coordinator registration submitted. Awaiting admin approval."}
 
 # ============= STUDENT ROUTES =============
 
